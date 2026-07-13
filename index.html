@@ -194,7 +194,7 @@
 <div class="app">
   <div class="header">
     <h1>Sardor AI</h1>
-    <p>Sizga o'xshagan sun'iy intellekt — savol bering, suhbatlashing</p>
+    <p>La havla vala quvvata illa billah</p>
   </div>
   <div class="girih"></div>
   <div class="messages" id="messages">
@@ -237,8 +237,7 @@
     inputEl.style.height = 'auto';
     inputEl.style.height = Math.min(inputEl.scrollHeight, 140) + 'px';
   }
-  inputEl.addEventListener('input', autoGrow);
-  inputEl.addEventListener('keydown', () => { lastInputWasVoice = false; });
+  inputEl.addEventListener('input', () => { lastInputWasVoice = false; autoGrow(); });
 
   function addMessage(role, text, imageUrl){
     if(emptyState) emptyState.remove();
@@ -320,7 +319,21 @@
     const utter = new SpeechSynthesisUtterance(text);
     utter.lang = 'uz-UZ';
     utter.rate = 1;
+    utter.pitch = 0.65;
+
+    const voices = window.speechSynthesis.getVoices();
+    let chosen = voices.find(v => /male/i.test(v.name));
+    if(!chosen) chosen = voices.find(v => v.lang && v.lang.toLowerCase().startsWith('uz'));
+    if(!chosen) chosen = voices.find(v => v.lang && v.lang.toLowerCase().startsWith('ru'));
+    if(!chosen) chosen = voices.find(v => v.lang && v.lang.toLowerCase().startsWith('en'));
+    if(chosen) utter.voice = chosen;
+
     window.speechSynthesis.speak(utter);
+  }
+
+  if(window.speechSynthesis){
+    window.speechSynthesis.getVoices();
+    window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
   }
 
   async function sendMessage(){
