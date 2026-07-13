@@ -4,6 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sardor AI — chatbot</title>
+<meta name="description" content="Sardor AI — Saydurasulov Sardor tomonidan yaratilgan bepul o'zbekcha sun'iy intellekt chatbot. Savol bering, suhbatlashing, rasm yuboring, ovozli gaplashing.">
+<meta name="keywords" content="Sardor AI, Sardor ai chatbot, sun'iy intellekt, o'zbek chatbot, Saydurasulov Sardor">
+<meta property="og:title" content="Sardor AI — chatbot">
+<meta property="og:description" content="Sizga o'xshagan sun'iy intellekt — savol bering, suhbatlashing.">
+<meta name="robots" content="index, follow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -224,6 +229,7 @@
   let history = [];
   let sending = false;
   let pendingImage = null;
+  let lastInputWasVoice = false;
 
   const BACKEND_URL = 'https://sardor-saydurasulov-bot.onrender.com/chat';
 
@@ -232,6 +238,7 @@
     inputEl.style.height = Math.min(inputEl.scrollHeight, 140) + 'px';
   }
   inputEl.addEventListener('input', autoGrow);
+  inputEl.addEventListener('keydown', () => { lastInputWasVoice = false; });
 
   function addMessage(role, text, imageUrl){
     if(emptyState) emptyState.remove();
@@ -279,6 +286,7 @@
     recognition.onresult = (e) => {
       const transcript = e.results[0][0].transcript;
       inputEl.value = (inputEl.value ? inputEl.value + ' ' : '') + transcript;
+      lastInputWasVoice = true;
       autoGrow();
     };
     recognition.onend = () => {
@@ -354,7 +362,8 @@
       typingEl.classList.remove('typing');
       typingEl.textContent = replyText;
       history.push({role:'assistant', content: replyText});
-      speak(replyText);
+      if(lastInputWasVoice) speak(replyText);
+      lastInputWasVoice = false;
     }catch(err){
       typingEl.classList.remove('typing');
       typingEl.textContent = "Internetga ulanishda muammo bo'ldi. Wi-Fi yoki internetni tekshiring.";
