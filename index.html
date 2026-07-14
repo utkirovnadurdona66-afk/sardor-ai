@@ -1,74 +1,63 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-    <meta charset="UTF-8">
-    <title>Sardor AI Professional Engine</title>
-    <style>
-        /* 1. CSS Qismi: Dizayn va Animatsiyalar */
-        :root { --primary: #4f46e5; --bg: #0f172a; --text: #f8fafc; }
-        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; }
-        .app-shell { display: flex; flex-direction: column; height: 100vh; max-width: 900px; margin: auto; }
-        #chat-window { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
-        .message { padding: 15px; border-radius: 15px; max-width: 75%; animation: fadeIn 0.3s; }
-        .user-msg { background: var(--primary); align-self: flex-end; }
-        .bot-msg { background: #1e293b; align-self: flex-start; border: 1px solid #334155; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        /* Bu yerga yana yuzlab qatorli dizayn sozlamalarini qo'shish mumkin */
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sardor AI Professional</title>
+<style>
+:root{--bg:#0f172a;--chat:#1e293b;--acc:#6366f1;--text:#f8fafc;}
+body{margin:0;background:var(--bg);color:var(--text);font-family:sans-serif;}
+.shell{max-width:800px;margin:auto;display:flex;flex-direction:column;height:100vh;}
+#chat{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:15px;}
+.msg{padding:15px;border-radius:15px;max-width:80%;}
+.u{background:var(--acc);align-self:flex-end;}
+.b{background:var(--chat);align-self:flex-start;border:1px solid #334155;}
+.comp{padding:20px;display:flex;gap:10px;background:var(--bg);}
+input{flex:1;padding:12px;border-radius:10px;border:1px solid #334155;background:var(--chat);color:white;}
+button{padding:0 20px;background:var(--acc);border:none;border-radius:10px;color:white;cursor:pointer;}
+</style>
 </head>
 <body>
-    <div class="app-shell">
-        <div id="chat-window">
-            <div class="message bot-msg">Sardor AI tizimi ishga tushdi. Qanday yordam bera olaman?</div>
-        </div>
-        <div class="composer">
-            <input id="input-box" placeholder="Xabar yozing...">
-            <button onclick="Core.send()">Yuborish</button>
-        </div>
-    </div>
-
-    <script>
-        /* 2. JS Qismi: Professional Logika */
-        const Core = {
-            url: 'https://sardor-saydurasulov-bot.onrender.com/chat',
-            history: [],
-            
-            async send() {
-                const input = document.getElementById('input-box');
-                const text = input.value.trim();
-                if(!text) return;
-
-                this.renderMsg(text, 'user-msg');
-                input.value = '';
-                
-                try {
-                    const res = await fetch(this.url, {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ messages: this.history.slice(-5) })
-                    });
-                    const data = await res.json();
-                    const reply = data.content?.[0]?.text || "Javob topilmadi.";
-                    this.renderMsg(reply, 'bot-msg');
-                    this.history.push({role: 'user', content: text}, {role: 'assistant', content: reply});
-                } catch(err) {
-                    this.renderMsg("Xatolik: Serverga ulanib bo'lmadi.", 'bot-msg');
-                }
-            },
-
-            renderMsg(text, className) {
-                const box = document.getElementById('chat-window');
-                const div = document.createElement('div');
-                div.className = `message ${className}`;
-                div.textContent = text;
-                box.appendChild(div);
-                box.scrollTop = box.scrollHeight;
-            }
-        };
-        
-        // Bu strukturaga kelajakda ovozli buyruqlar, 
-        // mahalliy xotira (localStorage), 
-        // mavzular (Dark/Light mode) qo'shib kodni 1000 qatorga yetkazish mumkin.
-    </script>
+<div class="shell">
+<div id="chat"><div class="msg b">Sardor AI tizimi ishga tushdi.</div></div>
+<div class="comp">
+<input id="in" placeholder="Xabar yozing...">
+<button onclick="send()">Yuborish</button>
+</div>
+</div>
+<script>
+const URL = 'https://sardor-saydurasulov-bot.onrender.com/chat';
+let history = [];
+async function send() {
+const input = document.getElementById('in');
+const chat = document.getElementById('chat');
+const text = input.value.trim();
+if(!text) return;
+render(text, 'u');
+input.value = '';
+history.push({role: 'user', content: text});
+try {
+const res = await fetch(URL, {
+method: 'POST',
+headers: {'Content-Type': 'application/json'},
+body: JSON.stringify({messages: history.slice(-5)})
+});
+const data = await res.json();
+const reply = data.content ? data.content[0].text : "Javob yo'q.";
+render(reply, 'b');
+history.push({role: 'assistant', content: reply});
+} catch(e) {
+render("Xatolik: Serverga ulanib bo'lmadi.", 'b');
+}
+}
+function render(t, c) {
+const chat = document.getElementById('chat');
+const div = document.createElement('div');
+div.className = `msg ${c}`;
+div.textContent = t;
+chat.appendChild(div);
+chat.scrollTop = chat.scrollHeight;
+}
+</script>
 </body>
 </html>
