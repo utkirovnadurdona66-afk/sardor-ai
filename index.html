@@ -1,63 +1,96 @@
-<!DOCTYPE html>
-<html lang="uz">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sardor AI Professional</title>
-<style>
-:root{--bg:#0f172a;--chat:#1e293b;--acc:#6366f1;--text:#f8fafc;}
-body{margin:0;background:var(--bg);color:var(--text);font-family:sans-serif;}
-.shell{max-width:800px;margin:auto;display:flex;flex-direction:column;height:100vh;}
-#chat{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:15px;}
-.msg{padding:15px;border-radius:15px;max-width:80%;}
-.u{background:var(--acc);align-self:flex-end;}
-.b{background:var(--chat);align-self:flex-start;border:1px solid #334155;}
-.comp{padding:20px;display:flex;gap:10px;background:var(--bg);}
-input{flex:1;padding:12px;border-radius:10px;border:1px solid #334155;background:var(--chat);color:white;}
-button{padding:0 20px;background:var(--acc);border:none;border-radius:10px;color:white;cursor:pointer;}
-</style>
-</head>
-<body>
-<div class="shell">
-<div id="chat"><div class="msg b">Sardor AI tizimi ishga tushdi.</div></div>
-<div class="comp">
-<input id="in" placeholder="Xabar yozing...">
-<button onclick="send()">Yuborish</button>
-</div>
-</div>
-<script>
-const URL = 'https://sardor-saydurasulov-bot.onrender.com/chat';
-let history = [];
-async function send() {
-  const input = document.getElementById('in');
-  const chat = document.getElementById('chat');
-  const text = input.value.trim();
-  if(!text) return;
-  
-  const userDiv = document.createElement('div');
-  userDiv.className = 'msg u';
-  userDiv.textContent = text;
-  chat.appendChild(userDiv);
-  input.value = '';
-  
-  try {
-    const res = await fetch(URL, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({messages: [{role: 'user', content: text}]})
-    });
-    const data = await res.json();
-    const reply = data.content ? data.content[0].text : "Javob topilmadi.";
-    
-    const botDiv = document.createElement('div');
-    botDiv.className = 'msg b';
-    botDiv.textContent = reply;
-    chat.appendChild(botDiv);
-    chat.scrollTop = chat.scrollHeight;
-  } catch(e) {
-    alert("Server xatosi!");
+    utter.lang = 'uz-UZ';
+    utter.rate = 1;
+    utter.pitch = 0.65;
+
+    const voices = window.speechSynthesis.getVoices();
+    let chosen = voices.find(v => /male/i.test(v.name));
+    if(!chosen) chosen = voices.find(v => v.lang && v.lang.toLowerCase().startsWith('uz'));
+    if(!chosen) chosen = voices.find(v => v.lang && v.lang.toLowerCase().startsWith('ru'));
+    if(!chosen) chosen = voices.find(v => v.lang && v.lang.toLowerCase().startsWith('en'));
+    if(chosen) utter.voice = chosen;
+
+    window.speechSynthesis.speak(utter);
   }
-}
+
+  if(window.speechSynthesis){
+    window.speechSynthesis.getVoices();
+    window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+  }
+
+  async function sendMessage(){
+    const text = inputEl.value.trim();
+    if((!text && !pendingImage) || sending) return;
+    sending = true;
+    sendBtn.disabled = true;
+    inputEl.value = '';
+    autoGrow();
+
+    const imageToSend = pendingImage;
+    addMessage('user', text, imageToSend ? imageToSend.previewUrl : null);
+    const historyEntry = { role: 'user', content: text };
+    if(imageToSend) historyEntry.image = { mimeType: imageToSend.mimeType, data: imageToSend.data };
+    history.push(historyEntry);
+    pendingImage = null;
+    imgInput.value = '';
+    imgPreviewBar.classList.remove('show');
+
+    const typingEl = addMessage('bot', 'yozmoqda...');
+    typingEl.classList.add('typing');
+
+    try{
+      const response = await fetch(BACKEND_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: history })
+      });
+      const data = await response.json();
+      if(!response.ok){
+        const errMsg = (data.error && data.error.message) ? data.error.message : 'Nomalum xatolik';
+        typingEl.classList.remove('typing');
+        typingEl.textContent = "Xatolik: " + errMsg;
+        history.pop();
+        return;
+      }
+      const textBlock = (data.content || []).find(b => b.type === 'text');
+      const replyText = textBlock ? textBlock.text : "Kechirasiz, javob ololmadim.";
+      typingEl.classList.remove('typing');
+      typingEl.textContent = '';
+      if(replyText.includes('```')){
+        renderMessageContent(typingEl, replyText);
+      } else {
+        typingEl.textContent = replyText;
+      }
+      history.push({role:'assistant', content: replyText});
+      if(lastInputWasVoice) speak(replyText);
+      lastInputWasVoice = false;
+    }catch(err){
+      typingEl.classList.remove('typing');
+      typingEl.textContent = "Internetga ulanishda muammo bo'ldi. Wi-Fi yoki internetni tekshiring.";
+      history.pop();
+    }finally{
+      sending = false;
+      sendBtn.disabled = false;
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+  }
+
+  document.getElementById('clearBtn').addEventListener('click', () => {
+    history = [];
+    messagesEl.innerHTML = '';
+    const div = document.createElement('div');
+    div.className = 'empty';
+    div.id = 'emptyState';
+    div.textContent = "Xabar yozing va suhbatni boshlang";
+    messagesEl.appendChild(div);
+  });
+
+  sendBtn.addEventListener('click', sendMessage);
+  inputEl.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter' && !e.shiftKey){
+      e.preventDefault();
+      sendMessage();
+    }
+  });
 </script>
 </body>
 </html>
