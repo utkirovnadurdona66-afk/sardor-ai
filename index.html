@@ -64,7 +64,7 @@
     height:14px;
     width:100%;
     background-image: repeating-linear-gradient(135deg, var(--gold) 0 2px, transparent 2px 12px),
-                       repeating-linear-gradient(45deg, var(--turquoise) 0 2px, transparent 2px 12px);
+                      repeating-linear-gradient(45deg, var(--turquoise) 0 2px, transparent 2px 12px);
     opacity:0.55;
   }
   .messages{
@@ -259,10 +259,9 @@
   const imgRemoveBtn = document.getElementById('imgRemoveBtn');
   let history = [];
   let sending = false;
-  let pendingImage = null; // { mimeType, data(base64), previewUrl }
+  let pendingImage = null;
   let lastInputWasVoice = false;
 
-  // Backend server manzilini shu yerga qo'ying (Render/Railway'ga joylashtirgach)
   const BACKEND_URL = 'https://sardor-saydurasulov-bot.onrender.com/chat';
 
   function autoGrow(){
@@ -344,42 +343,53 @@
     imgPreviewBar.classList.remove('show');
   });
 
+  // --- Ovozli kiritish (mikrofon) - OPTIMALLASHTIRILGAN ---
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   let recognition = null;
   let listening = false;
-  if(SpeechRecognition){
+
+  if (SpeechRecognition) {
     recognition = new SpeechRecognition();
     recognition.lang = 'uz-UZ';
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
+    recognition.interimResults = true;
+    recognition.continuous = false;
+
     recognition.onresult = (e) => {
-      const transcript = e.results[0][0].transcript;
-      inputEl.value = (inputEl.value ? inputEl.value + ' ' : '') + transcript;
+      let transcript = '';
+      for (let i = e.resultIndex; i < e.results.length; ++i) {
+        transcript += e.results[i][0].transcript;
+      }
+      inputEl.value = transcript;
       lastInputWasVoice = true;
       autoGrow();
     };
+
     recognition.onend = () => {
       listening = false;
       micBtn.classList.remove('active');
+      micBtn.textContent = '🎤';
     };
-    recognition.onerror = () => {
+
+    recognition.onerror = (event) => {
+      console.error("Mikrofon xatosi: ", event.error);
       listening = false;
       micBtn.classList.remove('active');
+      micBtn.textContent = '🎤';
     };
   }
+
   micBtn.addEventListener('click', () => {
-    if(!recognition){
-      alert("Kechirasiz, bu brauzer ovozli kiritishni qo'llab-quvvatlamaydi.");
+    if (!recognition) {
+      alert("Kechirasiz, brauzeringiz ovozli kiritishni qo'llab-quvvatlamaydi.");
       return;
     }
-    if(listening){
+    if (listening) {
       recognition.stop();
-      listening = false;
-      micBtn.classList.remove('active');
     } else {
       recognition.start();
       listening = true;
       micBtn.classList.add('active');
+      micBtn.textContent = '🔴';
     }
   });
 
@@ -389,21 +399,12 @@
     const utter = new SpeechSynthesisUtterance(text);
     utter.lang = 'uz-UZ';
     utter.rate = 1;
-    utter.pitch = 0.65; 
-
+    utter.pitch = 0.65;
     const voices = window.speechSynthesis.getVoices();
     let chosen = voices.find(v => /male/i.test(v.name));
     if(!chosen) chosen = voices.find(v => v.lang && v.lang.toLowerCase().startsWith('uz'));
-    if(!chosen) chosen = voices.find(v => v.lang && v.lang.toLowerCase().startsWith('ru'));
-    if(!chosen) chosen = voices.find(v => v.lang && v.lang.toLowerCase().startsWith('en'));
     if(chosen) utter.voice = chosen;
-
     window.speechSynthesis.speak(utter);
-  }
-
-  if(window.speechSynthesis){
-    window.speechSynthesis.getVoices();
-    window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
   }
 
   async function sendMessage(){
@@ -434,27 +435,19 @@
       });
       const data = await response.json();
       if(!response.ok){
-        const errMsg = (data.error && data.error.message) ? data.error.message : 'Nomalum xatolik';
-        typingEl.classList.remove('typing');
-        typingEl.textContent = "Xatolik: " + errMsg;
+        typingEl.textContent = "Xatolik yuz berdi.";
         history.pop();
         return;
       }
       const textBlock = (data.content || []).find(b => b.type === 'text');
-      const replyText = textBlock ? textBlock.text : "Kechirasiz, javob ololmadim.";
+      const replyText = textBlock ? textBlock.text : "Javob topilmadi.";
       typingEl.classList.remove('typing');
-      typingEl.textContent = '';
-      if(replyText.includes('```')){
-        renderMessageContent(typingEl, replyText);
-      } else {
-        typingEl.textContent = replyText;
-      }
+      typingEl.textContent = replyText;
       history.push({role:'assistant', content: replyText});
       if(lastInputWasVoice) speak(replyText);
       lastInputWasVoice = false;
     }catch(err){
-      typingEl.classList.remove('typing');
-      typingEl.textContent = "Internetga ulanishda muammo bo'ldi. Wi-Fi yoki internetni tekshiring.";
+      typingEl.textContent = "Internetga ulanishda muammo.";
       history.pop();
     }finally{
       sending = false;
@@ -481,20 +474,8 @@
     }
   });
 
-  // --- SARDOR AI: 100x POWER INTEGRATION (MAXIMUM FULL) ---
   function activateMaximumFullPower() {
-    const powerLevel = "MAX_FULL_100x";
-    const status = {
-        learning_engine: "Deep_Adaptive_Recursive_v100",
-        compute_core: "Hyper_Quantum_Topology",
-        latency: "Zero_Latency_Enabled",
-        system_health: "Auto_Repair_Mode",
-        security: "Quantum_Encryption_Active",
-        creativity: "Unbounded_Autonomy"
-    };
-    console.log("Sardor AI System running at 100x Performance:", status);
-    addMessage('bot', "Tizim 100 barobarlik maksimal quvvatga o‘tkazildi. Barcha super-intellektual modullar faol.");
-    return status;
+    addMessage('bot', "Tizim 100 barobarlik maksimal quvvatga o‘tkazildi.");
   }
 </script>
 </body>
