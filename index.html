@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sardor AI — chatbot</title>
-<meta name="description" content="Sardor AI — Saydurasulov Sardor tomonidan yaratilgan bepul o'zbekcha sun'iy intellekt chatbot. Savol bering, suhbatlashing, rasm va fayl yuboring, ovozli gaplashing.">
+<meta name="description" content="Sardor AI — Saydurasulov Sardor tomonidan yaratilgan bepul o'zbekcha sun'iy intellekt chatbot. Savol bering, suhbatlashing, rasm chizdiring, fayl yuboring, ovozli gaplashing.">
 <meta name="keywords" content="Sardor AI, Sardor ai chatbot, sun'iy intellekt, o'zbek chatbot, Saydurasulov Sardor">
 <meta property="og:title" content="Sardor AI — chatbot">
-<meta property="og:description" content="Sizga o'xshagan sun'iy intellekt — savol bering, suhbatlashing.">
+<meta property="og:description" content="Sizga o'xshagan sun'iy intellekt — savol bering, suhbatlashing, rasm chizdiring.">
 <meta name="robots" content="index, follow">
 <link rel="manifest" href="manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -179,7 +179,7 @@
     0%,100%{ opacity:0.5; r:2.2; }
     50%{ opacity:1; r:3.2; }
   }
-  .headerTitle{ position:relative; z-index:1; }
+  .headerTitle{ position:relative; z-index:1; flex:1; }
   .menuToggle{
     background:transparent;
     border:1px solid rgba(201,162,39,0.4);
@@ -204,6 +204,20 @@
     font-size:12px;
     color:var(--turquoise-light);
     letter-spacing:0.3px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .onlineDot{
+    width:7px;height:7px;border-radius:50%;
+    background:#5fd68a;
+    box-shadow:0 0 6px #5fd68a;
+    animation: onlineBlink 2s infinite ease-in-out;
+    flex-shrink:0;
+  }
+  @keyframes onlineBlink{
+    0%,100%{ opacity:1; }
+    50%{ opacity:0.35; }
   }
   .girih{
     height:12px;
@@ -275,6 +289,46 @@
     border:1px solid rgba(201,162,39,0.3);
     font-size:12.5px;
   }
+  .imgGrid{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-top:8px;
+  }
+  .imgGrid img{
+    width:140px;
+    height:140px;
+    object-fit:cover;
+    border-radius:10px;
+    border:1px solid rgba(201,162,39,0.3);
+  }
+  .genImageWrap{
+    margin-top:8px;
+  }
+  .genImageWrap img{
+    max-width:320px;
+    width:100%;
+    border-radius:12px;
+    display:block;
+    border:1px solid rgba(201,162,39,0.35);
+  }
+  .msgActions{
+    display:flex;
+    gap:8px;
+    margin-top:9px;
+  }
+  .msgActions button{
+    background:transparent;
+    border:1px solid rgba(201,162,39,0.3);
+    color:var(--turquoise-light);
+    font-size:11.5px;
+    padding:3px 10px;
+    border-radius:7px;
+    cursor:pointer;
+    font-family:'Manrope',sans-serif;
+    transition: background 0.15s;
+  }
+  .msgActions button:hover{ background:rgba(201,162,39,0.15); }
   .empty{
     margin:auto;
     text-align:center;
@@ -283,6 +337,24 @@
     font-size:14px;
     animation: riseIn 0.4s ease;
   }
+  .suggestRow{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    justify-content:center;
+    margin-top:14px;
+  }
+  .suggestRow button{
+    background:rgba(46,158,150,0.12);
+    border:1px solid rgba(46,158,150,0.4);
+    color:var(--turquoise-light);
+    padding:8px 14px;
+    border-radius:20px;
+    font-size:12.5px;
+    cursor:pointer;
+    font-family:'Manrope',sans-serif;
+  }
+  .suggestRow button:hover{ background:rgba(46,158,150,0.22); }
   .composer{
     display:flex;
     gap:9px;
@@ -324,6 +396,11 @@
   .composer button:hover{background:var(--gold-soft);}
   .composer button:active{ transform:scale(0.97); }
   .composer button:disabled{opacity:0.5;cursor:default;transform:none;}
+  #sendBtn.stopping{
+    background: var(--danger) !important;
+    color:#fff !important;
+  }
+  #sendBtn.stopping:hover{ background:#e06a4e !important; }
   .iconBtn{
     padding:0 13px !important;
     background:transparent !important;
@@ -480,12 +557,20 @@
       <button class="menuToggle" id="menuToggle" title="Suhbatlar ro'yxati">☰</button>
       <div class="headerTitle">
         <h2 id="chatTitle">Sardor AI</h2>
-        <p>La havla vala quvvata illa billah</p>
+        <p><span class="onlineDot"></span> Onlayn — javob berishga tayyor</p>
       </div>
     </div>
     <div class="girih"></div>
     <div class="messages" id="messages">
-      <div class="empty" id="emptyState">Xabar yozing va suhbatni boshlang</div>
+      <div class="empty" id="emptyState">
+        Xabar yozing va suhbatni boshlang
+        <div class="suggestRow" id="suggestRow">
+          <button data-q="Salom, qalaysan?">👋 Salom</button>
+          <button data-q="Menga qiziqarli bir fakt ayt">✨ Qiziqarli fakt</button>
+          <button data-q="Python'da 'salom dunyo' deb chiqaradigan kod yoz">💻 Kod yozdir</button>
+          <button data-q="Rasm chiz: tog'lar orasidagi quyosh botishi, sokin ko'l aks etgan holda">🎨 Rasm chizdir</button>
+        </div>
+      </div>
     </div>
     <div class="attachBar" id="attachBar">
       <div id="attachPreviewSlot"></div>
@@ -498,7 +583,7 @@
       <button id="imgBtn" class="iconBtn" title="Rasm biriktirish">📷</button>
       <button id="fileBtn" class="iconBtn" title="Fayl biriktirish (PDF, TXT)">📎</button>
       <button id="micBtn" class="iconBtn" title="Ovozli xabar">🎤</button>
-      <textarea id="input" placeholder="Xabaringizni yozing..." rows="1"></textarea>
+      <textarea id="input" placeholder="Xabaringizni yozing... (rasm chizdirish uchun 'rasm chiz' deb yozing)" rows="1"></textarea>
       <button id="sendBtn">Yuborish</button>
       <button id="clearBtn" title="Bu suhbatni tozalash" style="background:transparent;border:1px solid rgba(201,162,39,0.4);color:var(--gold-soft);">Tozalash</button>
     </div>
@@ -507,17 +592,21 @@
 
 <script>
   // ---------------- State & storage ----------------
-  const STORAGE_KEY = 'sardorAI_chats_v1';
-  const ACTIVE_KEY = 'sardorAI_activeChat_v1';
-  const BACKEND_URL = 'https://sardor-saydurasulov-bot.onrender.com/chat';
+  const STORAGE_KEY = 'sardorAI_chats_v2';
+  const ACTIVE_KEY = 'sardorAI_activeChat_v2';
+  const BACKEND_BASE = 'https://sardor-saydurasulov-bot.onrender.com';
+  const CHAT_URL = BACKEND_BASE + '/chat';
+  const IMAGE_URL = BACKEND_BASE + '/generate-image';
 
-  let chats = {};       // { id: { id, title, messages: [{role, content, image, file}] } }
+  const IMAGE_INTENT_RE = /\b(rasm|surat|kartinka|logo|banner)\b.*\b(chiz|yarat|soz|generatsi)|\bdraw\b|\bgenerate\b.*\bimage\b|\bnaris[uy]/i;
+
+  let chats = {};
   let activeId = null;
   let sending = false;
-  let pendingImages = []; // [{ mimeType, data, name, previewUrl }]
-  let pendingFile = null; // { kind:'file'|'text', mimeType, data, name }
-  let pendingAttachment = null; 
+  let pendingImages = [];
+  let pendingFile = null;
   let lastInputWasVoice = false;
+  let abortController = null;
 
   function loadChats(){
     try{
@@ -586,6 +675,7 @@
 
   function switchChat(id){
     if(id === activeId) return;
+    if(sending) stopGenerating();
     activeId = id;
     persist();
     renderChatList();
@@ -605,6 +695,7 @@
   }
 
   document.getElementById('newChatBtn').addEventListener('click', () => {
+    if(sending) stopGenerating();
     createChat();
     renderChatList();
     renderMessages();
@@ -617,6 +708,15 @@
     sidebar.classList.toggle('collapsed');
   });
   if(window.innerWidth <= 720) sidebar.classList.add('collapsed');
+
+  // ---------------- Suggested questions ----------------
+  document.getElementById('suggestRow').addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-q]');
+    if(!btn) return;
+    inputEl.value = btn.getAttribute('data-q');
+    autoGrow();
+    sendMessage();
+  });
 
   // ---------------- Message rendering ----------------
   const messagesEl = document.getElementById('messages');
@@ -655,27 +755,68 @@
     }
   }
 
-  function buildMessageEl(role, text, imageUrl, fileMeta){
+  // opts: { imageUrls: [], fileMeta: {name}, generatedImageUrl: string, showActions: bool, rawText }
+  function buildMessageEl(role, text, opts){
+    opts = opts || {};
     const div = document.createElement('div');
     div.className = 'msg ' + (role === 'user' ? 'user' : 'bot');
+    const textHolder = document.createElement('div');
     if(text){
       if(role === 'bot' && text.includes('```')){
-        renderMessageContent(div, text);
+        renderMessageContent(textHolder, text);
       } else {
-        div.appendChild(document.createTextNode(text));
+        textHolder.appendChild(document.createTextNode(text));
       }
     }
-    if(imageUrl){
-      const img = document.createElement('img');
-      img.src = imageUrl;
-      div.appendChild(img);
+    div.appendChild(textHolder);
+
+    if(opts.imageUrls && opts.imageUrls.length){
+      const grid = document.createElement('div');
+      grid.className = 'imgGrid';
+      opts.imageUrls.forEach(url => {
+        const img = document.createElement('img');
+        img.src = url;
+        grid.appendChild(img);
+      });
+      div.appendChild(grid);
     }
-    if(fileMeta){
+    if(opts.generatedImageUrl){
+      const wrap = document.createElement('div');
+      wrap.className = 'genImageWrap';
+      const img = document.createElement('img');
+      img.src = opts.generatedImageUrl;
+      wrap.appendChild(img);
+      div.appendChild(wrap);
+    }
+    if(opts.fileMeta){
       const chip = document.createElement('div');
       chip.className = 'fileChip';
-      chip.textContent = '📎 ' + fileMeta.name;
+      chip.textContent = '📎 ' + opts.fileMeta.name;
       div.appendChild(chip);
     }
+    if(role === 'bot' && opts.showActions !== false && (text || opts.generatedImageUrl)){
+      const actions = document.createElement('div');
+      actions.className = 'msgActions';
+      const copyBtn = document.createElement('button');
+      copyBtn.textContent = '📋 Nusxalash';
+      copyBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(opts.rawText !== undefined ? opts.rawText : text).then(() => {
+          copyBtn.textContent = '✓ Nusxalandi';
+          setTimeout(() => copyBtn.textContent = '📋 Nusxalash', 1400);
+        });
+      });
+      actions.appendChild(copyBtn);
+      if(opts.generatedImageUrl){
+        const dlBtn = document.createElement('a');
+        dlBtn.textContent = '⬇ Yuklab olish';
+        dlBtn.href = opts.generatedImageUrl;
+        dlBtn.download = 'sardor-ai-rasm.png';
+        dlBtn.style.cssText = 'background:transparent;border:1px solid rgba(201,162,39,0.3);color:var(--turquoise-light);font-size:11.5px;padding:3px 10px;border-radius:7px;cursor:pointer;text-decoration:none;font-family:Manrope,sans-serif;';
+        actions.appendChild(dlBtn);
+      }
+      div.appendChild(actions);
+    }
+    div._textHolder = textHolder;
     return div;
   }
 
@@ -686,16 +827,36 @@
     if(!chat || chat.messages.length === 0){
       const div = document.createElement('div');
       div.className = 'empty';
-      div.textContent = "Xabar yozing va suhbatni boshlang";
+      div.innerHTML = 'Xabar yozing va suhbatni boshlang' +
+        '<div class="suggestRow" id="suggestRow2">' +
+        '<button data-q="Salom, qalaysan?">👋 Salom</button>' +
+        '<button data-q="Menga qiziqarli bir fakt ayt">✨ Qiziqarli fakt</button>' +
+        '<button data-q="Python\'da \'salom dunyo\' deb chiqaradigan kod yoz">💻 Kod yozdir</button>' +
+        '<button data-q="Rasm chiz: tog\'lar orasidagi quyosh botishi, sokin ko\'l aks etgan holda">🎨 Rasm chizdir</button>' +
+        '</div>';
       messagesEl.appendChild(div);
+      div.querySelector('.suggestRow').addEventListener('click', (e) => {
+        const btn = e.target.closest('button[data-q]');
+        if(!btn) return;
+        inputEl.value = btn.getAttribute('data-q');
+        autoGrow();
+        sendMessage();
+      });
       return;
     }
     for(const m of chat.messages){
+      let imageUrls = [];
+      if(Array.isArray(m.images)) imageUrls = m.images.map(i => i.previewUrl).filter(Boolean);
+      else if(m.image && m.image.previewUrl) imageUrls = [m.image.previewUrl];
+      const genUrl = m.generatedImage ? `data:${m.generatedImage.mimeType};base64,${m.generatedImage.data}` : null;
       const el = buildMessageEl(
         m.role === 'user' ? 'user' : 'bot',
         m.content,
-        m.image ? m.image.previewUrl : null,
-        m.file ? { name: m.file.name } : null
+        {
+          imageUrls,
+          fileMeta: m.file ? { name: m.file.name } : null,
+          generatedImageUrl: genUrl
+        }
       );
       messagesEl.appendChild(el);
     }
@@ -877,26 +1038,52 @@
     window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
   }
 
-  // ---------------- Send ----------------
-  async function sendMessage(){
-    const text = inputEl.value.trim();
-    const pendingAttachment = (pendingImages.length > 0) ? { kind: 'image', ...pendingImages[0] } : pendingFile;
+  // ---------------- Send / Stream / Stop ----------------
+  function setSendingUI(isSending){
+    sending = isSending;
+    if(isSending){
+      sendBtn.textContent = '⏹ To\'xtatish';
+      sendBtn.classList.add('stopping');
+    } else {
+      sendBtn.textContent = 'Yuborish';
+      sendBtn.classList.remove('stopping');
+      sendBtn.disabled = false;
+    }
+  }
 
-    if((!text && !pendingAttachment) || sending) return;
-    sending = true;
-    sendBtn.disabled = true;
+  function stopGenerating(){
+    if(abortController){
+      abortController.abort();
+      abortController = null;
+    }
+    setSendingUI(false);
+  }
+
+  sendBtn.addEventListener('click', () => {
+    if(sending){ stopGenerating(); return; }
+    sendMessage();
+  });
+
+  async function sendMessage(){
+    if(sending) return;
+    const text = inputEl.value.trim();
+    const hasImages = pendingImages.length > 0;
+    const attach = hasImages ? { kind: 'images', images: pendingImages.slice() } : pendingFile;
+
+    if((!text && !attach)) return;
+
+    setSendingUI(true);
     inputEl.value = '';
     autoGrow();
 
     const chat = chats[activeId];
-    const attach = pendingAttachment;
     clearAttachment();
 
     let displayText = text;
     let userMsg = { role: 'user', content: text };
 
-    if(attach && attach.kind === 'image'){
-      userMsg.image = { mimeType: attach.mimeType, data: attach.data, previewUrl: attach.previewUrl };
+    if(attach && attach.kind === 'images'){
+      userMsg.images = attach.images.map(img => ({ mimeType: img.mimeType, data: img.data, previewUrl: img.previewUrl }));
     } else if(attach && attach.kind === 'file'){
       userMsg.file = { mimeType: attach.mimeType, data: attach.data, name: attach.name };
     } else if(attach && attach.kind === 'text'){
@@ -904,62 +1091,189 @@
       userMsg.content = (text ? text + '\n\n' : '') + `--- ${attach.name} fayli mazmuni ---\n${attach.data}`;
     }
 
-    if(chat.messages.length === 0) autoTitleChat(chat, text || (attach ? attach.name : 'Yangi suhbat'));
+    if(chat.messages.length === 0) autoTitleChat(chat, text || (attach ? (attach.name || 'Rasmlar') : 'Yangi suhbat'));
 
     chat.messages.push(userMsg);
     persist();
     renderChatList();
 
-    const userEl = buildMessageEl('user', displayText, attach && attach.kind === 'image' ? attach.previewUrl : null, attach && attach.kind !== 'text' && attach.kind !== 'image' ? {name: attach.name} : null);
     document.getElementById('emptyState')?.remove();
+    const userEl = buildMessageEl('user', displayText, {
+      imageUrls: (attach && attach.kind === 'images') ? attach.images.map(i => i.previewUrl) : [],
+      fileMeta: (attach && attach.kind === 'file') ? { name: attach.name } : null
+    });
     messagesEl.appendChild(userEl);
     messagesEl.scrollTop = messagesEl.scrollHeight;
 
+    const isImageIntent = IMAGE_INTENT_RE.test(text);
+
+    if(isImageIntent && text){
+      await runImageGeneration(chat, text, attach && attach.kind === 'images' ? attach.images[0] : null);
+    } else {
+      await runChatStream(chat);
+    }
+
+    setSendingUI(false);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  async function runImageGeneration(chat, prompt, refImage){
     const typingEl = document.createElement('div');
     typingEl.className = 'msg bot typing';
     typingEl.innerHTML = '<span class="dot"></span><span class="dot"></span><span class="dot"></span>';
     messagesEl.appendChild(typingEl);
     messagesEl.scrollTop = messagesEl.scrollHeight;
 
+    abortController = new AbortController();
     try{
-      const response = await fetch(BACKEND_URL, {
+      const body = { prompt };
+      if(refImage) body.image = { mimeType: refImage.mimeType, data: refImage.data };
+
+      const response = await fetch(IMAGE_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: chat.messages })
+        body: JSON.stringify(body),
+        signal: abortController.signal
       });
       const data = await response.json();
+      typingEl.remove();
+
+      if(!response.ok || !data.image){
+        const errMsg = (data.error && data.error.message) ? data.error.message : "Rasmni chizib bo'lmadi.";
+        messagesEl.appendChild(buildMessageEl('bot', "Xatolik: " + errMsg));
+        chat.messages.pop();
+        persist();
+        return;
+      }
+
+      const caption = data.text || "Mana, tayyor! 🎨";
+      const genUrl = `data:${data.image.mimeType};base64,${data.image.data}`;
+      const botEl = buildMessageEl('bot', caption, { generatedImageUrl: genUrl, rawText: caption });
+      messagesEl.appendChild(botEl);
+      chat.messages.push({ role: 'assistant', content: caption, generatedImage: data.image });
+      persist();
+      renderChatList();
+    }catch(err){
+      typingEl.remove();
+      if(err.name !== 'AbortError'){
+        messagesEl.appendChild(buildMessageEl('bot', "Internetga ulanishda muammo bo'ldi. Qaytadan urinib ko'ring."));
+        chat.messages.pop();
+        persist();
+      } else {
+        chat.messages.pop();
+        persist();
+        renderChatList();
+      }
+    }finally{
+      abortController = null;
+    }
+  }
+
+  async function runChatStream(chat){
+    const typingEl = document.createElement('div');
+    typingEl.className = 'msg bot typing';
+    typingEl.innerHTML = '<span class="dot"></span><span class="dot"></span><span class="dot"></span>';
+    messagesEl.appendChild(typingEl);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+
+    abortController = new AbortController();
+    let fullText = '';
+    let botEl = null;
+    let aborted = false;
+
+    try{
+      const response = await fetch(CHAT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: chat.messages }),
+        signal: abortController.signal
+      });
+
       if(!response.ok){
-        const errMsg = (data.error && data.error.message) ? data.error.message : 'Nomalum xatolik';
+        let errMsg = 'Nomalum xatolik';
+        try{ const data = await response.json(); errMsg = (data.error && data.error.message) ? data.error.message : errMsg; }catch(e){}
         typingEl.remove();
         messagesEl.appendChild(buildMessageEl('bot', "Xatolik: " + errMsg));
         chat.messages.pop();
         persist();
         return;
       }
-      const textBlock = (data.content || []).find(b => b.type === 'text');
-      const replyText = textBlock ? textBlock.text : "Kechirasiz, javob ololmadim.";
-      typingEl.remove();
-      const botEl = buildMessageEl('bot', replyText);
-      messagesEl.appendChild(botEl);
-      chat.messages.push({ role: 'assistant', content: replyText });
-      persist();
-      renderChatList();
-      if(lastInputWasVoice) speak(replyText);
-      lastInputWasVoice = false;
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while(true){
+        const { done, value } = await reader.read();
+        if(done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop();
+        for(const line of lines){
+          const trimmed = line.trim();
+          if(!trimmed.startsWith('data:')) continue;
+          const jsonStr = trimmed.slice(5).trim();
+          if(!jsonStr || jsonStr === '[DONE]') continue;
+          try{
+            const obj = JSON.parse(jsonStr);
+            if(obj.text){
+              fullText += obj.text;
+              if(!botEl){
+                typingEl.remove();
+                botEl = buildMessageEl('bot', '', { showActions: false });
+                messagesEl.appendChild(botEl);
+              }
+              botEl._textHolder.textContent = fullText;
+              messagesEl.scrollTop = messagesEl.scrollHeight;
+            }
+          }catch(e){}
+        }
+      }
     }catch(err){
-      typingEl.remove();
-      messagesEl.appendChild(buildMessageEl('bot', "Internetga ulanishda muammo bo'ldi. Wi-Fi yoki internetni tekshiring."));
-      chat.messages.pop();
-      persist();
-    }finally{
-      sending = false;
-      sendBtn.disabled = false;
-      messagesEl.scrollTop = messagesEl.scrollHeight;
+      if(err.name === 'AbortError'){
+        aborted = true;
+      } else {
+        typingEl.remove();
+        messagesEl.appendChild(buildMessageEl('bot', "Internetga ulanishda muammo bo'ldi. Wi-Fi yoki internetni tekshiring."));
+        chat.messages.pop();
+        persist();
+        abortController = null;
+        return;
+      }
     }
+
+    abortController = null;
+
+    if(!fullText){
+      typingEl.remove();
+      if(!aborted){
+        messagesEl.appendChild(buildMessageEl('bot', "Kechirasiz, javob ololmadim."));
+        chat.messages.pop();
+        persist();
+      } else {
+        chat.messages.pop();
+        persist();
+        renderChatList();
+      }
+      return;
+    }
+
+    // Yakuniy render — kod bloklari va amallar (nusxalash) bilan qayta chizamiz
+    if(botEl) botEl.remove();
+    const finalText = fullText + (aborted ? '\n\n[to\'xtatildi]' : '');
+    const finalEl = buildMessageEl('bot', finalText, { rawText: finalText });
+    messagesEl.appendChild(finalEl);
+
+    chat.messages.push({ role: 'assistant', content: finalText });
+    persist();
+    renderChatList();
+    if(lastInputWasVoice && !aborted) speak(fullText);
+    lastInputWasVoice = false;
   }
 
   document.getElementById('clearBtn').addEventListener('click', () => {
     if(!confirm('Shu suhbatni tozalashni xohlaysizmi?')) return;
+    if(sending) stopGenerating();
     chats[activeId].messages = [];
     chats[activeId].title = 'Yangi suhbat';
     persist();
@@ -967,11 +1281,10 @@
     renderMessages();
   });
 
-  sendBtn.addEventListener('click', sendMessage);
   inputEl.addEventListener('keydown', (e) => {
     if(e.key === 'Enter' && !e.shiftKey){
       e.preventDefault();
-      sendMessage();
+      if(!sending) sendMessage();
     }
   });
 
