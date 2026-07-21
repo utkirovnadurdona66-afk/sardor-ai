@@ -8,11 +8,11 @@
 <title>Sardor AI — bepul o'zbek sun'iy intellekt chatbot</title>
 <meta name="description" content="Sardor AI — Saydurasulov Sardor tomonidan yaratilgan bepul o'zbekcha sun'iy intellekt chatbot. Savol bering, suhbatlashing, rasm chizdiring, qo'shiq yozdiring, fayl yuboring, ovozli gaplashing.">
 <meta name="keywords" content="Sardor AI, Sardor ai chatbot, sun'iy intellekt, o'zbek chatbot, Saydurasulov Sardor">
-<link rel="canonical" href="https://utkirovnadurdona66-afk.github.io/sardor-ai/">
+<link rel="canonical" href="https://utkirovnadurdona66-afk.github.io/sardor-ai-app/">
 <meta property="og:title" content="Sardor AI — chatbot">
 <meta property="og:description" content="Sizga o'xshagan sun'iy intellekt — savol bering, suhbatlashing, rasm chizdiring.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://utkirovnadurdona66-afk.github.io/sardor-ai/">
+<meta property="og:url" content="https://utkirovnadurdona66-afk.github.io/sardor-ai-app/">
 <meta name="robots" content="index, follow">
 <script type="application/ld+json">
 {
@@ -20,7 +20,7 @@
   "@type": "WebApplication",
   "name": "Sardor AI",
   "alternateName": "Sardor ai",
-  "url": "https://utkirovnadurdona66-afk.github.io/sardor-ai/",
+  "url": "https://utkirovnadurdona66-afk.github.io/sardor-ai-app/",
   "description": "Sardor AI — Saydurasulov Sardor tomonidan yaratilgan bepul o'zbekcha sun'iy intellekt chatbot.",
   "applicationCategory": "ChatApplication",
   "operatingSystem": "Web",
@@ -442,6 +442,7 @@
     text-decoration:none;
   }
   .msgActions button:hover, .msgActions a:hover{ background:rgba(201,162,39,0.15); }
+  .msgActions button.reacted{ background:rgba(46,158,150,0.25); border-color:var(--turquoise); }
   .empty{
     margin:auto;
     text-align:center;
@@ -538,15 +539,10 @@
     color:var(--gold-soft) !important;
     font-size:17px !important;
   }
-  .iconBtn.recording{
-    background: var(--danger) !important;
-    color: #fff !important;
-    animation: pulseMic 1.2s infinite;
-  }
-  @keyframes pulseMic{
-    0%{ transform: scale(1); }
-    50%{ transform: scale(1.08); }
-    100%{ transform: scale(1); }
+  .iconBtn.active{
+    background:var(--turquoise) !important;
+    color:var(--lapis-dark) !important;
+    border-color:var(--turquoise) !important;
   }
   .composerFooter{
     display:flex;
@@ -755,7 +751,7 @@
       <input type="file" id="fileInput" accept=".pdf,.txt,.md,.csv" style="display:none;">
       <button id="imgBtn" class="iconBtn" title="Rasm biriktirish">📷</button>
       <button id="fileBtn" class="iconBtn" title="Fayl biriktirish (PDF, TXT)">📎</button>
-      <button id="micBtn" class="iconBtn" title="Ovozli xabar gapirish">🎤</button>
+      <button id="micBtn" class="iconBtn" title="Ovozli xabar">🎤</button>
       <textarea id="input" placeholder="Xabaringizni yozing... (Ctrl+/ bilan bu yerga sakrang)" rows="1"></textarea>
       <button id="sendBtn">Yuborish</button>
       <button id="clearBtn" title="Bu suhbatni tozalash" style="background:transparent;border:1px solid rgba(201,162,39,0.4);color:var(--gold-soft);">Tozalash</button>
@@ -784,14 +780,9 @@
   let sending = false;
   let pendingImages = [];
   let pendingFile = null;
+  let lastInputWasVoice = false;
   let abortController = null;
   let searchQuery = '';
-
-  // Speech Recognition & Synthesis Global Vars
-  let recognition = null;
-  let isRecording = false;
-  let currentUtterance = null;
-  let speakingMsgId = null;
 
   function loadChats(){
     try{
@@ -813,7 +804,7 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify(chats));
       localStorage.setItem(ACTIVE_KEY, activeId);
     }catch(e){
-      console.warn('Saqlashda muammo:', e);
+      console.warn('Saqlashda muammo (xotira to\'lgan bo\'lishi mumkin):', e);
     }
   }
 
@@ -835,6 +826,15 @@
 
   function timeNow(){
     return new Date().toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function greetingByHour(){
+    const h = new Date().getHours();
+    if(h < 6) return "Tungi tinchlik 🌙 Nima haqida gaplashamiz?";
+    if(h < 11) return "Xayrli tong! ☀️ Bugun sizga qanday yordam bera olaman?";
+    if(h < 17) return "Assalomu alaykum! 👋 Nima haqida gaplashamiz?";
+    if(h < 22) return "Xayrli kech! 🌆 Sizni tinglayman.";
+    return "Kech bo'ldi, lekin men doim shu yerdaman 🌙 Nima kerak?";
   }
 
   // ---------------- Theme ----------------
@@ -934,7 +934,6 @@
   function switchChat(id){
     if(id === activeId) return;
     if(sending) stopGenerating();
-    stopSpeech();
     if(chats[activeId]) chats[activeId].draft = inputEl.value;
     activeId = id;
     persist();
@@ -959,7 +958,6 @@
 
   document.getElementById('newChatBtn').addEventListener('click', () => {
     if(sending) stopGenerating();
-    stopSpeech();
     if(chats[activeId]) chats[activeId].draft = inputEl.value;
     createChat();
     renderChatList();
@@ -1053,476 +1051,678 @@
     charCounter.textContent = inputEl.value.length + ' belgi';
   }
 
+  function renderMessageContent(container, text){
+    const parts = text.split(/```(\w*)\n?([\s\S]*?)```/g);
+    for(let i = 0; i < parts.length; i += 3){
+      const plain = parts[i];
+      if(plain) container.appendChild(document.createTextNode(plain));
+      const lang = parts[i+1];
+      const code = parts[i+2];
+      if(code !== undefined){
+        const wrap = document.createElement('div');
+        wrap.className = 'codeWrap';
+        const btn = document.createElement('button');
+        btn.className = 'codeCopyBtn';
+        btn.textContent = 'Copy';
+        btn.addEventListener('click', () => {
+          navigator.clipboard.writeText(code.trim()).then(() => {
+            btn.textContent = 'Nusxalandi!';
+            setTimeout(() => btn.textContent = 'Copy', 1500);
+          });
+        });
+        const pre = document.createElement('pre');
+        const codeEl = document.createElement('code');
+        if(lang) codeEl.className = 'language-' + lang;
+        codeEl.textContent = code.trim();
+        pre.appendChild(codeEl);
+        wrap.appendChild(btn);
+        wrap.appendChild(pre);
+        container.appendChild(wrap);
+        if(window.hljs) window.hljs.highlightElement(codeEl);
+      }
+    }
+  }
+
+  // opts: { imageUrls, fileMeta, generatedImageUrl, showActions, rawText, time, reaction, onRegenerate, onEdit }
+  function buildMessageEl(role, text, opts){
+    opts = opts || {};
+    const row = document.createElement('div');
+    row.className = 'msgRow ' + (role === 'user' ? 'user' : 'bot');
+
+    const div = document.createElement('div');
+    div.className = 'msg ' + (role === 'user' ? 'user' : 'bot');
+    const textHolder = document.createElement('div');
+    if(text){
+      if(role === 'bot' && text.includes('```')){
+        renderMessageContent(textHolder, text);
+      } else {
+        textHolder.appendChild(document.createTextNode(text));
+      }
+    }
+    div.appendChild(textHolder);
+
+    if(opts.imageUrls && opts.imageUrls.length){
+      const grid = document.createElement('div');
+      grid.className = 'imgGrid';
+      opts.imageUrls.forEach(url => {
+        const img = document.createElement('img');
+        img.src = url;
+        grid.appendChild(img);
+      });
+      div.appendChild(grid);
+    }
+    if(opts.generatedImageUrl){
+      const wrap = document.createElement('div');
+      wrap.className = 'genImageWrap';
+      const img = document.createElement('img');
+      img.src = opts.generatedImageUrl;
+      wrap.appendChild(img);
+      div.appendChild(wrap);
+    }
+    if(opts.fileMeta){
+      const chip = document.createElement('div');
+      chip.className = 'fileChip';
+      chip.textContent = '📎 ' + opts.fileMeta.name;
+      div.appendChild(chip);
+    }
+
+    if(opts.showActions !== false && (text || opts.generatedImageUrl)){
+      const actions = document.createElement('div');
+      actions.className = 'msgActions';
+
+      const copyBtn = document.createElement('button');
+      copyBtn.textContent = '📋';
+      copyBtn.title = 'Nusxalash';
+      copyBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(opts.rawText !== undefined ? opts.rawText : text).then(() => {
+          showToast('Nusxalandi ✓');
+        });
+      });
+      actions.appendChild(copyBtn);
+
+      if(role === 'bot' && text){
+        const speakBtn = document.createElement('button');
+        speakBtn.textContent = '🔊';
+        speakBtn.title = "Ovoz bilan o'qish";
+        speakBtn.addEventListener('click', () => speak(text));
+        actions.appendChild(speakBtn);
+      }
+
+      if(opts.generatedImageUrl){
+        const dlBtn = document.createElement('a');
+        dlBtn.textContent = '⬇';
+        dlBtn.title = 'Yuklab olish';
+        dlBtn.href = opts.generatedImageUrl;
+        dlBtn.download = 'sardor-ai-rasm.png';
+        actions.appendChild(dlBtn);
+      }
+
+      if(role === 'bot' && opts.onRegenerate){
+        const regenBtn = document.createElement('button');
+        regenBtn.textContent = '🔄';
+        regenBtn.title = 'Qayta yaratish';
+        regenBtn.addEventListener('click', opts.onRegenerate);
+        actions.appendChild(regenBtn);
+      }
+      if(role === 'user' && opts.onEdit){
+        const editBtn = document.createElement('button');
+        editBtn.textContent = '✏️';
+        editBtn.title = "Tahrirlash va qayta yuborish";
+        editBtn.addEventListener('click', opts.onEdit);
+        actions.appendChild(editBtn);
+      }
+      if(role === 'bot'){
+        const upBtn = document.createElement('button');
+        upBtn.textContent = '👍';
+        upBtn.className = opts.reaction === 'up' ? 'reacted' : '';
+        upBtn.addEventListener('click', () => {
+          if(opts.onReact) opts.onReact(opts.reaction === 'up' ? null : 'up');
+        });
+        const downBtn = document.createElement('button');
+        downBtn.textContent = '👎';
+        downBtn.className = opts.reaction === 'down' ? 'reacted' : '';
+        downBtn.addEventListener('click', () => {
+          if(opts.onReact) opts.onReact(opts.reaction === 'down' ? null : 'down');
+        });
+        actions.appendChild(upBtn);
+        actions.appendChild(downBtn);
+      }
+
+      div.appendChild(actions);
+    }
+
+    row.appendChild(div);
+
+    if(opts.time){
+      const meta = document.createElement('div');
+      meta.className = 'msgMeta';
+      meta.textContent = opts.time;
+      row.appendChild(meta);
+    }
+
+    row._textHolder = textHolder;
+    row._bubble = div;
+    return row;
+  }
+
+  function renderMessages(){
+    messagesEl.querySelectorAll('.msgRow, .empty').forEach(el => el.remove());
+    const chat = chats[activeId];
+    chatTitleEl.textContent = chat && chat.title !== 'Yangi suhbat' ? chat.title : 'Sardor AI';
+    if(!chat || chat.messages.length === 0){
+      const div = document.createElement('div');
+      div.className = 'empty';
+      div.innerHTML = 'Xabar yozing va suhbatni boshlang' +
+        '<div class="suggestRow" id="suggestRow2">' +
+        '<button data-q="Salom, qalaysan?">👋 Salom</button>' +
+        '<button data-q="Menga qiziqarli bir fakt ayt">✨ Qiziqarli fakt</button>' +
+        '<button data-q="Python\'da \'salom dunyo\' deb chiqaradigan kod yoz">💻 Kod yozdir</button>' +
+        '<button data-q="Rasm chiz: tog\'lar orasidagi quyosh botishi, sokin ko\'l aks etgan holda">🎨 Rasm chizdir</button>' +
+        '<button data-q="Do\'stlik haqida qisqa qo\'shiq matni yoz">🎤 Qo\'shiq yozdir</button>' +
+        '</div>';
+      messagesEl.insertBefore(div, scrollDownBtn);
+      wireSuggestRow(div.querySelector('.suggestRow'));
+      return;
+    }
+    let lastUserIdx = -1;
+    chat.messages.forEach((m, i) => { if(m.role === 'user') lastUserIdx = i; });
+    chat.messages.forEach((m, idx) => {
+      let imageUrls = [];
+      if(Array.isArray(m.images)) imageUrls = m.images.map(i => i.previewUrl).filter(Boolean);
+      else if(m.image && m.image.previewUrl) imageUrls = [m.image.previewUrl];
+      const genUrl = m.generatedImage ? `data:${m.generatedImage.mimeType};base64,${m.generatedImage.data}` : null;
+      const role = m.role === 'user' ? 'user' : 'bot';
+      const row = buildMessageEl(role, m.content, {
+        imageUrls,
+        fileMeta: m.file ? { name: m.file.name } : null,
+        generatedImageUrl: genUrl,
+        time: m.time || '',
+        reaction: m.reaction,
+        onReact: role === 'bot' ? (val) => { m.reaction = val; persist(); renderMessages(); } : null,
+        onRegenerate: (role === 'bot' && idx === chat.messages.length - 1) ? () => regenerateLast() : null,
+        onEdit: (role === 'user' && idx === lastUserIdx) ? () => editAndResend(idx) : null
+      });
+      messagesEl.insertBefore(row, scrollDownBtn);
+    });
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function autoTitleChat(chat, firstText){
+    if(chat.title === 'Yangi suhbat' && firstText){
+      chat.title = firstText.length > 34 ? firstText.slice(0,34) + '…' : firstText;
+    }
+  }
+
+  // ---------------- Regenerate / Edit ----------------
+  function regenerateLast(){
+    if(sending) return;
+    const chat = chats[activeId];
+    if(!chat || chat.messages.length === 0) return;
+    if(chat.messages[chat.messages.length - 1].role === 'assistant'){
+      chat.messages.pop();
+      persist();
+      renderMessages();
+    }
+    setSendingUI(true);
+    runChatStream(chat).finally(() => { setSendingUI(false); messagesEl.scrollTop = messagesEl.scrollHeight; });
+  }
+
+  function editAndResend(idx){
+    if(sending) return;
+    const chat = chats[activeId];
+    const msg = chat.messages[idx];
+    const newText = prompt("Xabarni tahrirlang:", msg.content || '');
+    if(newText === null) return;
+    chat.messages = chat.messages.slice(0, idx);
+    inputEl.value = newText;
+    persist();
+    renderMessages();
+    autoGrow();
+    updateCharCounter();
+    sendMessage();
+  }
+
+  // ---------------- Composer ----------------
   function autoGrow(){
     inputEl.style.height = 'auto';
     inputEl.style.height = Math.min(inputEl.scrollHeight, 140) + 'px';
   }
   inputEl.addEventListener('input', () => {
+    lastInputWasVoice = false;
     autoGrow();
     updateCharCounter();
+    if(chats[activeId]) chats[activeId].draft = inputEl.value;
   });
 
-  function renderMessageContent(container, text){
-    const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
-    let lastIndex = 0;
-    let match;
+  const imgInput = document.getElementById('imgInput');
+  const imgBtn = document.getElementById('imgBtn');
+  const MAX_IMAGES = 6;
 
-    container.innerHTML = '';
-
-    while ((match = codeBlockRegex.exec(text)) !== null) {
-      if (match.index > lastIndex) {
-        const textNode = document.createTextNode(text.substring(lastIndex, match.index));
-        container.appendChild(textNode);
-      }
-
-      const lang = match[1] || 'plaintext';
-      const code = match[2];
-
-      const codeWrap = document.createElement('div');
-      codeWrap.className = 'codeWrap';
-
-      const copyBtn = document.createElement('button');
-      copyBtn.className = 'codeCopyBtn';
-      copyBtn.textContent = 'Nusxalash';
-      copyBtn.addEventListener('click', () => {
-        navigator.clipboard.writeText(code).then(() => {
-          copyBtn.textContent = 'Nusxalandi!';
-          setTimeout(() => copyBtn.textContent = 'Nusxalash', 1500);
-        });
-      });
-
-      const pre = document.createElement('pre');
-      const codeEl = document.createElement('code');
-      codeEl.className = 'language-' + lang;
-      codeEl.textContent = code;
-
-      pre.appendChild(codeEl);
-      codeWrap.appendChild(copyBtn);
-      codeWrap.appendChild(pre);
-      container.appendChild(codeWrap);
-
-      if (window.hljs) hljs.highlightElement(codeEl);
-
-      lastIndex = codeBlockRegex.lastIndex;
-    }
-
-    if (lastIndex < text.length) {
-      const textNode = document.createTextNode(text.substring(lastIndex));
-      container.appendChild(textNode);
-    }
-  }
-
-  function renderMessages(){
-    messagesEl.innerHTML = '';
-    const chat = chats[activeId];
-    if(!chat) return;
-    chatTitleEl.textContent = chat.title || 'Sardor AI';
-
-    if(chat.messages.length === 0){
-      const emptyState = document.createElement('div');
-      emptyState.className = 'empty';
-      emptyState.id = 'emptyState';
-      emptyState.innerHTML = `
-        Xabar yozing va suhbatni boshlang
-        <div class="suggestRow" id="suggestRow">
-          <button data-q="Salom, qalaysan?">👋 Salom</button>
-          <button data-q="Menga qiziqarli bir fakt ayt">✨ Qiziqarli fakt</button>
-          <button data-q="Python'da 'salom dunyo' deb chiqaradigan kod yoz">💻 Kod yozdir</button>
-          <button data-q="Rasm chiz: tog'lar orasidagi quyosh botishi, sokin ko'l aks etgan holda">🎨 Rasm chizdir</button>
-          <button data-q="Do'stlik haqida qisqa qo'shiq matni yoz">🎤 Qo'shiq yozdir</button>
-        </div>
-      `;
-      messagesEl.appendChild(emptyState);
-      wireSuggestRow(emptyState.querySelector('#suggestRow'));
+  function addImageFile(file){
+    if(!file || !file.type.startsWith('image/')) return;
+    if(pendingImages.length >= MAX_IMAGES){
+      showToast(`Eng ko'pi bilan ${MAX_IMAGES} ta rasm`);
       return;
     }
-
-    for(let i=0; i<chat.messages.length; i++){
-      const m = chat.messages[i];
-      const msgId = 'msg_' + i;
-      const row = document.createElement('div');
-      row.className = 'msgRow ' + (m.role === 'user' ? 'user' : 'bot');
-
-      const msgBox = document.createElement('div');
-      msgBox.className = 'msg ' + (m.role === 'user' ? 'user' : 'bot');
-      
-      if(m.role === 'bot') {
-        if(m.isTyping) {
-          msgBox.classList.add('typing');
-          msgBox.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
-        } else {
-          renderMessageContent(msgBox, m.content || '');
-        }
-      } else {
-        msgBox.textContent = m.content || '';
-      }
-
-      if(m.images && m.images.length){
-        const grid = document.createElement('div');
-        grid.className = 'imgGrid';
-        m.images.forEach(src => {
-          const img = document.createElement('img');
-          img.src = src;
-          grid.appendChild(img);
-        });
-        msgBox.appendChild(grid);
-      }
-
-      if(m.genImage){
-        const wrap = document.createElement('div');
-        wrap.className = 'genImageWrap';
-        const img = document.createElement('img');
-        img.src = m.genImage;
-        wrap.appendChild(img);
-        msgBox.appendChild(wrap);
-      }
-
-      row.appendChild(msgBox);
-
-      const meta = document.createElement('div');
-      meta.className = 'msgMeta';
-      meta.textContent = m.time || '';
-      row.appendChild(meta);
-
-      if(m.role === 'bot' && !m.isTyping){
-        const actions = document.createElement('div');
-        actions.className = 'msgActions';
-
-        const copyBtn = document.createElement('button');
-        copyBtn.textContent = '📋 Nusxalash';
-        copyBtn.addEventListener('click', () => {
-          navigator.clipboard.writeText(m.content || '').then(() => showToast("Nusxalandi ✓"));
-        });
-
-        const speakBtn = document.createElement('button');
-        speakBtn.id = 'speakBtn_' + msgId;
-        speakBtn.textContent = (speakingMsgId === msgId) ? '⏹ To\'xtatish' : '🔊 Ovozli o\'qish';
-        speakBtn.addEventListener('click', () => {
-          toggleSpeech(m.content || '', msgId);
-        });
-
-        actions.appendChild(copyBtn);
-        actions.appendChild(speakBtn);
-        row.appendChild(actions);
-      }
-
-      messagesEl.appendChild(row);
-    }
-    messagesEl.scrollTop = messagesEl.scrollHeight;
-  }
-
-  // ---------------- Ovozli o'qish (Speech Synthesis / TTS) ----------------
-  function toggleSpeech(text, msgId){
-    if('speechSynthesis' in window){
-      if(window.speechSynthesis.speaking && speakingMsgId === msgId){
-        stopSpeech();
-        return;
-      }
-
-      stopSpeech();
-
-      // Kod bloklarini hamda belgilarni o'qishda tashlab o'tish uchun tozalash
-      let cleanText = text.replace(/```[\s\S]*?```/g, 'Kod bloki.').replace(/[*_#`]/g, '');
-      if(!cleanText.trim()) return;
-
-      currentUtterance = new SpeechSynthesisUtterance(cleanText);
-      currentUtterance.lang = 'uz-UZ'; // O'zbek tili
-      currentUtterance.rate = 1.0;
-
-      currentUtterance.onend = () => {
-        speakingMsgId = null;
-        renderMessages();
-      };
-      currentUtterance.onerror = () => {
-        speakingMsgId = null;
-        renderMessages();
-      };
-
-      speakingMsgId = msgId;
-      window.speechSynthesis.speak(currentUtterance);
-      renderMessages();
-    } else {
-      showToast("Brauzeringiz ovozli o'qishni qo'llab-quvvatlamaydi");
-    }
-  }
-
-  function stopSpeech(){
-    if('speechSynthesis' in window){
-      window.speechSynthesis.cancel();
-    }
-    speakingMsgId = null;
-  }
-
-  // ---------------- Ovozni eshitish (Speech Recognition / STT) ----------------
-  const micBtn = document.getElementById('micBtn');
-
-  function initSpeechRecognition(){
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if(!SpeechRecognition){
-      micBtn.style.display = 'none'; // Brauzerda ovoz kiritish qo'llanmasa yashiriladi
-      return;
-    }
-
-    recognition = new SpeechRecognition();
-    recognition.continuous = false;
-    recognition.interimResults = true;
-    recognition.lang = 'uz-UZ'; // O'zbekcha nutqni aniqlash
-
-    recognition.onstart = () => {
-      isRecording = true;
-      micBtn.classList.add('recording');
-      micBtn.title = "Eshitilmoqda... To'xtatish uchun bosing";
-      showToast("Eshitilmoqda... Gapiring!");
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result;
+      const base64 = dataUrl.split(',')[1];
+      pendingImages.push({ mimeType: file.type, data: base64, name: file.name, previewUrl: dataUrl });
+      showAttachBar();
     };
+    reader.readAsDataURL(file);
+  }
 
-    recognition.onresult = (event) => {
-      let transcript = '';
-      for(let i = event.resultIndex; i < event.results.length; i++){
-        transcript += event.results[i][0].transcript;
+  imgBtn.addEventListener('click', () => imgInput.click());
+  imgInput.addEventListener('change', () => {
+    Array.from(imgInput.files).forEach(addImageFile);
+    imgInput.value = '';
+  });
+
+  document.addEventListener('paste', (e) => {
+    const items = e.clipboardData && e.clipboardData.items;
+    if(!items) return;
+    let found = false;
+    for(const item of items){
+      if(item.type.startsWith('image/')){
+        const file = item.getAsFile();
+        if(file){ addImageFile(file); found = true; }
       }
-      inputEl.value = transcript;
+    }
+    if(found) e.preventDefault();
+  });
+
+  // Drag & drop images onto the chat window
+  ['dragenter','dragover'].forEach(evt => {
+    messagesEl.addEventListener(evt, (e) => {
+      e.preventDefault();
+      messagesEl.classList.add('dragOver');
+    });
+  });
+  ['dragleave','drop'].forEach(evt => {
+    messagesEl.addEventListener(evt, (e) => {
+      e.preventDefault();
+      messagesEl.classList.remove('dragOver');
+    });
+  });
+  messagesEl.addEventListener('drop', (e) => {
+    const files = e.dataTransfer && e.dataTransfer.files;
+    if(!files) return;
+    Array.from(files).forEach(f => { if(f.type.startsWith('image/')) addImageFile(f); });
+  });
+
+  const fileInput = document.getElementById('fileInput');
+  const fileBtn = document.getElementById('fileBtn');
+  fileBtn.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', () => {
+    const file = fileInput.files[0];
+    if(!file) return;
+    if(file.size > 8 * 1024 * 1024){
+      showToast("Fayl juda katta (8MB dan oshmasin)");
+      fileInput.value = '';
+      return;
+    }
+    const reader = new FileReader();
+    if(file.type === 'application/pdf'){
+      reader.onload = () => {
+        const base64 = reader.result.split(',')[1];
+        pendingFile = { kind:'file', mimeType: 'application/pdf', data: base64, name: file.name };
+        showAttachBar();
+      };
+      reader.readAsDataURL(file);
+    } else {
+      reader.onload = () => {
+        pendingFile = { kind:'text', mimeType: 'text/plain', data: reader.result, name: file.name };
+        showAttachBar();
+      };
+      reader.readAsText(file);
+    }
+  });
+
+  const attachBar = document.getElementById('attachBar');
+  const attachPreviewSlot = document.getElementById('attachPreviewSlot');
+  const attachLabel = document.getElementById('attachLabel');
+  document.getElementById('attachRemoveBtn').addEventListener('click', clearAttachment);
+
+  function showAttachBar(){
+    attachPreviewSlot.innerHTML = '';
+    pendingImages.forEach((img, idx) => {
+      const thumb = document.createElement('div');
+      thumb.className = 'attachThumb';
+      const im = document.createElement('img');
+      im.src = img.previewUrl;
+      const rm = document.createElement('button');
+      rm.className = 'rm';
+      rm.textContent = '✕';
+      rm.addEventListener('click', () => {
+        pendingImages.splice(idx, 1);
+        if(pendingImages.length === 0 && !pendingFile) clearAttachment();
+        else showAttachBar();
+      });
+      thumb.appendChild(im);
+      thumb.appendChild(rm);
+      attachPreviewSlot.appendChild(thumb);
+    });
+    if(pendingFile){
+      const box = document.createElement('div');
+      box.className = 'fileIcon';
+      box.textContent = '📄';
+      attachPreviewSlot.appendChild(box);
+    }
+    const parts = [];
+    if(pendingImages.length) parts.push(pendingImages.length + ' ta rasm');
+    if(pendingFile) parts.push(pendingFile.name);
+    attachLabel.textContent = parts.join(' + ');
+    attachBar.classList.add('show');
+  }
+  function clearAttachment(){
+    pendingImages = [];
+    pendingFile = null;
+    imgInput.value = '';
+    fileInput.value = '';
+    attachBar.classList.remove('show');
+  }
+
+  // ---- Voice input ----
+  const micBtn = document.getElementById('micBtn');
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let recognition = null;
+  let listening = false;
+  if(SpeechRecognition){
+    recognition = new SpeechRecognition();
+    recognition.lang = 'uz-UZ';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    recognition.onresult = (e) => {
+      const transcript = e.results[0][0].transcript;
+      inputEl.value = (inputEl.value ? inputEl.value + ' ' : '') + transcript;
+      lastInputWasVoice = true;
       autoGrow();
       updateCharCounter();
     };
-
-    recognition.onerror = (event) => {
-      console.warn("Nutqni aniqlashda xato:", event.error);
-      stopRecording();
-      if(event.error === 'not-allowed'){
-        showToast("Mikrofon uchun ruxsat berilmagan!");
-      }
-    };
-
-    recognition.onend = () => {
-      stopRecording();
-    };
+    recognition.onend = () => { listening = false; micBtn.classList.remove('active'); };
+    recognition.onerror = () => { listening = false; micBtn.classList.remove('active'); };
   }
-
-  function stopRecording(){
-    isRecording = false;
-    micBtn.classList.remove('recording');
-    micBtn.title = "Ovozli xabar gapirish";
-    if(recognition){
-      try { recognition.stop(); } catch(e){}
-    }
-  }
-
   micBtn.addEventListener('click', () => {
     if(!recognition){
-      showToast("Brauzeringiz ovozli kirishni qo'llab-quvvatlamaydi");
+      showToast("Bu brauzer ovozli kiritishni qo'llab-quvvatlamaydi");
       return;
     }
-    if(isRecording){
-      stopRecording();
+    if(listening){
+      recognition.stop(); listening = false; micBtn.classList.remove('active');
     } else {
-      try {
-        recognition.start();
-      } catch(e) {
-        stopRecording();
-      }
+      recognition.start(); listening = true; micBtn.classList.add('active');
     }
   });
 
-  initSpeechRecognition();
+  function speak(text){
+    if(!window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'uz-UZ';
+    utter.rate = 1;
+    utter.pitch = 0.9;
+    const voices = window.speechSynthesis.getVoices();
+    let chosen = voices.find(v => /male/i.test(v.name));
+    if(!chosen) chosen = voices.find(v => v.lang && v.lang.toLowerCase().startsWith('uz'));
+    if(!chosen) chosen = voices.find(v => v.lang && v.lang.toLowerCase().startsWith('ru'));
+    if(!chosen) chosen = voices.find(v => v.lang && v.lang.toLowerCase().startsWith('en'));
+    if(chosen) utter.voice = chosen;
+    window.speechSynthesis.speak(utter);
+  }
+  if(window.speechSynthesis){
+    window.speechSynthesis.getVoices();
+    window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+  }
 
-  // ---------------- Generator & Network ----------------
+  // ---------------- Send / Stream / Stop ----------------
+  function setSendingUI(isSending){
+    sending = isSending;
+    if(isSending){
+      sendBtn.textContent = '⏹ To\'xtatish';
+      sendBtn.classList.add('stopping');
+    } else {
+      sendBtn.textContent = 'Yuborish';
+      sendBtn.classList.remove('stopping');
+      sendBtn.disabled = false;
+    }
+  }
+
   function stopGenerating(){
     if(abortController){
       abortController.abort();
       abortController = null;
     }
-    sending = false;
-    sendBtn.textContent = 'Yuborish';
-    sendBtn.classList.remove('stopping');
+    setSendingUI(false);
   }
 
-  async function sendMessage(){
-    const text = inputEl.value.trim();
-    if(!text && !pendingImages.length && !pendingFile) return;
+  sendBtn.addEventListener('click', () => {
+    if(sending){ stopGenerating(); return; }
+    sendMessage();
+  });
 
-    if(sending){
-      stopGenerating();
+  async function sendMessage(){
+    if(sending) return;
+    const text = inputEl.value.trim();
+    const hasImages = pendingImages.length > 0;
+    const attach = hasImages ? { kind: 'images', images: pendingImages.slice() } : pendingFile;
+
+    if((!text && !attach)) return;
+
+    setSendingUI(true);
+    inputEl.value = '';
+    autoGrow();
+    updateCharCounter();
+
+    const chat = chats[activeId];
+    chat.draft = '';
+    clearAttachment();
+
+    let displayText = text;
+    let userMsg = { role: 'user', content: text, time: timeNow() };
+
+    if(attach && attach.kind === 'images'){
+      userMsg.images = attach.images.map(img => ({ mimeType: img.mimeType, data: img.data, previewUrl: img.previewUrl }));
+    } else if(attach && attach.kind === 'file'){
+      userMsg.file = { mimeType: attach.mimeType, data: attach.data, name: attach.name };
+    } else if(attach && attach.kind === 'text'){
+      displayText = (text ? text + '\n\n' : '') + `[Fayl: ${attach.name}]`;
+      userMsg.content = (text ? text + '\n\n' : '') + `--- ${attach.name} fayli mazmuni ---\n${attach.data}`;
+    }
+
+    if(chat.messages.length === 0) autoTitleChat(chat, text || (attach ? (attach.name || 'Rasmlar') : 'Yangi suhbat'));
+
+    chat.messages.push(userMsg);
+    persist();
+    renderChatList();
+    renderMessages();
+
+    const isImageIntent = IMAGE_INTENT_RE.test(text);
+
+    if(isImageIntent && text){
+      await runImageGeneration(chat, text, attach && attach.kind === 'images' ? attach.images[0] : null);
+    } else {
+      await runChatStream(chat);
+    }
+
+    setSendingUI(false);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  async function runImageGeneration(chat, prompt, refImage){
+    const typingEl = document.createElement('div');
+    typingEl.className = 'msgRow bot';
+    typingEl.innerHTML = '<div class="msg bot typing"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>';
+    messagesEl.insertBefore(typingEl, scrollDownBtn);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+
+    abortController = new AbortController();
+    try{
+      const body = { prompt };
+      if(refImage) body.image = { mimeType: refImage.mimeType, data: refImage.data };
+
+      const response = await fetch(IMAGE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        signal: abortController.signal
+      });
+      const data = await response.json();
+      typingEl.remove();
+
+      if(!response.ok || !data.image){
+        const errMsg = (data.error && data.error.message) ? data.error.message : "Rasmni chizib bo'lmadi.";
+        renderBotError(chat, errMsg);
+        return;
+      }
+
+      const caption = data.text || "Mana, tayyor! 🎨";
+      chat.messages.push({ role: 'assistant', content: caption, generatedImage: data.image, time: timeNow() });
+      persist();
+      renderChatList();
+      renderMessages();
+    }catch(err){
+      typingEl.remove();
+      if(err.name !== 'AbortError'){
+        renderBotError(chat, "Internetga ulanishda muammo bo'ldi. Qaytadan urinib ko'ring.");
+      } else {
+        chat.messages.pop();
+        persist();
+        renderChatList();
+        renderMessages();
+      }
+    }finally{
+      abortController = null;
+    }
+  }
+
+  function renderBotError(chat, errMsg){
+    chat.messages.pop();
+    persist();
+    renderMessages();
+    const row = buildMessageEl('bot', "Xatolik: " + errMsg, { showActions: false });
+    messagesEl.insertBefore(row, scrollDownBtn);
+  }
+
+  async function runChatStream(chat){
+    const typingEl = document.createElement('div');
+    typingEl.className = 'msgRow bot';
+    typingEl.innerHTML = '<div class="msg bot typing"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>';
+    messagesEl.insertBefore(typingEl, scrollDownBtn);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+
+    abortController = new AbortController();
+    let fullText = '';
+    let botRow = null;
+    let aborted = false;
+
+    try{
+      const response = await fetch(CHAT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: chat.messages }),
+        signal: abortController.signal
+      });
+
+      if(!response.ok){
+        let errMsg = 'Nomalum xatolik';
+        try{ const data = await response.json(); errMsg = (data.error && data.error.message) ? data.error.message : errMsg; }catch(e){}
+        typingEl.remove();
+        renderBotError(chat, errMsg);
+        return;
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while(true){
+        const { done, value } = await reader.read();
+        if(done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop();
+        for(const line of lines){
+          const trimmed = line.trim();
+          if(!trimmed.startsWith('data:')) continue;
+          const jsonStr = trimmed.slice(5).trim();
+          if(!jsonStr || jsonStr === '[DONE]') continue;
+          try{
+            const obj = JSON.parse(jsonStr);
+            if(obj.text){
+              fullText += obj.text;
+              if(!botRow){
+                typingEl.remove();
+                botRow = buildMessageEl('bot', '', { showActions: false });
+                messagesEl.insertBefore(botRow, scrollDownBtn);
+              }
+              botRow._textHolder.textContent = fullText;
+              messagesEl.scrollTop = messagesEl.scrollHeight;
+            }
+          }catch(e){}
+        }
+      }
+    }catch(err){
+      if(err.name === 'AbortError'){
+        aborted = true;
+      } else {
+        typingEl.remove();
+        renderBotError(chat, "Internetga ulanishda muammo bo'ldi. Wi-Fi yoki internetni tekshiring.");
+        abortController = null;
+        return;
+      }
+    }
+
+    abortController = null;
+
+    if(!fullText){
+      typingEl.remove();
+      if(!aborted){
+        renderBotError(chat, "Kechirasiz, javob ololmadim.");
+      } else {
+        chat.messages.pop();
+        persist();
+        renderChatList();
+        renderMessages();
+      }
       return;
     }
 
-    stopSpeech();
-    if(isRecording) stopRecording();
-
-    const chat = chats[activeId];
-    if(!chat) return;
-
-    if(chat.messages.length === 0 && text){
-      chat.title = text.slice(0, 30) + (text.length > 30 ? '...' : '');
-      renderChatList();
-    }
-
-    // User xabari
-    const userMsg = {
-      role: 'user',
-      content: text,
-      time: timeNow(),
-      images: [...pendingImages]
-    };
-    chat.messages.push(userMsg);
-
-    // Bot kutilayotgan indikatorini yaratish
-    const typingMsg = {
-      role: 'bot',
-      isTyping: true,
-      time: timeNow()
-    };
-    chat.messages.push(typingMsg);
-
-    inputEl.value = '';
-    pendingImages = [];
-    pendingFile = null;
-    document.getElementById('attachBar').classList.remove('show');
-    autoGrow();
-    updateCharCounter();
+    const finalText = fullText + (aborted ? '\n\n[to\'xtatildi]' : '');
+    chat.messages.push({ role: 'assistant', content: finalText, time: timeNow() });
     persist();
+    renderChatList();
     renderMessages();
-
-    sending = true;
-    sendBtn.textContent = 'To\'xtatish';
-    sendBtn.classList.add('stopping');
-
-    abortController = new AbortController();
-
-    try {
-      if(IMAGE_INTENT_RE.test(text)){
-        const res = await fetch(IMAGE_URL, {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({ prompt: text }),
-          signal: abortController.signal,
-          keepalive: true
-        });
-        const data = await res.json();
-        chat.messages.pop(); // typingMsg o'chirish
-        chat.messages.push({
-          role: 'bot',
-          content: 'Mana, siz so\'ragan rasm:',
-          genImage: data.url,
-          time: timeNow()
-        });
-      } else {
-        const res = await fetch(CHAT_URL, {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({ message: text, history: chat.messages.filter(m => !m.isTyping) }),
-          signal: abortController.signal,
-          keepalive: true
-        });
-        const data = await res.json();
-        chat.messages.pop(); // typingMsg o'chirish
-        chat.messages.push({
-          role: 'bot',
-          content: data.reply || 'Javob olishda muammo bo\'ldi.',
-          time: timeNow()
-        });
-      }
-    } catch(e) {
-      chat.messages.pop(); // typingMsg o'chirish
-      if(e.name !== 'AbortError'){
-        chat.messages.push({
-          role: 'bot',
-          content: 'Server uzoq vaqt javob bermadi yoki tarmoq xatosi yuz berdi. Iltimos, qaytadan urinib ko\'ring.',
-          time: timeNow()
-        });
-      }
-    } finally {
-      stopGenerating();
-      persist();
-      renderMessages();
-    }
+    if(lastInputWasVoice && !aborted) speak(fullText);
+    lastInputWasVoice = false;
   }
 
-  sendBtn.addEventListener('click', sendMessage);
+  document.getElementById('clearBtn').addEventListener('click', () => {
+    if(!confirm('Shu suhbatni tozalashni xohlaysizmi?')) return;
+    if(sending) stopGenerating();
+    chats[activeId].messages = [];
+    chats[activeId].title = 'Yangi suhbat';
+    persist();
+    renderChatList();
+    renderMessages();
+  });
+
   inputEl.addEventListener('keydown', (e) => {
     if(e.key === 'Enter' && !e.shiftKey){
       e.preventDefault();
-      sendMessage();
+      if(!sending) sendMessage();
     }
   });
 
-  document.getElementById('clearBtn').addEventListener('click', () => {
-    if(confirm("Bu suhbatdagi barcha xabarlarni o'chirib tashlamoqchimisiz?")){
-      stopSpeech();
-      chats[activeId].messages = [];
-      persist();
-      renderMessages();
-    }
-  });
-
-  // ---------------- File & Image Attachments ----------------
-  const imgInput = document.getElementById('imgInput');
-  const fileInput = document.getElementById('fileInput');
-  const attachBar = document.getElementById('attachBar');
-  const attachPreviewSlot = document.getElementById('attachPreviewSlot');
-  const attachLabel = document.getElementById('attachLabel');
-
-  document.getElementById('imgBtn').addEventListener('click', () => imgInput.click());
-  document.getElementById('fileBtn').addEventListener('click', () => fileInput.click());
-
-  imgInput.addEventListener('change', (e) => {
-    const files = Array.from(e.target.files);
-    files.forEach(file => {
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        pendingImages.push(ev.target.result);
-        updateAttachBar();
-      };
-      reader.readAsDataURL(file);
-    });
-  });
-
-  fileInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if(file){
-      pendingFile = file;
-      updateAttachBar();
-    }
-  });
-
-  function updateAttachBar(){
-    if(pendingImages.length || pendingFile){
-      attachBar.classList.add('show');
-      attachPreviewSlot.innerHTML = '';
-      if(pendingImages.length){
-        pendingImages.forEach((src, idx) => {
-          const thumb = document.createElement('div');
-          thumb.className = 'attachThumb';
-          thumb.innerHTML = `<img src="${src}"><button class="rm" onclick="removeImg(${idx})">✕</button>`;
-          attachPreviewSlot.appendChild(thumb);
-        });
-        attachLabel.textContent = `${pendingImages.length} ta rasm tanlandi`;
-      } else if(pendingFile){
-        attachPreviewSlot.innerHTML = `<div class="fileIcon">📄</div>`;
-        attachLabel.textContent = pendingFile.name;
-      }
-    } else {
-      attachBar.classList.remove('show');
-    }
-  }
-
-  window.removeImg = function(idx){
-    pendingImages.splice(idx, 1);
-    updateAttachBar();
-  };
-
-  document.getElementById('attachRemoveBtn').addEventListener('click', () => {
-    pendingImages = [];
-    pendingFile = null;
-    imgInput.value = '';
-    fileInput.value = '';
-    updateAttachBar();
-  });
-
-  // Init
+  // ---------------- Init ----------------
   initTheme();
   loadChats();
   renderChatList();
   renderMessages();
+  inputEl.value = (chats[activeId] && chats[activeId].draft) || '';
+  autoGrow();
+  updateCharCounter();
 </script>
 </body>
 </html>
