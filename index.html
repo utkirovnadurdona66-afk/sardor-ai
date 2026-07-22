@@ -752,6 +752,14 @@
       <button id="imgBtn" class="iconBtn" title="Rasm biriktirish">📷</button>
       <button id="fileBtn" class="iconBtn" title="Fayl biriktirish (PDF, TXT)">📎</button>
       <button id="micBtn" class="iconBtn" title="Ovozli xabar">🎤</button>
+      <select id="voiceLangSelect" title="Ovozli til" style="height:46px;border-radius:12px;border:1px solid rgba(201,162,39,0.4);background:transparent;color:var(--gold-soft);font-family:'Manrope',sans-serif;font-size:12px;padding:0 4px;flex-shrink:0;">
+        <option value="auto">🌐 Avto</option>
+        <option value="uz-UZ">🇺🇿 O'zbek</option>
+        <option value="ru-RU">🇷🇺 Русский</option>
+        <option value="en-US">🇬🇧 English</option>
+        <option value="tr-TR">🇹🇷 Türkçe</option>
+        <option value="ar-SA">🇸🇦 العربية</option>
+      </select>
       <textarea id="input" placeholder="Xabaringizni yozing... (Ctrl+/ bilan bu yerga sakrang)" rows="1"></textarea>
       <button id="sendBtn">Yuborish</button>
       <button id="clearBtn" title="Bu suhbatni tozalash" style="background:transparent;border:1px solid rgba(201,162,39,0.4);color:var(--gold-soft);">Tozalash</button>
@@ -1424,6 +1432,24 @@
     attachBar.classList.remove('show');
   }
 
+  // ---- Til aniqlash (ovoz uchun) ----
+  function detectLangCode(text){
+    if(!text) return 'uz-UZ';
+    if(/[\u0600-\u06FF]/.test(text)) return 'ar-SA';
+    if(/[\u0400-\u04FF]/.test(text)) return 'ru-RU';
+    if(/[ğışçİĞÜÖ]/.test(text)) return 'tr-TR';
+    if(/\b(the|is|are|and|you|please|hello|what|how)\b/i.test(text)) return 'en-US';
+    return 'uz-UZ';
+  }
+
+  const voiceLangSelect = document.getElementById('voiceLangSelect');
+  const VOICE_LANG_KEY = 'sardorAI_voiceLang_v1';
+  voiceLangSelect.value = localStorage.getItem(VOICE_LANG_KEY) || 'auto';
+  voiceLangSelect.addEventListener('change', () => {
+    localStorage.setItem(VOICE_LANG_KEY, voiceLangSelect.value);
+    if(recognition) recognition.lang = voiceLangSelect.value === 'auto' ? (navigator.language || 'uz-UZ') : voiceLangSelect.value;
+  });
+
   // ---- Voice input ----
   const micBtn = document.getElementById('micBtn');
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -1431,7 +1457,7 @@
   let listening = false;
   if(SpeechRecognition){
     recognition = new SpeechRecognition();
-    recognition.lang = 'uz-UZ';
+    recognition.lang = voiceLangSelect.value === 'auto' ? (navigator.language || 'uz-UZ') : voiceLangSelect.value;
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
     recognition.onresult = (e) => {
@@ -1452,6 +1478,7 @@
     if(listening){
       recognition.stop(); listening = false; micBtn.classList.remove('active');
     } else {
+      recognition.lang = voiceLangSelect.value === 'auto' ? (navigator.language || 'uz-UZ') : voiceLangSelect.value;
       recognition.start(); listening = true; micBtn.classList.add('active');
     }
   });
@@ -1460,12 +1487,14 @@
     if(!window.speechSynthesis) return;
     window.speechSynthesis.cancel();
     const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = 'uz-UZ';
+    const langCode = voiceLangSelect.value === 'auto' ? detectLangCode(text) : voiceLangSelect.value;
+    utter.lang = langCode;
     utter.rate = 1;
     utter.pitch = 0.9;
+    const prefix = langCode.split('-')[0].toLowerCase();
     const voices = window.speechSynthesis.getVoices();
-    let chosen = voices.find(v => /male/i.test(v.name));
-    if(!chosen) chosen = voices.find(v => v.lang && v.lang.toLowerCase().startsWith('uz'));
+    let chosen = voices.find(v => v.lang && v.lang.toLowerCase().startsWith(prefix) && /male/i.test(v.name));
+    if(!chosen) chosen = voices.find(v => v.lang && v.lang.toLowerCase().startsWith(prefix));
     if(!chosen) chosen = voices.find(v => v.lang && v.lang.toLowerCase().startsWith('ru'));
     if(!chosen) chosen = voices.find(v => v.lang && v.lang.toLowerCase().startsWith('en'));
     if(chosen) utter.voice = chosen;
