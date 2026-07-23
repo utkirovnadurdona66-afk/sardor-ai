@@ -8,11 +8,11 @@
 <title>Sardor AI — bepul o'zbek sun'iy intellekt chatbot</title>
 <meta name="description" content="Sardor AI — Saydurasulov Sardor tomonidan yaratilgan bepul o'zbekcha sun'iy intellekt chatbot. Savol bering, suhbatlashing, rasm chizdiring, qo'shiq yozdiring, fayl yuboring, ovozli gaplashing.">
 <meta name="keywords" content="Sardor AI, Sardor ai chatbot, sun'iy intellekt, o'zbek chatbot, Saydurasulov Sardor">
-<link rel="canonical" href="https://utkirovnadurdona66-afk.github.io/sardor-ai-app/">
+<link rel="canonical" href="https://utkirovnadurdona66-afk.github.io/sardor-ai/">
 <meta property="og:title" content="Sardor AI — chatbot">
 <meta property="og:description" content="Sizga o'xshagan sun'iy intellekt — savol bering, suhbatlashing, rasm chizdiring.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://utkirovnadurdona66-afk.github.io/sardor-ai-app/">
+<meta property="og:url" content="https://utkirovnadurdona66-afk.github.io/sardor-ai/">
 <meta name="robots" content="index, follow">
 <script type="application/ld+json">
 {
@@ -20,7 +20,7 @@
   "@type": "WebApplication",
   "name": "Sardor AI",
   "alternateName": "Sardor ai",
-  "url": "https://utkirovnadurdona66-afk.github.io/sardor-ai-app/",
+  "url": "https://utkirovnadurdona66-afk.github.io/sardor-ai/",
   "description": "Sardor AI — Saydurasulov Sardor tomonidan yaratilgan bepul o'zbekcha sun'iy intellekt chatbot.",
   "applicationCategory": "ChatApplication",
   "operatingSystem": "Web",
@@ -28,6 +28,7 @@
   "creator": { "@type": "Person", "name": "Saydurasulov Sardor" }
 }
 </script>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230d1526'/%3E%3Ccircle cx='50' cy='50' r='30' fill='none' stroke='%23c9a227' stroke-width='4'/%3E%3Ccircle cx='40' cy='46' r='5' fill='%237fd4c9'/%3E%3Ccircle cx='60' cy='46' r='5' fill='%237fd4c9'/%3E%3Cpath d='M38,60 Q50,68 62,60' stroke='%23e6c869' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="manifest" href="manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -667,6 +668,137 @@
   }
   .toast.show{ opacity:1; transform:translateX(-50%) translateY(-6px); }
 
+  /* ---------- Voice Room ---------- */
+  .voiceRoomOverlay{
+    position:fixed; inset:0;
+    background: radial-gradient(circle at 50% 30%, var(--lapis), var(--lapis-deeper));
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    z-index:100;
+    text-align:center;
+    padding:20px;
+  }
+  .voiceRoomOverlay.show{ display:flex; }
+  .voiceRoomClose{
+    position:absolute; top:20px; right:24px;
+    width:38px; height:38px; border-radius:50%;
+    background:rgba(245,238,220,0.08);
+    border:1px solid rgba(201,162,39,0.4);
+    color:var(--gold-soft);
+    font-size:16px; cursor:pointer;
+  }
+  .voiceAvatarWrap{
+    position:relative;
+    width:220px; height:220px;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+  }
+  .voiceRing{
+    position:absolute;
+    width:100%; height:100%;
+    border-radius:50%;
+    border:2px solid var(--turquoise);
+    opacity:0;
+  }
+  .voiceRing.ring2{ width:130%; height:130%; animation-delay:0.4s; }
+  .voiceAvatarWrap.listening .voiceRing{ animation: ringPulse 1.6s ease-out infinite; opacity:1; }
+  .voiceAvatarWrap.speaking .voiceRing{ animation: ringPulse 0.9s ease-out infinite; opacity:1; border-color:var(--gold); }
+  @keyframes ringPulse{
+    0%{ transform:scale(0.75); opacity:0.8; }
+    100%{ transform:scale(1.35); opacity:0; }
+  }
+  .voiceAvatarSvg{ width:200px; height:200px; position:relative; z-index:1; }
+  .voiceAvatarWrap.thinking .voiceAvatarSvg{ animation: avatarSway 1.2s ease-in-out infinite; }
+  .voiceAvatarWrap.speaking .voiceAvatarSvg{ animation: avatarBounce 0.5s ease-in-out infinite; }
+  @keyframes avatarSway{ 0%,100%{ transform:rotate(-2deg); } 50%{ transform:rotate(2deg); } }
+  @keyframes avatarBounce{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.04); } }
+  .eye{ animation: blink 4s infinite; transform-origin:center; }
+  .eyeR{ animation-delay:0.15s; }
+  @keyframes blink{ 0%,92%,100%{ transform:scaleY(1); } 96%{ transform:scaleY(0.15); } }
+  .voiceAvatarWrap.speaking .mouth{ animation: talkMouth 0.35s ease-in-out infinite; }
+  @keyframes talkMouth{ 0%,100%{ d: path('M80,118 Q100,128 120,118'); } 50%{ d: path('M80,116 Q100,134 120,116'); } }
+  .voiceStatus{
+    margin-top:24px;
+    color:var(--turquoise-light);
+    font-size:15px;
+    min-height:20px;
+  }
+  .voiceMicBig{
+    margin-top:28px;
+    width:76px; height:76px;
+    border-radius:50%;
+    background:var(--gold);
+    border:none;
+    font-size:28px;
+    cursor:pointer;
+    color:var(--lapis-dark);
+    box-shadow:0 4px 18px rgba(0,0,0,0.4);
+    transition:background 0.2s, transform 0.15s;
+  }
+  .voiceMicBig:active{ transform:scale(0.95); }
+  .voiceMicBig.listening{ background:var(--turquoise); }
+  .voiceMicBig.speaking{ background:var(--danger); }
+  .voiceHint{
+    margin-top:16px;
+    font-size:11.5px;
+    color:rgba(128,128,128,0.7);
+    max-width:280px;
+  }
+
+  /* ---------- About modal ---------- */
+  .aboutOverlay{
+    position:fixed; inset:0;
+    background:rgba(0,0,0,0.55);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:110;
+    padding:20px;
+  }
+  .aboutOverlay.show{ display:flex; }
+  .aboutBox{
+    position:relative;
+    background:var(--lapis-dark);
+    border:1px solid rgba(201,162,39,0.4);
+    border-radius:16px;
+    padding:26px 26px 20px;
+    max-width:360px;
+    width:100%;
+  }
+  .aboutBox h3{
+    font-family:'Cormorant Garamond', serif;
+    font-size:22px;
+    margin:0 0 6px;
+    color:var(--gold-soft);
+  }
+  .aboutBox p{ font-size:13px; color:var(--turquoise-light); margin:4px 0 12px; }
+  .aboutBox ul{ list-style:none; padding:0; margin:0 0 14px; display:flex; flex-direction:column; gap:8px; font-size:13.5px; }
+  .aboutFooter{ font-size:11.5px !important; color:rgba(128,128,128,0.7) !important; margin-top:10px !important; }
+
+  /* ---------- Message language flag ---------- */
+  .langFlag{ opacity:0.75; }
+
+  /* ---------- Follow-up chips ---------- */
+  .followUps{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-top:8px;
+  }
+  .followUps button{
+    background:rgba(46,158,150,0.1);
+    border:1px solid rgba(46,158,150,0.35);
+    color:var(--turquoise-light);
+    font-size:11.5px;
+    padding:5px 11px;
+    border-radius:14px;
+    cursor:pointer;
+    font-family:'Manrope',sans-serif;
+  }
+  .followUps button:hover{ background:rgba(46,158,150,0.2); }
+
   @media (max-width: 720px){
     .sidebar{
       position:fixed;
@@ -720,9 +852,14 @@
       <button class="menuToggle" id="menuToggle" title="Suhbatlar ro'yxati">☰</button>
       <div class="headerTitle">
         <h2 id="chatTitle">Sardor AI</h2>
-        <p><span class="onlineDot"></span> Onlayn — javob berishga tayyor</p>
+        <p><span class="onlineDot"></span> La havla vala quvvata illa billah</p>
       </div>
       <div class="headerActions">
+        <button id="fontDownBtn" title="Shriftni kichraytirish">A-</button>
+        <button id="fontUpBtn" title="Shriftni kattalashtirish">A+</button>
+        <button id="soundToggleBtn" title="Bildirishnoma ovozi">🔔</button>
+        <button id="aboutBtn" title="Ilova haqida">ℹ️</button>
+        <button id="voiceRoomBtn" title="Ovozli suhbat xonasi">🎙️ <span class="lbl">Ovozli xona</span></button>
         <button id="renameBtn" title="Suhbat nomini o'zgartirish">✏️ <span class="lbl">Nomlash</span></button>
         <button id="shareBtn" title="Suhbatni nusxalash">🔗 <span class="lbl">Ulashish</span></button>
       </div>
@@ -766,10 +903,47 @@
     </div>
     <div class="composerFooter">
       <span id="charCounter">0 belgi</span>
-      <span>Enter — yuborish · Shift+Enter — yangi qator</span>
+      <span>Sardor AI xato qilishi mumkin — muhim narsalarni tekshirib ko'ring</span>
     </div>
   </div>
 </div>
+<div class="voiceRoomOverlay" id="voiceRoomOverlay">
+  <button class="voiceRoomClose" id="voiceRoomClose" title="Yopish (Esc)">✕</button>
+  <div class="voiceAvatarWrap" id="voiceAvatarWrap">
+    <div class="voiceRing ring1"></div>
+    <div class="voiceRing ring2"></div>
+    <svg class="voiceAvatarSvg" viewBox="0 0 200 200">
+      <circle cx="100" cy="100" r="72" fill="rgba(46,158,150,0.12)" stroke="var(--turquoise)" stroke-width="2"/>
+      <circle cx="100" cy="34" r="6" fill="var(--gold)"/>
+      <line x1="100" y1="40" x2="100" y2="58" stroke="var(--gold)" stroke-width="2"/>
+      <rect x="55" y="58" width="90" height="80" rx="26" fill="rgba(245,238,220,0.06)" stroke="var(--gold)" stroke-width="2"/>
+      <circle class="eye eyeL" cx="80" cy="96" r="7" fill="var(--turquoise-light)"/>
+      <circle class="eye eyeR" cx="120" cy="96" r="7" fill="var(--turquoise-light)"/>
+      <path class="mouth" d="M80,118 Q100,128 120,118" stroke="var(--gold-soft)" stroke-width="3" fill="none" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div class="voiceStatus" id="voiceStatus">Gaplashish uchun mikrofonga bosing</div>
+  <button class="voiceMicBig" id="voiceMicBig">🎤</button>
+  <div class="voiceHint">Har gapdan keyin u avtomatik javob beradi va yana tinglaydi</div>
+</div>
+
+<div class="aboutOverlay" id="aboutOverlay">
+  <div class="aboutBox">
+    <button class="voiceRoomClose" id="aboutClose" title="Yopish">✕</button>
+    <h3>Sardor AI haqida</h3>
+    <p>La havla vala quvvata illa billah</p>
+    <ul>
+      <li>💬 Jonli (streaming) suhbat</li>
+      <li>🎨 Rasm chizish</li>
+      <li>🎤 Ovozli xona — faqat gaplashish, yozmasdan</li>
+      <li>📎 Rasm va PDF tahlil qilish</li>
+      <li>🌗 Kunduzgi/tungi mavzu</li>
+      <li>🌐 Ko'p tilda gaplashish va eshitish</li>
+    </ul>
+    <p class="aboutFooter">Yaratuvchi: Saydurasulov Sardor</p>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
