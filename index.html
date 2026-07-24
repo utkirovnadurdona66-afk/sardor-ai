@@ -720,13 +720,43 @@
   .voiceAvatarWrap.speaking .mouth{ animation: talkMouth 0.35s ease-in-out infinite; }
   @keyframes talkMouth{ 0%,100%{ d: path('M80,118 Q100,128 120,118'); } 50%{ d: path('M80,116 Q100,134 120,116'); } }
   .voiceStatus{
-    margin-top:24px;
+    margin-top:14px;
     color:var(--turquoise-light);
     font-size:15px;
     min-height:20px;
   }
+  .voiceWave{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:4px;
+    height:26px;
+    margin-top:16px;
+    opacity:0.35;
+    transition:opacity 0.2s;
+  }
+  .voiceAvatarWrap.listening ~ .voiceWave{ opacity:1; }
+  .voiceWave span{
+    width:4px;
+    height:6px;
+    border-radius:3px;
+    background:var(--turquoise);
+    transition: height 0.08s ease;
+  }
+  .voiceAvatarWrap.speaking ~ .voiceWave span{ background:var(--gold); animation: waveIdle 0.7s ease-in-out infinite; }
+  .voiceAvatarWrap.speaking ~ .voiceWave span:nth-child(2n){ animation-delay:0.12s; }
+  .voiceAvatarWrap.speaking ~ .voiceWave span:nth-child(3n){ animation-delay:0.24s; }
+  @keyframes waveIdle{ 0%,100%{ height:6px; } 50%{ height:22px; } }
+  .voiceCaption{
+    margin-top:14px;
+    max-width:320px;
+    min-height:18px;
+    font-size:13px;
+    color:rgba(245,238,220,0.75);
+    font-style:italic;
+  }
   .voiceMicBig{
-    margin-top:28px;
+    margin-top:22px;
     width:76px; height:76px;
     border-radius:50%;
     background:var(--gold);
@@ -923,10 +953,15 @@
       <path class="mouth" d="M80,118 Q100,128 120,118" stroke="var(--gold-soft)" stroke-width="3" fill="none" stroke-linecap="round"/>
     </svg>
   </div>
+  <div class="voiceWave" id="voiceWave">
+    <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+  </div>
   <div class="voiceStatus" id="voiceStatus">Gaplashish uchun mikrofonga bosing</div>
+  <div class="voiceCaption" id="voiceCaption"></div>
   <button class="voiceMicBig" id="voiceMicBig">🎤</button>
-  <div class="voiceHint">Har gapdan keyin u avtomatik javob beradi va yana tinglaydi</div>
+  <div class="voiceHint">Gapirayotganda bosing — u to'xtaydi va sizni tinglaydi</div>
 </div>
+
 
 <div class="aboutOverlay" id="aboutOverlay">
   <div class="aboutBox">
@@ -1711,6 +1746,19 @@
     return 'uz-UZ';
   }
 
+  // ---- Ovoz uchun matnni tozalash: emoji va belgilarni o'qimasin, faqat tabiiy gap eshitilsin ----
+  const EMOJI_RE = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{1F1E6}-\u{1F1FF}\u{2190}-\u{21FF}\u{2B00}-\u{2BFF}\uFE0F]/gu;
+  function stripForSpeech(text){
+    if(!text) return '';
+    return text
+      .replace(/```[\s\S]*?```/g, ' kod parchasi ')
+      .replace(EMOJI_RE, '')
+      .replace(/[*_~`#>]+/g, '')
+      .replace(/\[to'xtatildi\]/gi, '')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
+  }
+
   const voiceLangSelect = document.getElementById('voiceLangSelect');
   const VOICE_LANG_KEY = 'sardorAI_voiceLang_v1';
   voiceLangSelect.value = localStorage.getItem(VOICE_LANG_KEY) || 'auto';
@@ -1745,6 +1793,7 @@
       listening = false; micBtn.classList.remove('active');
       if(voiceRoomActive && voiceListeningNow){
         voiceListeningNow = false;
+        stopMicWave();
         setVoiceState('idle', "Gapirish uchun mikrofonga bosing");
       }
     };
@@ -1752,6 +1801,7 @@
       listening = false; micBtn.classList.remove('active');
       if(voiceRoomActive){
         voiceListeningNow = false;
+        stopMicWave();
         setVoiceState('idle', "Eshitilmadi, qayta urinib ko'ring");
       }
     };
@@ -1769,14 +1819,16 @@
     }
   });
 
-  function speak(text){
+  function speak(text, onEndCb){
     if(!window.speechSynthesis) return;
+    const clean = stripForSpeech(text);
+    if(!clean) return;
     window.speechSynthesis.cancel();
-    const utter = new SpeechSynthesisUtterance(text);
-    const langCode = voiceLangSelect.value === 'auto' ? detectLangCode(text) : voiceLangSelect.value;
+    const utter = new SpeechSynthesisUtterance(clean);
+    const langCode = voiceLangSelect.value === 'auto' ? detectLangCode(clean) : voiceLangSelect.value;
     utter.lang = langCode;
-    utter.rate = 1;
-    utter.pitch = 0.9;
+    utter.rate = 1.02;
+    utter.pitch = 0.95;
     const prefix = langCode.split('-')[0].toLowerCase();
     const voices = window.speechSynthesis.getVoices();
     let chosen = voices.find(v => v.lang && v.lang.toLowerCase().startsWith(prefix) && /male/i.test(v.name));
@@ -1784,6 +1836,7 @@
     if(!chosen) chosen = voices.find(v => v.lang && v.lang.toLowerCase().startsWith('ru'));
     if(!chosen) chosen = voices.find(v => v.lang && v.lang.toLowerCase().startsWith('en'));
     if(chosen) utter.voice = chosen;
+    if(onEndCb) utter.onend = onEndCb;
     window.speechSynthesis.speak(utter);
   }
   if(window.speechSynthesis){
@@ -1795,25 +1848,65 @@
   let voiceRoomActive = false;
   let voiceListeningNow = false;
   let voiceAbort = null;
+  let voiceMicStream = null;
+  let voiceAudioCtx = null;
+  let voiceAnalyser = null;
+  let voiceRafId = null;
 
   const voiceRoomBtn = document.getElementById('voiceRoomBtn');
   const voiceRoomOverlay = document.getElementById('voiceRoomOverlay');
   const voiceRoomClose = document.getElementById('voiceRoomClose');
   const voiceAvatarWrap = document.getElementById('voiceAvatarWrap');
   const voiceStatus = document.getElementById('voiceStatus');
+  const voiceCaption = document.getElementById('voiceCaption');
   const voiceMicBig = document.getElementById('voiceMicBig');
+  const voiceWaveBars = document.querySelectorAll('#voiceWave span');
 
   function setVoiceState(state, text){
     voiceAvatarWrap.className = 'voiceAvatarWrap ' + state;
     voiceMicBig.className = 'voiceMicBig ' + state;
     voiceStatus.textContent = text;
+    if(navigator.vibrate) navigator.vibrate(15);
+  }
+
+  async function ensureMicVisualizer(){
+    if(voiceMicStream) return true;
+    try{
+      voiceMicStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      voiceAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const src = voiceAudioCtx.createMediaStreamSource(voiceMicStream);
+      voiceAnalyser = voiceAudioCtx.createAnalyser();
+      voiceAnalyser.fftSize = 64;
+      src.connect(voiceAnalyser);
+      return true;
+    }catch(e){
+      return false; // ruxsat berilmadi — baribir CSS animatsiya bilan davom etadi
+    }
+  }
+
+  function drawMicWave(){
+    if(!voiceAnalyser || !voiceListeningNow){ voiceRafId = null; return; }
+    const data = new Uint8Array(voiceAnalyser.frequencyBinCount);
+    voiceAnalyser.getByteFrequencyData(data);
+    const step = Math.floor(data.length / voiceWaveBars.length) || 1;
+    voiceWaveBars.forEach((bar, i) => {
+      const v = data[i * step] || 0;
+      bar.style.height = Math.max(6, Math.min(26, (v / 255) * 26)) + 'px';
+    });
+    voiceRafId = requestAnimationFrame(drawMicWave);
+  }
+  function stopMicWave(){
+    if(voiceRafId){ cancelAnimationFrame(voiceRafId); voiceRafId = null; }
+    voiceWaveBars.forEach(bar => bar.style.height = '6px');
   }
 
   function openVoiceRoom(){
     if(!SpeechRecognition){ showToast("Bu brauzer ovozli suhbatni qo'llab-quvvatlamaydi"); return; }
     voiceRoomActive = true;
     voiceRoomOverlay.classList.add('show');
+    voiceCaption.textContent = '';
     setVoiceState('idle', "Gaplashish uchun mikrofonga bosing");
+    ensureMicVisualizer();
   }
   function closeVoiceRoom(){
     voiceRoomActive = false;
@@ -1822,6 +1915,9 @@
     try{ recognition && recognition.stop(); }catch(e){}
     window.speechSynthesis && window.speechSynthesis.cancel();
     if(voiceAbort){ voiceAbort.abort(); voiceAbort = null; }
+    stopMicWave();
+    if(voiceMicStream){ voiceMicStream.getTracks().forEach(t => t.stop()); voiceMicStream = null; }
+    if(voiceAudioCtx){ voiceAudioCtx.close().catch(()=>{}); voiceAudioCtx = null; }
     renderMessages();
     renderChatList();
   }
@@ -1833,10 +1929,18 @@
     recognition.lang = voiceLangSelect.value === 'auto' ? (navigator.language || 'uz-UZ') : voiceLangSelect.value;
     voiceListeningNow = true;
     setVoiceState('listening', "Tinglayapman...");
+    if(voiceAnalyser && !voiceRafId) drawMicWave();
     try{ recognition.start(); }catch(e){}
   }
   function voiceMicClick(){
     if(!recognition) return;
+    const isSpeaking = voiceAvatarWrap.classList.contains('speaking');
+    if(isSpeaking){
+      // Barge-in: gapirayotganda bosilsa, darhol to'xtaydi va tinglashga o'tadi
+      window.speechSynthesis.cancel();
+      startVoiceListening();
+      return;
+    }
     if(voiceListeningNow){
       recognition.stop();
     } else {
@@ -1847,10 +1951,12 @@
   voiceAvatarWrap.addEventListener('click', voiceMicClick);
 
   async function handleVoiceRoomTranscript(transcript){
+    stopMicWave();
     if(!transcript || !transcript.trim()){
       setVoiceState('idle', "Gapirish uchun mikrofonga bosing");
       return;
     }
+    voiceCaption.textContent = '“' + transcript + '”';
     const chat = chats[activeId];
     if(chat.messages.length === 0) autoTitleChat(chat, transcript);
     chat.messages.push({ role: 'user', content: transcript, time: timeNow() });
@@ -1914,18 +2020,24 @@
     persist();
     renderChatList();
     playNotifySound();
+    voiceCaption.textContent = stripForSpeech(fullText);
     setVoiceState('speaking', "Gapiryapman...");
     speakInRoom(fullText);
   }
 
   function speakInRoom(text){
-    if(!window.speechSynthesis){ setVoiceState('idle', "Gapirish uchun mikrofonga bosing"); return; }
+    const clean = stripForSpeech(text);
+    if(!window.speechSynthesis || !clean){
+      setVoiceState('idle', "Gapirish uchun mikrofonga bosing");
+      if(voiceRoomActive) startVoiceListening();
+      return;
+    }
     window.speechSynthesis.cancel();
-    const utter = new SpeechSynthesisUtterance(text);
-    const langCode = voiceLangSelect.value === 'auto' ? detectLangCode(text) : voiceLangSelect.value;
+    const utter = new SpeechSynthesisUtterance(clean);
+    const langCode = voiceLangSelect.value === 'auto' ? detectLangCode(clean) : voiceLangSelect.value;
     utter.lang = langCode;
-    utter.rate = 1;
-    utter.pitch = 0.9;
+    utter.rate = 1.02;
+    utter.pitch = 0.95;
     const prefix = langCode.split('-')[0].toLowerCase();
     const voices = window.speechSynthesis.getVoices();
     let chosen = voices.find(v => v.lang && v.lang.toLowerCase().startsWith(prefix));
