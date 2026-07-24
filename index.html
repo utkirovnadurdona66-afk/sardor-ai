@@ -365,6 +365,24 @@
     color:var(--cream);
     border-bottom-left-radius:3px;
   }
+  body.glass-mode .msg.bot{
+    background:rgba(255,255,255,0.06);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border:1px solid rgba(255,255,255,0.18);
+  }
+  body.glass-mode .msg.user{
+    background:rgba(46,158,150,0.55);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+  body.glass-mode .sidebar,
+  body.glass-mode .header,
+  body.glass-mode .composer{
+    background:rgba(255,255,255,0.04) !important;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+  }
   .msg.bot.typing{
     display:flex;
     align-items:center;
@@ -888,6 +906,9 @@
         <button id="fontDownBtn" title="Shriftni kichraytirish">A-</button>
         <button id="fontUpBtn" title="Shriftni kattalashtirish">A+</button>
         <button id="soundToggleBtn" title="Bildirishnoma ovozi">🔔</button>
+        <button id="memoryBtn" title="Xotira">🧠</button>
+        <button id="statsBtn" title="Profil va statistika">📊</button>
+        <button id="themeBtn" title="Ranglar va tema">🎨</button>
         <button id="aboutBtn" title="Ilova haqida">ℹ️</button>
         <button id="voiceRoomBtn" title="Ovozli suhbat xonasi">🎙️ <span class="lbl">Ovozli xona</span></button>
         <button id="renameBtn" title="Suhbat nomini o'zgartirish">✏️ <span class="lbl">Nomlash</span></button>
@@ -969,14 +990,48 @@
     <h3>Sardor AI haqida</h3>
     <p>La havla vala quvvata illa billah</p>
     <ul>
-      <li>💬 Jonli (streaming) suhbat</li>
-      <li>🎨 Rasm chizish</li>
-      <li>🎤 Ovozli xona — faqat gaplashish, yozmasdan</li>
-      <li>📎 Rasm va PDF tahlil qilish</li>
-      <li>🌗 Kunduzgi/tungi mavzu</li>
+      <li>💬 Jonli (streaming) suhbat + internetdan qidirish</li>
+      <li>🎨 Rasm chizish, tahrirlash, logo/banner/stiker</li>
+      <li>🎤 Ovozli xona — jonli mikrofon to'lqini bilan</li>
+      <li>📎 Rasm, PDF, Word, Excel tahlil qilish</li>
+      <li>🧠 Xotira — muhim narsalarni doim eslab qoladi</li>
+      <li>🌗 15+ tema, neon va shisha (glass) uslub</li>
       <li>🌐 Ko'p tilda gaplashish va eshitish</li>
     </ul>
     <p class="aboutFooter">Yaratuvchi: Saydurasulov Sardor</p>
+  </div>
+</div>
+
+<div class="aboutOverlay" id="memoryOverlay">
+  <div class="aboutBox">
+    <button class="voiceRoomClose" id="memoryClose" title="Yopish">✕</button>
+    <h3>🧠 Xotira</h3>
+    <p>Bu yerga yozganlaringizni Sardor AI har bir suhbatda eslab turadi (masalan: ismingiz, kasbingiz, yoqtirgan narsalaringiz).</p>
+    <div id="memoryList" style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto;margin-bottom:12px;"></div>
+    <div style="display:flex;gap:6px;">
+      <input type="text" id="memoryInput" placeholder="Masalan: Mening ismim Davlat" style="flex:1;padding:9px 10px;border-radius:9px;border:1px solid rgba(201,162,39,0.4);background:rgba(128,128,128,0.06);color:var(--cream);font-family:'Manrope',sans-serif;font-size:13px;outline:none;">
+      <button id="memoryAddBtn" style="background:var(--gold);border:none;color:var(--lapis-dark);border-radius:9px;padding:0 14px;cursor:pointer;font-weight:700;">+</button>
+    </div>
+  </div>
+</div>
+
+<div class="aboutOverlay" id="statsOverlay">
+  <div class="aboutBox">
+    <button class="voiceRoomClose" id="statsClose" title="Yopish">✕</button>
+    <h3>📊 Profil va statistika</h3>
+    <div id="statsBody" style="display:flex;flex-direction:column;gap:8px;font-size:13.5px;"></div>
+  </div>
+</div>
+
+<div class="aboutOverlay" id="themeOverlay">
+  <div class="aboutBox">
+    <button class="voiceRoomClose" id="themeClose" title="Yopish">✕</button>
+    <h3>🎨 Ranglar va tema</h3>
+    <p>Rang palettasini tanlang:</p>
+    <div id="paletteGrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;"></div>
+    <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;">
+      <input type="checkbox" id="glassToggle"> Shisha (glassmorphism) uslub
+    </label>
   </div>
 </div>
 
@@ -2056,6 +2111,144 @@
   const aboutOverlay = document.getElementById('aboutOverlay');
   document.getElementById('aboutBtn').addEventListener('click', () => aboutOverlay.classList.add('show'));
   document.getElementById('aboutClose').addEventListener('click', () => aboutOverlay.classList.remove('show'));
+
+  // ---------------- Xotira (Memory) ----------------
+  const MEMORY_KEY = 'sardorAI_memory_v1';
+  let memoryNotes = [];
+  try{ memoryNotes = JSON.parse(localStorage.getItem(MEMORY_KEY) || '[]'); }catch(e){ memoryNotes = []; }
+  function persistMemory(){ localStorage.setItem(MEMORY_KEY, JSON.stringify(memoryNotes)); }
+  function renderMemoryList(){
+    const list = document.getElementById('memoryList');
+    list.innerHTML = '';
+    if(memoryNotes.length === 0){
+      list.innerHTML = '<div style="font-size:12px;color:rgba(128,128,128,0.6);">Hali hech narsa qo\'shilmagan</div>';
+      return;
+    }
+    memoryNotes.forEach((note, idx) => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:6px;background:rgba(128,128,128,0.06);padding:6px 10px;border-radius:8px;font-size:12.5px;';
+      const span = document.createElement('span');
+      span.style.flex = '1';
+      span.textContent = note;
+      const rm = document.createElement('button');
+      rm.textContent = '✕';
+      rm.style.cssText = 'background:transparent;border:none;color:var(--danger);cursor:pointer;';
+      rm.addEventListener('click', () => { memoryNotes.splice(idx, 1); persistMemory(); renderMemoryList(); });
+      row.appendChild(span);
+      row.appendChild(rm);
+      list.appendChild(row);
+    });
+  }
+  const memoryOverlay = document.getElementById('memoryOverlay');
+  document.getElementById('memoryBtn').addEventListener('click', () => { renderMemoryList(); memoryOverlay.classList.add('show'); });
+  document.getElementById('memoryClose').addEventListener('click', () => memoryOverlay.classList.remove('show'));
+  document.getElementById('memoryAddBtn').addEventListener('click', () => {
+    const input = document.getElementById('memoryInput');
+    const val = input.value.trim();
+    if(!val) return;
+    memoryNotes.push(val);
+    persistMemory();
+    input.value = '';
+    renderMemoryList();
+    showToast("Xotiraga qo'shildi ✓");
+  });
+  document.getElementById('memoryInput').addEventListener('keydown', (e) => {
+    if(e.key === 'Enter'){ e.preventDefault(); document.getElementById('memoryAddBtn').click(); }
+  });
+  function memoryContextLine(){
+    if(memoryNotes.length === 0) return '';
+    return "[Foydalanuvchi haqida eslab qolingan narsalar: " + memoryNotes.join('; ') + "]";
+  }
+
+  // ---------------- Profil va statistika ----------------
+  const statsOverlay = document.getElementById('statsOverlay');
+  document.getElementById('statsBtn').addEventListener('click', () => {
+    const chatIds = Object.keys(chats);
+    let totalMsgs = 0, userMsgs = 0, botMsgs = 0, images = 0, earliestTs = null;
+    chatIds.forEach(id => {
+      const c = chats[id];
+      totalMsgs += c.messages.length;
+      c.messages.forEach(m => {
+        if(m.role === 'user') userMsgs++; else botMsgs++;
+        if(m.generatedImage || (m.images && m.images.length)) images++;
+      });
+      const ts = Number(id.split('_')[1]) || null;
+      if(ts && (!earliestTs || ts < earliestTs)) earliestTs = ts;
+    });
+    const since = earliestTs ? new Date(earliestTs).toLocaleDateString('uz-UZ', { year:'numeric', month:'long', day:'numeric' }) : '—';
+    const body = document.getElementById('statsBody');
+    body.innerHTML = '';
+    [
+      ['💬 Jami suhbatlar', chatIds.length],
+      ['✉️ Jami xabarlar', totalMsgs],
+      ['🗣️ Sizning xabarlaringiz', userMsgs],
+      ['🤖 Sardor AI javoblari', botMsgs],
+      ['🖼️ Rasm bilan bog\'liq xabarlar', images],
+      ['📅 Foydalanish boshlangan sana', since]
+    ].forEach(([label, val]) => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;justify-content:space-between;border-bottom:1px solid rgba(128,128,128,0.15);padding-bottom:6px;';
+      row.innerHTML = `<span>${label}</span><strong>${val}</strong>`;
+      body.appendChild(row);
+    });
+    statsOverlay.classList.add('show');
+  });
+  document.getElementById('statsClose').addEventListener('click', () => statsOverlay.classList.remove('show'));
+
+  // ---------------- Ranglar va tema (palette) ----------------
+  const PALETTES = [
+    { name: "Lazurit (asosiy)", gold: '#c9a227', goldSoft: '#e6c869', turquoise: '#2e9e96', turquoiseLight: '#7fd4c9' },
+    { name: 'Neon', gold: '#ff2ec4', goldSoft: '#ff7ae0', turquoise: '#00e5ff', turquoiseLight: '#7dfaff' },
+    { name: 'O\'rmon', gold: '#8bc34a', goldSoft: '#b6e08a', turquoise: '#2e8b6e', turquoiseLight: '#7fd4a8' },
+    { name: 'Quyosh botishi', gold: '#ff8a3d', goldSoft: '#ffb877', turquoise: '#e94e77', turquoiseLight: '#ff9db8' },
+    { name: 'Binafsha', gold: '#a970ff', goldSoft: '#c9a3ff', turquoise: '#6a4bd6', turquoiseLight: '#a996f0' },
+    { name: 'Oltin qum', gold: '#d4af37', goldSoft: '#f0d878', turquoise: '#b08d57', turquoiseLight: '#e0c9a0' },
+    { name: 'Muzlik', gold: '#7fc8f8', goldSoft: '#b6e2ff', turquoise: '#2e6fa6', turquoiseLight: '#8fc2e8' },
+    { name: 'Qizil olov', gold: '#ff5252', goldSoft: '#ff8a80', turquoise: '#c62828', turquoiseLight: '#ff8a80' }
+  ];
+  const PALETTE_KEY = 'sardorAI_palette_v1';
+  const GLASS_KEY = 'sardorAI_glass_v1';
+  function applyPalette(idx){
+    const p = PALETTES[idx] || PALETTES[0];
+    document.documentElement.style.setProperty('--gold', p.gold);
+    document.documentElement.style.setProperty('--gold-soft', p.goldSoft);
+    document.documentElement.style.setProperty('--turquoise', p.turquoise);
+    document.documentElement.style.setProperty('--turquoise-light', p.turquoiseLight);
+    localStorage.setItem(PALETTE_KEY, idx);
+  }
+  function renderPaletteGrid(){
+    const grid = document.getElementById('paletteGrid');
+    grid.innerHTML = '';
+    const current = parseInt(localStorage.getItem(PALETTE_KEY) || '0', 10);
+    PALETTES.forEach((p, idx) => {
+      const sw = document.createElement('button');
+      sw.title = p.name;
+      sw.style.cssText = `height:44px;border-radius:10px;cursor:pointer;border:2px solid ${idx===current?'#fff':'transparent'};background:linear-gradient(135deg, ${p.gold}, ${p.turquoise});`;
+      sw.addEventListener('click', () => { applyPalette(idx); renderPaletteGrid(); });
+      grid.appendChild(sw);
+    });
+  }
+  const themeOverlay = document.getElementById('themeOverlay');
+  document.getElementById('themeBtn').addEventListener('click', () => { renderPaletteGrid(); themeOverlay.classList.add('show'); });
+  document.getElementById('themeClose').addEventListener('click', () => themeOverlay.classList.remove('show'));
+  const glassToggle = document.getElementById('glassToggle');
+  glassToggle.checked = localStorage.getItem(GLASS_KEY) === 'on';
+  document.body.classList.toggle('glass-mode', glassToggle.checked);
+  glassToggle.addEventListener('change', () => {
+    localStorage.setItem(GLASS_KEY, glassToggle.checked ? 'on' : 'off');
+    document.body.classList.toggle('glass-mode', glassToggle.checked);
+  });
+  applyPalette(parseInt(localStorage.getItem(PALETTE_KEY) || '0', 10));
+
+  // ---------------- Bildirishnoma (Notification API, tab fonda bo'lganda) ----------------
+  if('Notification' in window && Notification.permission === 'default'){
+    // Ruxsatni birinchi xabar yuborilganda so'raymiz (majburlab emas)
+  }
+  function notifyIfHidden(text){
+    if(document.hidden && 'Notification' in window && Notification.permission === 'granted'){
+      try{ new Notification('Sardor AI', { body: text.slice(0, 120), icon: 'icon-192.png' }); }catch(e){}
+    }
+  }
 
   // ---------------- Esc key closes overlays ----------------
   document.addEventListener('keydown', (e) => {
