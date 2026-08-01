@@ -69,6 +69,7 @@
   .shell{
     display:flex;
     height:100vh;
+    height:100dvh;
     max-width:1180px;
     margin:0 auto;
   }
@@ -655,9 +656,6 @@
     background:#0d1526 !important;
   }
   .codeCopyBtn{
-    position:absolute;
-    top:6px;
-    right:6px;
     background:rgba(201,162,39,0.25);
     border:1px solid rgba(201,162,39,0.5);
     color:var(--gold-soft);
@@ -666,6 +664,7 @@
     border-radius:6px;
     cursor:pointer;
     font-family:'Manrope',sans-serif;
+    white-space:nowrap;
   }
   .codeCopyBtn:hover{background:rgba(201,162,39,0.4);}
   .toast{
@@ -852,6 +851,7 @@
       position:fixed;
       z-index:20;
       height:100vh;
+      height:100dvh;
       box-shadow:8px 0 24px rgba(0,0,0,0.4);
     }
     .sidebar.collapsed{ margin-left:-270px; }
@@ -859,6 +859,28 @@
     .headerTitle h2{ font-size:20px; }
     .msg{ max-width:90%; }
     .headerActions button span.lbl{ display:none; }
+    .headerActions{ flex-wrap:wrap; justify-content:flex-end; row-gap:6px; }
+    .headerActions button{ padding:0 8px; font-size:12px; }
+
+    .composer{
+      flex-wrap:wrap;
+      row-gap:8px;
+      padding:10px 12px 8px;
+    }
+    .composer #imgBtn, .composer #fileBtn, .composer #locBtn, .composer #micBtn, .composer #voiceLangSelect{
+      order:1;
+      flex:0 0 auto;
+    }
+    .composer #voiceLangSelect{ font-size:11px !important; padding:0 2px !important; max-width:64px; }
+    .composer #input{
+      order:2;
+      flex-basis:100%;
+      width:100%;
+    }
+    .composer #sendBtn{ order:3; flex:1 1 auto; }
+    .composer #clearBtn{ order:4; flex:0 0 auto; }
+    .composerFooter{ padding:0 12px 10px; flex-wrap:wrap; row-gap:2px; }
+    .composerFooter span:last-child{ font-size:9.5px; }
   }
 </style>
 </head>
@@ -1102,6 +1124,16 @@
     return new Date().toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' });
   }
 
+  function buildMessagesPayload(chat){
+    const memLine = (typeof memoryContextLine === 'function') ? memoryContextLine() : '';
+    if(!memLine) return chat.messages;
+    return [
+      { role: 'user', content: memLine },
+      { role: 'assistant', content: "Tushundim, buni esda saqlayman." },
+      ...chat.messages
+    ];
+  }
+
   function greetingByHour(){
     const h = new Date().getHours();
     if(h < 6) return "Tungi tinchlik 🌙 Nima haqida gaplashamiz?";
@@ -1343,6 +1375,8 @@
       if(code !== undefined){
         const wrap = document.createElement('div');
         wrap.className = 'codeWrap';
+        const btnRow = document.createElement('div');
+        btnRow.style.cssText = 'position:absolute;top:6px;right:6px;display:flex;gap:6px;';
         const btn = document.createElement('button');
         btn.className = 'codeCopyBtn';
         btn.textContent = 'Copy';
@@ -1352,12 +1386,45 @@
             setTimeout(() => btn.textContent = 'Copy', 1500);
           });
         });
+        btnRow.appendChild(btn);
+
+        const optBtn = document.createElement('button');
+        optBtn.className = 'codeCopyBtn';
+        optBtn.textContent = '⚡ Optimallashtir';
+        optBtn.addEventListener('click', () => {
+          if(sending) return;
+          inputEl.value = "Shu kodni optimallashtir va yaxshila:\n```" + (lang || '') + "\n" + code.trim() + "\n```";
+          autoGrow();
+          updateCharCounter();
+          sendMessage();
+        });
+        btnRow.appendChild(optBtn);
+
+        const isPreviewable = /^(html|htm|xml)$/i.test(lang || '') || /<html|<body|<!doctype/i.test(code);
+        if(isPreviewable){
+          const prevBtn = document.createElement('button');
+          prevBtn.className = 'codeCopyBtn';
+          prevBtn.textContent = '▶ Preview';
+          prevBtn.addEventListener('click', () => {
+            const existing = wrap.querySelector('.codePreviewFrame');
+            if(existing){ existing.remove(); prevBtn.textContent = '▶ Preview'; return; }
+            const iframe = document.createElement('iframe');
+            iframe.className = 'codePreviewFrame';
+            iframe.style.cssText = 'width:100%;height:320px;border:none;border-top:1px solid rgba(201,162,39,0.3);background:#fff;';
+            iframe.sandbox = 'allow-scripts';
+            iframe.srcdoc = code;
+            wrap.appendChild(iframe);
+            prevBtn.textContent = '✕ Yopish';
+          });
+          btnRow.appendChild(prevBtn);
+        }
+
         const pre = document.createElement('pre');
         const codeEl = document.createElement('code');
         if(lang) codeEl.className = 'language-' + lang;
         codeEl.textContent = code.trim();
         pre.appendChild(codeEl);
-        wrap.appendChild(btn);
+        wrap.appendChild(btnRow);
         wrap.appendChild(pre);
         container.appendChild(wrap);
         if(window.hljs) window.hljs.highlightElement(codeEl);
@@ -2024,7 +2091,7 @@
       const response = await fetch(CHAT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: chat.messages }),
+        body: JSON.stringify({ messages: buildMessagesPayload(chat) }),
         signal: voiceAbort.signal
       });
       if(!response.ok){
@@ -2075,6 +2142,7 @@
     persist();
     renderChatList();
     playNotifySound();
+    notifyIfHidden(fullText);
     voiceCaption.textContent = stripForSpeech(fullText);
     setVoiceState('speaking', "Gapiryapman...");
     speakInRoom(fullText);
@@ -2334,6 +2402,9 @@
 
   async function sendMessage(){
     if(sending) return;
+    if('Notification' in window && Notification.permission === 'default'){
+      Notification.requestPermission().catch(() => {});
+    }
     const text = inputEl.value.trim();
     const hasImages = pendingImages.length > 0;
     const attach = hasImages ? { kind: 'images', images: pendingImages.slice() } : pendingFile;
@@ -2459,7 +2530,7 @@
       const response = await fetch(CHAT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: chat.messages }),
+        body: JSON.stringify({ messages: buildMessagesPayload(chat) }),
         signal: abortController.signal
       });
 
@@ -2533,6 +2604,7 @@
     renderChatList();
     renderMessages();
     if(!aborted) playNotifySound();
+    if(!aborted) notifyIfHidden(finalText);
     if(lastInputWasVoice && !aborted) speak(fullText);
     lastInputWasVoice = false;
     if(!aborted && window.innerWidth > 720) inputEl.focus();
@@ -2556,6 +2628,14 @@
   });
 
   // ---------------- Init ----------------
+  function detectDevice(){
+    const isMobile = window.innerWidth <= 720 || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    document.body.classList.toggle('is-mobile', isMobile);
+    document.body.classList.toggle('is-pc', !isMobile);
+  }
+  detectDevice();
+  window.addEventListener('resize', detectDevice);
+
   initTheme();
   loadChats();
   renderChatList();
