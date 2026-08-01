@@ -682,8 +682,21 @@
     opacity:0;
     pointer-events:none;
     transition:opacity 0.25s, transform 0.25s;
+    display:flex;
+    align-items:center;
+    gap:10px;
   }
-  .toast.show{ opacity:1; transform:translateX(-50%) translateY(-6px); }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(-6px); pointer-events:auto; }
+  .toast button{
+    background:rgba(201,162,39,0.25);
+    border:1px solid rgba(201,162,39,0.5);
+    color:var(--gold-soft);
+    padding:3px 10px;
+    border-radius:12px;
+    font-size:11.5px;
+    cursor:pointer;
+    font-family:'Manrope',sans-serif;
+  }
 
   /* ---------- Voice Room ---------- */
   .voiceRoomOverlay{
@@ -793,6 +806,15 @@
     color:rgba(128,128,128,0.7);
     max-width:280px;
   }
+  .voiceRateRow{
+    margin-top:18px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:11.5px;
+    color:rgba(245,238,220,0.7);
+  }
+  .voiceRateRow input[type=range]{ width:120px; }
 
   /* ---------- About modal ---------- */
   .aboutOverlay{
@@ -813,6 +835,8 @@
     padding:26px 26px 20px;
     max-width:360px;
     width:100%;
+    max-height:82vh;
+    overflow-y:auto;
   }
   .aboutBox h3{
     font-family:'Cormorant Garamond', serif;
@@ -845,6 +869,190 @@
     font-family:'Manrope',sans-serif;
   }
   .followUps button:hover{ background:rgba(46,158,150,0.2); }
+
+  /* ---------- NEW: 25 qo'shimcha funksiyalar uchun style ---------- */
+  .storageBarWrap{
+    height:4px;
+    width:100%;
+    background:rgba(128,128,128,0.15);
+    border-radius:3px;
+    overflow:hidden;
+    margin-top:6px;
+  }
+  .storageBarFill{
+    height:100%;
+    background:var(--turquoise);
+    width:0%;
+    transition:width 0.3s;
+  }
+  .storageBarFill.warn{ background:var(--danger); }
+  .storageLabel{ font-size:9.5px; color:rgba(128,128,128,0.6); margin-top:2px; }
+
+  .chatItem .dupBtn, .chatItem .tagDot{
+    background:transparent;border:none;cursor:pointer;font-size:11px;
+    opacity:0.5; flex-shrink:0; color:var(--turquoise-light);
+  }
+  .chatItem:hover .dupBtn{ opacity:0.8; }
+  .tagDot{
+    width:9px;height:9px;border-radius:50%;
+    flex-shrink:0;
+    cursor:pointer;
+    border:1px solid rgba(255,255,255,0.3);
+  }
+
+  body.focus-mode .sidebar{ display:none; }
+  body.focus-mode .header .headerActions button:not(#focusModeBtn){ display:none; }
+  body.focus-mode .header .headerActions button.lbl-hide{ display:none; }
+  body.focus-mode .menuToggle{ display:none; }
+
+  body.compact-mode .msg{ padding:7px 11px; font-size:13.5px; }
+  body.compact-mode .msgRow{ margin-bottom:5px; }
+  body.compact-mode .msgMeta{ display:none; }
+
+  .searchModalOverlay{
+    position:fixed; inset:0;
+    background:rgba(0,0,0,0.6);
+    display:none;
+    align-items:flex-start;
+    justify-content:center;
+    z-index:120;
+    padding:60px 20px 20px;
+  }
+  .searchModalOverlay.show{ display:flex; }
+  .searchModalBox{
+    background:var(--lapis-dark);
+    border:1px solid rgba(201,162,39,0.4);
+    border-radius:14px;
+    width:100%;
+    max-width:480px;
+    max-height:70vh;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+  .searchModalBox input{
+    padding:14px 16px;
+    border:none;
+    border-bottom:1px solid rgba(201,162,39,0.25);
+    background:transparent;
+    color:var(--cream);
+    font-family:'Manrope',sans-serif;
+    font-size:15px;
+    outline:none;
+  }
+  .searchModalResults{ overflow-y:auto; flex:1; padding:6px; }
+  .searchResultItem{
+    padding:10px 12px;
+    border-radius:9px;
+    cursor:pointer;
+    font-size:13px;
+    color:var(--cream-dim);
+  }
+  .searchResultItem:hover{ background:rgba(46,158,150,0.15); }
+  .searchResultItem b{ color:var(--gold-soft); }
+  .searchResultChat{ font-size:10.5px; color:var(--turquoise-light); margin-bottom:2px; }
+  mark.hitMark{ background:var(--gold); color:var(--lapis-dark); border-radius:3px; padding:0 1px; }
+
+  .inChatSearchBar{
+    display:none;
+    align-items:center;
+    gap:8px;
+    padding:8px 26px;
+    background:var(--lapis-dark);
+    border-top:1px solid rgba(201,162,39,0.15);
+  }
+  .inChatSearchBar.show{ display:flex; }
+  .inChatSearchBar input{
+    flex:1;
+    padding:8px 10px;
+    border-radius:8px;
+    border:1px solid rgba(201,162,39,0.4);
+    background:rgba(128,128,128,0.06);
+    color:var(--cream);
+    font-family:'Manrope',sans-serif;
+    font-size:13px;
+    outline:none;
+  }
+  .inChatSearchBar button{
+    background:transparent;
+    border:1px solid rgba(201,162,39,0.4);
+    color:var(--gold-soft);
+    border-radius:8px;
+    padding:6px 10px;
+    cursor:pointer;
+    font-size:12px;
+  }
+  .inChatSearchBar span{ font-size:11px; color:rgba(128,128,128,0.7); white-space:nowrap; }
+
+  .emojiPickerBox{
+    position:absolute;
+    bottom:56px;
+    right:26px;
+    background:var(--lapis-dark);
+    border:1px solid rgba(201,162,39,0.4);
+    border-radius:12px;
+    padding:8px;
+    display:none;
+    grid-template-columns:repeat(8, 1fr);
+    gap:4px;
+    max-width:280px;
+    z-index:30;
+    box-shadow:0 4px 20px rgba(0,0,0,0.4);
+  }
+  .emojiPickerBox.show{ display:grid; }
+  .emojiPickerBox button{
+    background:transparent;
+    border:none;
+    font-size:18px;
+    cursor:pointer;
+    padding:4px;
+    border-radius:6px;
+  }
+  .emojiPickerBox button:hover{ background:rgba(201,162,39,0.15); }
+
+  .shortcutsGrid{ display:flex; flex-direction:column; gap:8px; font-size:12.5px; }
+  .shortcutsGrid div{ display:flex; justify-content:space-between; gap:10px; }
+  .shortcutsGrid kbd{
+    background:rgba(201,162,39,0.15);
+    border:1px solid rgba(201,162,39,0.4);
+    border-radius:5px;
+    padding:1px 7px;
+    font-family:monospace;
+    font-size:11px;
+    color:var(--gold-soft);
+  }
+
+  .continueBtnWrap{ margin-top:6px; }
+  .continueBtnWrap button{
+    background:rgba(201,162,39,0.15);
+    border:1px solid rgba(201,162,39,0.4);
+    color:var(--gold-soft);
+    font-size:11.5px;
+    padding:5px 12px;
+    border-radius:14px;
+    cursor:pointer;
+    font-family:'Manrope',sans-serif;
+  }
+
+  .draftSavedTag{
+    font-size:9.5px;
+    color:var(--turquoise-light);
+    opacity:0;
+    transition:opacity 0.3s;
+  }
+  .draftSavedTag.show{ opacity:0.8; }
+
+  .fontFamilyRow{ display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
+  .fontFamilyRow button{
+    background:rgba(128,128,128,0.08);
+    border:1px solid rgba(201,162,39,0.3);
+    color:var(--cream);
+    padding:7px 12px;
+    border-radius:9px;
+    cursor:pointer;
+    font-size:12.5px;
+  }
+  .fontFamilyRow button.active{ border-color:var(--gold); background:rgba(201,162,39,0.2); color:var(--gold-soft); }
 
   @media (max-width: 720px){
     .sidebar{
@@ -900,9 +1108,16 @@
       <button class="newChatBtn" id="newChatBtn">+ Yangi suhbat <span style="opacity:.55;font-weight:400;">(Ctrl+K)</span></button>
     </div>
     <div class="chatList" id="chatList"></div>
-    <div class="sidebarFooter">
-      <span>Saydurasulov Sardor</span>
-      <button id="exportAllBtn" title="Barcha suhbatlarni .txt qilib yuklab olish">⬇ Export</button>
+    <div class="sidebarFooter" style="flex-direction:column;align-items:stretch;gap:6px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+        <span>Saydurasulov Sardor</span>
+        <div style="display:flex;gap:6px;">
+          <button id="globalSearchBtn" title="Barcha suhbatlarda qidirish (Ctrl+Shift+F)">🔎</button>
+          <button id="exportAllBtn" title="Barcha suhbatlarni .txt qilib yuklab olish">⬇ Export</button>
+        </div>
+      </div>
+      <div class="storageBarWrap"><div class="storageBarFill" id="storageBarFill"></div></div>
+      <div class="storageLabel" id="storageLabel">Xotira: 0%</div>
     </div>
   </div>
 
@@ -931,6 +1146,12 @@
         <button id="memoryBtn" title="Xotira">🧠</button>
         <button id="statsBtn" title="Profil va statistika">📊</button>
         <button id="themeBtn" title="Ranglar va tema">🎨</button>
+        <button id="inChatSearchBtn" title="Shu suhbatda qidirish (Ctrl+F)">🔍</button>
+        <button id="compactModeBtn" title="Ixcham ko'rinish">📏</button>
+        <button id="focusModeBtn" title="Fokus rejimi (Ctrl+.)">🎯</button>
+        <button id="shortcutsBtn" title="Klaviatura yorliqlari (?)">⌨️</button>
+        <button id="exportMdBtn" title="Suhbatni Markdown qilib yuklab olish">📝</button>
+        <button id="exportPdfBtn" title="Suhbatni chop etish / PDF">🖨️</button>
         <button id="aboutBtn" title="Ilova haqida">ℹ️</button>
         <button id="voiceRoomBtn" title="Ovozli suhbat xonasi">🎙️ <span class="lbl">Ovozli xona</span></button>
         <button id="renameBtn" title="Suhbat nomini o'zgartirish">✏️ <span class="lbl">Nomlash</span></button>
@@ -947,22 +1168,33 @@
           <button data-q="Python'da 'salom dunyo' deb chiqaradigan kod yoz">💻 Kod yozdir</button>
           <button data-q="Rasm chiz: tog'lar orasidagi quyosh botishi, sokin ko'l aks etgan holda">🎨 Rasm chizdir</button>
           <button data-q="Do'stlik haqida qisqa qo'shiq matni yoz">🎤 Qo'shiq yozdir</button>
+          <button id="randomPromptBtn">🎲 Tasodifiy savol</button>
         </div>
       </div>
       <button class="scrollDownBtn" id="scrollDownBtn" title="Pastga tushish">⬇</button>
+      <button class="scrollDownBtn" id="scrollUpBtn" title="Yuqoriga chiqish" style="bottom:60px;">⬆</button>
+    </div>
+    <div class="inChatSearchBar" id="inChatSearchBar">
+      <input type="text" id="inChatSearchInput" placeholder="Shu suhbatda qidirish...">
+      <span id="inChatSearchCount">0/0</span>
+      <button id="inChatSearchPrev">↑</button>
+      <button id="inChatSearchNext">↓</button>
+      <button id="inChatSearchClose">✕</button>
     </div>
     <div class="attachBar" id="attachBar">
       <div id="attachPreviewSlot"></div>
       <span id="attachLabel"></span>
       <button id="attachRemoveBtn">✕ olib tashlash</button>
     </div>
-    <div class="composer">
+    <div class="composer" style="position:relative;">
       <input type="file" id="imgInput" accept="image/*" multiple style="display:none;">
       <input type="file" id="fileInput" accept=".pdf,.txt,.md,.csv" style="display:none;">
       <button id="imgBtn" class="iconBtn" title="Rasm biriktirish">📷</button>
       <button id="fileBtn" class="iconBtn" title="Fayl biriktirish (PDF, TXT)">📎</button>
       <button id="locBtn" class="iconBtn" title="Joylashuvni ulashish">📍</button>
       <button id="micBtn" class="iconBtn" title="Ovozli xabar">🎤</button>
+      <button id="emojiBtn" class="iconBtn" title="Emoji">😊</button>
+      <div class="emojiPickerBox" id="emojiPickerBox"></div>
       <select id="voiceLangSelect" title="Ovozli til" style="height:46px;border-radius:12px;border:1px solid rgba(201,162,39,0.4);background:transparent;color:var(--gold-soft);font-family:'Manrope',sans-serif;font-size:12px;padding:0 4px;flex-shrink:0;">
         <option value="auto">🌐 Avto</option>
         <option value="uz-UZ">🇺🇿 O'zbek</option>
@@ -977,6 +1209,8 @@
     </div>
     <div class="composerFooter">
       <span id="charCounter">0 belgi</span>
+      <span class="draftSavedTag" id="draftSavedTag">qoralama saqlandi ✓</span>
+      <span id="wordCounter" style="opacity:.7;"></span>
       <span>Sardor AI xato qilishi mumkin — muhim narsalarni tekshirib ko'ring</span>
     </div>
   </div>
@@ -1003,6 +1237,11 @@
   <div class="voiceCaption" id="voiceCaption"></div>
   <button class="voiceMicBig" id="voiceMicBig">🎤</button>
   <div class="voiceHint">Gapirayotganda bosing — u to'xtaydi va sizni tinglaydi</div>
+  <div class="voiceRateRow">
+    <span>🐢</span>
+    <input type="range" id="voiceRateSlider" min="0.6" max="1.6" step="0.05" value="1.02">
+    <span>🐇</span>
+  </div>
 </div>
 
 
@@ -1054,6 +1293,36 @@
     <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;">
       <input type="checkbox" id="glassToggle"> Shisha (glassmorphism) uslub
     </label>
+    <p style="margin-top:14px;margin-bottom:2px;">Shrift turi:</p>
+    <div class="fontFamilyRow" id="fontFamilyRow">
+      <button data-f="'Manrope',sans-serif">Sans</button>
+      <button data-f="'Cormorant Garamond',serif">Serif</button>
+      <button data-f="'Courier New',monospace">Mono</button>
+    </div>
+  </div>
+</div>
+
+<div class="aboutOverlay" id="shortcutsOverlay">
+  <div class="aboutBox">
+    <button class="voiceRoomClose" id="shortcutsClose" title="Yopish">✕</button>
+    <h3>⌨️ Klaviatura yorliqlari</h3>
+    <div class="shortcutsGrid">
+      <div><span>Yangi suhbat</span><kbd>Ctrl+K</kbd></div>
+      <div><span>Xabar maydoniga sakrash</span><kbd>Ctrl+/</kbd></div>
+      <div><span>Xabar yuborish</span><kbd>Enter</kbd></div>
+      <div><span>Barcha suhbatlarda qidirish</span><kbd>Ctrl+Shift+F</kbd></div>
+      <div><span>Shu suhbatda qidirish</span><kbd>Ctrl+F</kbd></div>
+      <div><span>Fokus rejimi</span><kbd>Ctrl+.</kbd></div>
+      <div><span>Oynalarni yopish</span><kbd>Esc</kbd></div>
+      <div><span>Yorliqlar oynasi</span><kbd>?</kbd></div>
+    </div>
+  </div>
+</div>
+
+<div class="searchModalOverlay" id="searchModalOverlay">
+  <div class="searchModalBox">
+    <input type="text" id="searchModalInput" placeholder="🔎 Barcha suhbatlar bo'yicha qidirish...">
+    <div class="searchModalResults" id="searchModalResults"></div>
   </div>
 </div>
 
@@ -1102,22 +1371,32 @@
     }catch(e){
       console.warn('Saqlashda muammo (xotira to\'lgan bo\'lishi mumkin):', e);
     }
+    updateStorageIndicator();
   }
 
   function createChat(){
     const id = 'c_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
-    chats[id] = { id, title: 'Yangi suhbat', messages: [], pinned: false, draft: '' };
+    chats[id] = { id, title: 'Yangi suhbat', messages: [], pinned: false, draft: '', tag: null };
     activeId = id;
     persist();
     return id;
   }
 
-  function showToast(text){
+  function showToast(text, actionLabel, actionFn){
     const t = document.getElementById('toast');
-    t.textContent = text;
+    t.innerHTML = '';
+    const span = document.createElement('span');
+    span.textContent = text;
+    t.appendChild(span);
+    if(actionLabel && actionFn){
+      const btn = document.createElement('button');
+      btn.textContent = actionLabel;
+      btn.addEventListener('click', () => { actionFn(); t.classList.remove('show'); });
+      t.appendChild(btn);
+    }
     t.classList.add('show');
     clearTimeout(showToast._tm);
-    showToast._tm = setTimeout(() => t.classList.remove('show'), 1800);
+    showToast._tm = setTimeout(() => t.classList.remove('show'), actionLabel ? 6000 : 1800);
   }
 
   function timeNow(){
@@ -1169,6 +1448,7 @@
   // ---------------- Sidebar rendering ----------------
   const chatListEl = document.getElementById('chatList');
   const chatTitleEl = document.getElementById('chatTitle');
+  const TAG_COLORS = ['#c9a227', '#2e9e96', '#c9573f', '#a970ff', '#8bc34a', null];
 
   function renderChatList(){
     chatListEl.innerHTML = '';
@@ -1200,6 +1480,18 @@
         renderChatList();
       });
 
+      const tagDot = document.createElement('button');
+      tagDot.className = 'tagDot';
+      tagDot.style.background = chat.tag || 'transparent';
+      tagDot.title = "Rangli yorliq";
+      tagDot.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const idx = TAG_COLORS.indexOf(chat.tag || null);
+        chat.tag = TAG_COLORS[(idx + 1) % TAG_COLORS.length];
+        persist();
+        renderChatList();
+      });
+
       const titleSpan = document.createElement('span');
       titleSpan.className = 'title';
       titleSpan.textContent = chat.title || 'Yangi suhbat';
@@ -1207,6 +1499,15 @@
       titleSpan.addEventListener('dblclick', (e) => {
         e.stopPropagation();
         renameChat(id);
+      });
+
+      const dupBtn = document.createElement('button');
+      dupBtn.className = 'dupBtn';
+      dupBtn.textContent = '⧉';
+      dupBtn.title = "Suhbatni nusxalash";
+      dupBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        duplicateChat(id);
       });
 
       const delBtn = document.createElement('button');
@@ -1219,11 +1520,31 @@
       });
 
       item.appendChild(pinBtn);
+      item.appendChild(tagDot);
       item.appendChild(titleSpan);
+      item.appendChild(dupBtn);
       item.appendChild(delBtn);
       item.addEventListener('click', () => switchChat(id));
       chatListEl.appendChild(item);
     }
+  }
+
+  function duplicateChat(id){
+    const src = chats[id];
+    const newId = 'c_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
+    chats[newId] = {
+      id: newId,
+      title: (src.title || 'Yangi suhbat') + ' (nusxa)',
+      messages: JSON.parse(JSON.stringify(src.messages || [])),
+      pinned: false,
+      draft: '',
+      tag: src.tag || null
+    };
+    activeId = newId;
+    persist();
+    renderChatList();
+    renderMessages();
+    showToast("Suhbat nusxalandi ✓");
   }
 
   function renameChat(id){
@@ -1259,7 +1580,7 @@
 
   function deleteChat(id){
     const name = (chats[id] && chats[id].title) || 'Yangi suhbat';
-    if(!confirm(`"${name}" suhbatini butunlay o'chirishni xohlaysizmi?`)) return;
+    const backup = JSON.parse(JSON.stringify(chats[id]));
     delete chats[id];
     if(id === activeId){
       const ids = Object.keys(chats);
@@ -1268,6 +1589,13 @@
     persist();
     renderChatList();
     renderMessages();
+    showToast(`"${name}" o'chirildi`, 'Bekor qilish', () => {
+      chats[id] = backup;
+      activeId = id;
+      persist();
+      renderChatList();
+      renderMessages();
+    });
   }
 
   document.getElementById('newChatBtn').addEventListener('click', () => {
@@ -1315,64 +1643,323 @@
     URL.revokeObjectURL(url);
   }
 
-  // ---------------- Sidebar toggle ----------------
-  const sidebar = document.getElementById('sidebar');
-  document.getElementById('menuToggle').addEventListener('click', () => {
-    sidebar.classList.toggle('collapsed');
-  });
-  if(window.innerWidth <= 720) sidebar.classList.add('collapsed');
-
-  // ---------------- Keyboard shortcuts ----------------
-  document.addEventListener('keydown', (e) => {
-    if(e.ctrlKey && e.key.toLowerCase() === 'k'){
-      e.preventDefault();
-      document.getElementById('newChatBtn').click();
-    } else if(e.ctrlKey && e.key === '/'){
-      e.preventDefault();
-      inputEl.focus();
+  // ---- NEW: Export chat as Markdown ----
+  document.getElementById('exportMdBtn').addEventListener('click', () => {
+    const chat = chats[activeId];
+    if(!chat || chat.messages.length === 0){ showToast("Suhbat bo'sh"); return; }
+    let out = `# ${chat.title || 'Sardor AI suhbat'}\n\n`;
+    for(const m of chat.messages){
+      out += `**${m.role === 'user' ? 'Siz' : 'Sardor AI'}:**\n\n${m.content || ''}\n\n---\n\n`;
     }
+    downloadText(out, (chat.title || 'suhbat').replace(/[^\w\-]+/g,'_') + '.md');
+    showToast("Markdown fayl yuklandi ✓");
   });
 
-  // ---------------- Suggested questions ----------------
-  function wireSuggestRow(el){
-    el.addEventListener('click', (e) => {
-      const btn = e.target.closest('button[data-q]');
-      if(!btn) return;
-      inputEl.value = btn.getAttribute('data-q');
+  // ---- NEW: Export chat as PDF (print) ----
+  document.getElementById('exportPdfBtn').addEventListener('click', () => {
+    const chat = chats[activeId];
+    if(!chat || chat.messages.length === 0){ showToast("Suhbat bo'sh"); return; }
+    const w = window.open('', '_blank');
+    let html = `<html><head><meta charset="utf-8"><title>${chat.title||'Suhbat'}</title>
+      <style>
+        body{font-family:sans-serif;padding:30px;color:#222;}
+        h1{font-size:20px;}
+        .m{margin-bottom:14px;padding:10px 14px;border-radius:10px;}
+        .u{background:#e8f5f3;text-align:right;}
+        .b{background:#f5f2e6;}
+        .r{font-size:11px;color:#888;margin-bottom:3px;}
+      </style></head><body>`;
+    html += `<h1>${chat.title || 'Sardor AI suhbat'}</h1>`;
+    chat.messages.forEach(m => {
+      const cls = m.role === 'user' ? 'u' : 'b';
+      const role = m.role === 'user' ? 'Siz' : 'Sardor AI';
+      html += `<div class="m ${cls}"><div class="r">${role}</div>${(m.content||'').replace(/</g,'&lt;').replace(/\n/g,'<br>')}</div>`;
+    });
+    html += `</body></html>`;
+    w.document.write(html);
+    w.document.close();
+    setTimeout(() => w.print(), 400);
+  });
+
+  // ---- NEW: Storage usage indicator ----
+  function updateStorageIndicator(){
+    try{
+      let total = 0;
+      for(const k in localStorage){
+        if(localStorage.hasOwnProperty(k)) total += (localStorage[k].length + k.length) * 2;
+      }
+      const limitBytes = 5 * 1024 * 1024; // taxminiy 5MB
+      const pct = Math.min(100, Math.round((total / limitBytes) * 100));
+      const fill = document.getElementById('storageBarFill');
+      const label = document.getElementById('storageLabel');
+      if(fill){
+        fill.style.width = pct + '%';
+        fill.classList.toggle('warn', pct > 80);
+      }
+      if(label) label.textContent = `Xotira: ${pct}% (${(total/1024).toFixed(0)} KB)`;
+    }catch(e){}
+  }
+
+  // ---- NEW: Global search across all chats ----
+  const searchModalOverlay = document.getElementById('searchModalOverlay');
+  const searchModalInput = document.getElementById('searchModalInput');
+  const searchModalResults = document.getElementById('searchModalResults');
+  function openGlobalSearch(){
+    searchModalOverlay.classList.add('show');
+    searchModalInput.value = '';
+    searchModalResults.innerHTML = '<div style="padding:14px;font-size:12.5px;color:rgba(128,128,128,0.7);">Qidiruv so\'zini kiriting...</div>';
+    setTimeout(() => searchModalInput.focus(), 50);
+  }
+  function closeGlobalSearch(){ searchModalOverlay.classList.remove('show'); }
+  document.getElementById('globalSearchBtn').addEventListener('click', openGlobalSearch);
+  searchModalOverlay.addEventListener('click', (e) => { if(e.target === searchModalOverlay) closeGlobalSearch(); });
+  function highlightText(text, q){
+    const idx = text.toLowerCase().indexOf(q.toLowerCase());
+    if(idx === -1) return text.slice(0, 80);
+    const start = Math.max(0, idx - 25);
+    const end = Math.min(text.length, idx + q.length + 40);
+    let snippet = (start > 0 ? '…' : '') + text.slice(start, end) + (end < text.length ? '…' : '');
+    const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'ig');
+    return snippet.replace(re, m => `<mark class="hitMark">${m}</mark>`);
+  }
+  searchModalInput.addEventListener('input', () => {
+    const q = searchModalInput.value.trim();
+    searchModalResults.innerHTML = '';
+    if(!q){ searchModalResults.innerHTML = '<div style="padding:14px;font-size:12.5px;color:rgba(128,128,128,0.7);">Qidiruv so\'zini kiriting...</div>'; return; }
+    let found = 0;
+    for(const id of Object.keys(chats)){
+      const c = chats[id];
+      c.messages.forEach((m, idx) => {
+        if(m.content && m.content.toLowerCase().includes(q.toLowerCase()) && found < 40){
+          found++;
+          const item = document.createElement('div');
+          item.className = 'searchResultItem';
+          item.innerHTML = `<div class="searchResultChat">${c.title || 'Yangi suhbat'}</div>${highlightText(m.content, q)}`;
+          item.addEventListener('click', () => {
+            activeId = id;
+            persist();
+            renderChatList();
+            renderMessages();
+            closeGlobalSearch();
+          });
+          searchModalResults.appendChild(item);
+        }
+      });
+    }
+    if(found === 0) searchModalResults.innerHTML = '<div style="padding:14px;font-size:12.5px;color:rgba(128,128,128,0.7);">Hech narsa topilmadi</div>';
+  });
+
+  // ---- NEW: In-chat search (Ctrl+F) ----
+  const inChatSearchBar = document.getElementById('inChatSearchBar');
+  const inChatSearchInput = document.getElementById('inChatSearchInput');
+  const inChatSearchCount = document.getElementById('inChatSearchCount');
+  let inChatMatches = [];
+  let inChatMatchIdx = -1;
+  function openInChatSearch(){
+    inChatSearchBar.classList.add('show');
+    setTimeout(() => inChatSearchInput.focus(), 50);
+  }
+  function closeInChatSearch(){
+    inChatSearchBar.classList.remove('show');
+    document.querySelectorAll('.msg mark.hitMark').forEach(el => {
+      el.outerHTML = el.innerHTML;
+    });
+    inChatMatches = []; inChatMatchIdx = -1;
+  }
+  function runInChatSearch(){
+    document.querySelectorAll('.msg mark.hitMark').forEach(el => { el.outerHTML = el.innerHTML; });
+    inChatMatches = [];
+    const q = inChatSearchInput.value.trim();
+    if(!q){ inChatSearchCount.textContent = '0/0'; return; }
+    const holders = messagesEl.querySelectorAll('.msg > div:first-child');
+    holders.forEach(holder => {
+      const text = holder.textContent;
+      if(text.toLowerCase().includes(q.toLowerCase())){
+        const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'ig');
+        holder.innerHTML = holder.textContent.replace(re, m => `<mark class="hitMark">${m}</mark>`);
+        holder.querySelectorAll('mark.hitMark').forEach(m => inChatMatches.push(m));
+      }
+    });
+    inChatMatchIdx = inChatMatches.length ? 0 : -1;
+    updateInChatSearchCount();
+    if(inChatMatches.length) inChatMatches[0].scrollIntoView({ block: 'center', behavior: 'smooth' });
+  }
+  function updateInChatSearchCount(){
+    inChatSearchCount.textContent = inChatMatches.length ? `${inChatMatchIdx+1}/${inChatMatches.length}` : '0/0';
+  }
+  document.getElementById('inChatSearchBtn').addEventListener('click', () => {
+    if(inChatSearchBar.classList.contains('show')) closeInChatSearch(); else openInChatSearch();
+  });
+  document.getElementById('inChatSearchClose').addEventListener('click', closeInChatSearch);
+  inChatSearchInput.addEventListener('input', runInChatSearch);
+  document.getElementById('inChatSearchNext').addEventListener('click', () => {
+    if(!inChatMatches.length) return;
+    inChatMatchIdx = (inChatMatchIdx + 1) % inChatMatches.length;
+    inChatMatches[inChatMatchIdx].scrollIntoView({ block: 'center', behavior: 'smooth' });
+    updateInChatSearchCount();
+  });
+  document.getElementById('inChatSearchPrev').addEventListener('click', () => {
+    if(!inChatMatches.length) return;
+    inChatMatchIdx = (inChatMatchIdx - 1 + inChatMatches.length) % inChatMatches.length;
+    inChatMatches[inChatMatchIdx].scrollIntoView({ block: 'center', behavior: 'smooth' });
+    updateInChatSearchCount();
+  });
+
+  // ---- NEW: Focus mode ----
+  const FOCUS_KEY = 'sardorAI_focus_v1';
+  function applyFocusMode(on){
+    document.body.classList.toggle('focus-mode', on);
+    localStorage.setItem(FOCUS_KEY, on ? 'on' : 'off');
+  }
+  document.getElementById('focusModeBtn').addEventListener('click', () => {
+    applyFocusMode(!document.body.classList.contains('focus-mode'));
+  });
+  if(localStorage.getItem(FOCUS_KEY) === 'on') applyFocusMode(true);
+
+  // ---- NEW: Compact mode ----
+  const COMPACT_KEY = 'sardorAI_compact_v1';
+  function applyCompactMode(on){
+    document.body.classList.toggle('compact-mode', on);
+    localStorage.setItem(COMPACT_KEY, on ? 'on' : 'off');
+  }
+  document.getElementById('compactModeBtn').addEventListener('click', () => {
+    applyCompactMode(!document.body.classList.contains('compact-mode'));
+  });
+  if(localStorage.getItem(COMPACT_KEY) === 'on') applyCompactMode(true);
+
+  // ---- NEW: Shortcuts modal ----
+  const shortcutsOverlay = document.getElementById('shortcutsOverlay');
+  document.getElementById('shortcutsBtn').addEventListener('click', () => shortcutsOverlay.classList.add('show'));
+  document.getElementById('shortcutsClose').addEventListener('click', () => shortcutsOverlay.classList.remove('show'));
+
+  // ---- NEW: Random prompt ----
+  const RANDOM_PROMPTS = [
+    "Agar 24 soat qo'shimcha vaqting bo'lsa, nima qilar eding?",
+    "Menga hech kim bilmagan qiziq bir fakt ayt",
+    "3 daqiqada o'rganib bo'ladigan foydali ko'nikma nima?",
+    "Kelajakda hayot qanday bo'lishi mumkinligi haqida fikr bildir",
+    "Menga kunimni yaxshi o'tkazish uchun bitta maslahat ber",
+    "Motivatsion qisqa gap yoz",
+    "Eng qiziqarli tarixiy voqealardan birini ayt",
+    "Menga miyani charxlaydigan bir topishmoq ber",
+    "O'zbekistonning qiziqarli joylari haqida gapir",
+    "Hayotni osonlashtiradigan bitta hayot hikmati ayt"
+  ];
+  document.addEventListener('click', (e) => {
+    if(e.target && e.target.id === 'randomPromptBtn'){
+      const q = RANDOM_PROMPTS[Math.floor(Math.random() * RANDOM_PROMPTS.length)];
+      inputEl.value = q;
       autoGrow();
       updateCharCounter();
       sendMessage();
+    }
+  });
+
+  // ---- NEW: Emoji picker ----
+  const EMOJI_LIST = ['😀','😂','😍','🤔','😎','👍','🙏','🔥','🎉','❤️','😢','😴','🤝','👏','💡','✅','❌','⭐','🚀','🎨','📌','📎','🎤','🎧','🌙','☀️','🍀','🎁','🕌','🌸'];
+  const emojiPickerBox = document.getElementById('emojiPickerBox');
+  EMOJI_LIST.forEach(em => {
+    const b = document.createElement('button');
+    b.textContent = em;
+    b.addEventListener('click', () => {
+      inputEl.value += em;
+      autoGrow(); updateCharCounter();
+      emojiPickerBox.classList.remove('show');
+      inputEl.focus();
     });
+    emojiPickerBox.appendChild(b);
+  });
+  document.getElementById('emojiBtn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    emojiPickerBox.classList.toggle('show');
+  });
+  document.addEventListener('click', (e) => {
+    if(!emojiPickerBox.contains(e.target) && e.target.id !== 'emojiBtn') emojiPickerBox.classList.remove('show');
+  });
+
+  // ---- NEW: Font family selector ----
+  const FONT_FAMILY_KEY = 'sardorAI_fontFamily_v1';
+  function applyFontFamily(f){
+    document.body.style.fontFamily = f;
+    localStorage.setItem(FONT_FAMILY_KEY, f);
+    document.querySelectorAll('#fontFamilyRow button').forEach(b => b.classList.toggle('active', b.getAttribute('data-f') === f));
   }
-  wireSuggestRow(document.getElementById('suggestRow'));
+  document.getElementById('fontFamilyRow').addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-f]');
+    if(btn) applyFontFamily(btn.getAttribute('data-f'));
+  });
+  applyFontFamily(localStorage.getItem(FONT_FAMILY_KEY) || "'Manrope',sans-serif");
+
+  // ---- NEW: Tab title unread indicator ----
+  const ORIGINAL_TITLE = document.title;
+  let unreadPending = false;
+  document.addEventListener('visibilitychange', () => {
+    if(!document.hidden && unreadPending){
+      unreadPending = false;
+      document.title = ORIGINAL_TITLE;
+    }
+  });
+  function markUnreadIfHidden(){
+    if(document.hidden){
+      unreadPending = true;
+      document.title = '● ' + ORIGINAL_TITLE;
+    }
+  }
+
+  // ---- NEW: Word counter ----
+  const wordCounterEl = document.getElementById('wordCounter');
+  function updateWordCounter(){
+    const words = inputEl.value.trim().split(/\s+/).filter(Boolean).length;
+    wordCounterEl.textContent = words ? words + ' so\'z' : '';
+  }
+
+  // ---- NEW: Draft saved indicator ----
+  const draftSavedTag = document.getElementById('draftSavedTag');
+  let draftSaveTimer = null;
+  function flashDraftSaved(){
+    clearTimeout(draftSaveTimer);
+    draftSavedTag.classList.add('show');
+    draftSaveTimer = setTimeout(() => draftSavedTag.classList.remove('show'), 1200);
+  }
 
   // ---------------- Message rendering ----------------
   const messagesEl = document.getElementById('messages');
   const inputEl = document.getElementById('input');
   const sendBtn = document.getElementById('sendBtn');
   const scrollDownBtn = document.getElementById('scrollDownBtn');
+  const scrollUpBtn = document.getElementById('scrollUpBtn');
   const charCounter = document.getElementById('charCounter');
+  const CHAR_SOFT_LIMIT = 4000;
 
   messagesEl.addEventListener('scroll', () => {
     const distFromBottom = messagesEl.scrollHeight - messagesEl.scrollTop - messagesEl.clientHeight;
     scrollDownBtn.classList.toggle('show', distFromBottom > 200);
+    scrollUpBtn.classList.toggle('show', messagesEl.scrollTop > 200);
   });
   scrollDownBtn.addEventListener('click', () => {
     messagesEl.scrollTo({ top: messagesEl.scrollHeight, behavior: 'smooth' });
   });
+  scrollUpBtn.addEventListener('click', () => {
+    messagesEl.scrollTo({ top: 0, behavior: 'smooth' });
+  });
 
   function updateCharCounter(){
-    charCounter.textContent = inputEl.value.length + ' belgi';
+    const len = inputEl.value.length;
+    charCounter.textContent = len + ' belgi';
+    charCounter.style.color = len > CHAR_SOFT_LIMIT ? 'var(--danger)' : '';
+    updateWordCounter();
   }
 
   function renderMessageContent(container, text){
     const parts = text.split(/```(\w*)\n?([\s\S]*?)```/g);
+    let codeBlockCount = 0;
     for(let i = 0; i < parts.length; i += 3){
       const plain = parts[i];
       if(plain) container.appendChild(document.createTextNode(plain));
       const lang = parts[i+1];
       const code = parts[i+2];
       if(code !== undefined){
+        codeBlockCount++;
         const wrap = document.createElement('div');
         wrap.className = 'codeWrap';
         const btnRow = document.createElement('div');
@@ -1429,6 +2016,21 @@
         container.appendChild(wrap);
         if(window.hljs) window.hljs.highlightElement(codeEl);
       }
+    }
+    // NEW: "copy all code blocks" button if more than one
+    if(codeBlockCount > 1){
+      const allBtn = document.createElement('button');
+      allBtn.className = 'codeCopyBtn';
+      allBtn.style.cssText = 'margin-top:6px;display:block;';
+      allBtn.textContent = '📋 Barcha kodlarni nusxalash';
+      allBtn.addEventListener('click', () => {
+        const blocks = [];
+        for(let i = 0; i < parts.length; i += 3){
+          if(parts[i+2] !== undefined) blocks.push(parts[i+2].trim());
+        }
+        navigator.clipboard.writeText(blocks.join('\n\n')).then(() => showToast('Barcha kodlar nusxalandi ✓'));
+      });
+      container.appendChild(allBtn);
     }
   }
 
@@ -1506,6 +2108,18 @@
         speakBtn.title = "Ovoz bilan o'qish";
         speakBtn.addEventListener('click', () => speak(text));
         actions.appendChild(speakBtn);
+
+        // NEW: translate quick action
+        const translateBtn = document.createElement('button');
+        translateBtn.textContent = '🌐';
+        translateBtn.title = "Ruschaga tarjima qilish";
+        translateBtn.addEventListener('click', () => {
+          if(sending) return;
+          inputEl.value = "Shu matnni ruschaga tarjima qil:\n" + text;
+          autoGrow(); updateCharCounter();
+          sendMessage();
+        });
+        actions.appendChild(translateBtn);
       }
 
       if(opts.generatedImageUrl){
@@ -1574,6 +2188,22 @@
       div.appendChild(actions);
     }
 
+    // NEW: continue button if bot response looks cut off
+    if(role === 'bot' && opts.isLast && text && text.length > 40 && !/[.!?…"')\]。！？]\s*$/.test(text.trim())){
+      const contWrap = document.createElement('div');
+      contWrap.className = 'continueBtnWrap';
+      const contBtn = document.createElement('button');
+      contBtn.textContent = '➡ Davom ettirish';
+      contBtn.addEventListener('click', () => {
+        if(sending) return;
+        inputEl.value = 'Davom et';
+        autoGrow(); updateCharCounter();
+        sendMessage();
+      });
+      contWrap.appendChild(contBtn);
+      div.appendChild(contWrap);
+    }
+
     row.appendChild(div);
 
     if(opts.time || opts.langFlag){
@@ -1591,7 +2221,7 @@
   }
 
   function renderMessages(){
-    messagesEl.querySelectorAll('.msgRow, .empty').forEach(el => el.remove());
+    messagesEl.querySelectorAll('.msgRow, .empty, .followUps').forEach(el => el.remove());
     const chat = chats[activeId];
     chatTitleEl.textContent = chat && chat.title !== 'Yangi suhbat' ? chat.title : 'Sardor AI';
     if(!chat || chat.messages.length === 0){
@@ -1604,9 +2234,15 @@
         '<button data-q="Python\'da \'salom dunyo\' deb chiqaradigan kod yoz">💻 Kod yozdir</button>' +
         '<button data-q="Rasm chiz: tog\'lar orasidagi quyosh botishi, sokin ko\'l aks etgan holda">🎨 Rasm chizdir</button>' +
         '<button data-q="Do\'stlik haqida qisqa qo\'shiq matni yoz">🎤 Qo\'shiq yozdir</button>' +
+        '<button id="randomPromptBtn2">🎲 Tasodifiy savol</button>' +
         '</div>';
       messagesEl.insertBefore(div, scrollDownBtn);
       wireSuggestRow(div.querySelector('.suggestRow'));
+      const rb2 = div.querySelector('#randomPromptBtn2');
+      if(rb2) rb2.addEventListener('click', () => {
+        const q = RANDOM_PROMPTS[Math.floor(Math.random() * RANDOM_PROMPTS.length)];
+        inputEl.value = q; autoGrow(); updateCharCounter(); sendMessage();
+      });
       return;
     }
     let lastUserIdx = -1;
@@ -1617,6 +2253,7 @@
       else if(m.image && m.image.previewUrl) imageUrls = [m.image.previewUrl];
       const genUrl = m.generatedImage ? `data:${m.generatedImage.mimeType};base64,${m.generatedImage.data}` : null;
       const role = m.role === 'user' ? 'user' : 'bot';
+      const isLastMsg = idx === chat.messages.length - 1;
       const row = buildMessageEl(role, m.content, {
         imageUrls,
         fileMeta: m.file ? { name: m.file.name } : null,
@@ -1625,14 +2262,15 @@
         time: m.time || '',
         langFlag: m.content ? langFlagEmoji(m.content) : '',
         reaction: m.reaction,
+        isLast: isLastMsg,
         onReact: role === 'bot' ? (val) => { m.reaction = val; persist(); renderMessages(); } : null,
-        onRegenerate: (role === 'bot' && idx === chat.messages.length - 1) ? () => regenerateLast() : null,
+        onRegenerate: (role === 'bot' && isLastMsg) ? () => regenerateLast() : null,
         onEdit: (role === 'user' && idx === lastUserIdx) ? () => editAndResend(idx) : null,
         onDelete: () => { chat.messages.splice(idx, 1); persist(); renderChatList(); renderMessages(); }
       });
       messagesEl.insertBefore(row, scrollDownBtn);
 
-      if(role === 'bot' && idx === chat.messages.length - 1 && !sending && m.content && !m.generatedImage){
+      if(role === 'bot' && isLastMsg && !sending && m.content && !m.generatedImage){
         const chips = document.createElement('div');
         chips.className = 'followUps';
         chips.style.marginLeft = '4px';
@@ -1700,6 +2338,8 @@
     autoGrow();
     updateCharCounter();
     if(chats[activeId]) chats[activeId].draft = inputEl.value;
+    clearTimeout(inputEl._saveTm);
+    inputEl._saveTm = setTimeout(() => { persist(); flashDraftSaved(); }, 600);
   });
 
   const imgInput = document.getElementById('imgInput');
@@ -1889,6 +2529,16 @@
     if(recognition) recognition.lang = voiceLangSelect.value === 'auto' ? (navigator.language || 'uz-UZ') : voiceLangSelect.value;
   });
 
+  // ---- NEW: Voice speech rate control ----
+  const VOICE_RATE_KEY = 'sardorAI_voiceRate_v1';
+  let voiceRate = parseFloat(localStorage.getItem(VOICE_RATE_KEY) || '1.02');
+  const voiceRateSlider = document.getElementById('voiceRateSlider');
+  voiceRateSlider.value = voiceRate;
+  voiceRateSlider.addEventListener('input', () => {
+    voiceRate = parseFloat(voiceRateSlider.value);
+    localStorage.setItem(VOICE_RATE_KEY, voiceRate);
+  });
+
   // ---- Voice input ----
   const micBtn = document.getElementById('micBtn');
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -1949,7 +2599,7 @@
     const utter = new SpeechSynthesisUtterance(clean);
     const langCode = voiceLangSelect.value === 'auto' ? detectLangCode(clean) : voiceLangSelect.value;
     utter.lang = langCode;
-    utter.rate = 1.02;
+    utter.rate = voiceRate;
     utter.pitch = 0.95;
     const prefix = langCode.split('-')[0].toLowerCase();
     const voices = window.speechSynthesis.getVoices();
@@ -2159,7 +2809,7 @@
     const utter = new SpeechSynthesisUtterance(clean);
     const langCode = voiceLangSelect.value === 'auto' ? detectLangCode(clean) : voiceLangSelect.value;
     utter.lang = langCode;
-    utter.rate = 1.02;
+    utter.rate = voiceRate;
     utter.pitch = 0.95;
     const prefix = langCode.split('-')[0].toLowerCase();
     const voices = window.speechSynthesis.getVoices();
@@ -2184,7 +2834,7 @@
   const MEMORY_KEY = 'sardorAI_memory_v1';
   let memoryNotes = [];
   try{ memoryNotes = JSON.parse(localStorage.getItem(MEMORY_KEY) || '[]'); }catch(e){ memoryNotes = []; }
-  function persistMemory(){ localStorage.setItem(MEMORY_KEY, JSON.stringify(memoryNotes)); }
+  function persistMemory(){ localStorage.setItem(MEMORY_KEY, JSON.stringify(memoryNotes)); updateStorageIndicator(); }
   function renderMemoryList(){
     const list = document.getElementById('memoryList');
     list.innerHTML = '';
@@ -2232,18 +2882,27 @@
   const statsOverlay = document.getElementById('statsOverlay');
   document.getElementById('statsBtn').addEventListener('click', () => {
     const chatIds = Object.keys(chats);
-    let totalMsgs = 0, userMsgs = 0, botMsgs = 0, images = 0, earliestTs = null;
+    let totalMsgs = 0, userMsgs = 0, botMsgs = 0, images = 0, earliestTs = null, totalWords = 0;
+    const hourCounts = new Array(24).fill(0);
     chatIds.forEach(id => {
       const c = chats[id];
       totalMsgs += c.messages.length;
       c.messages.forEach(m => {
         if(m.role === 'user') userMsgs++; else botMsgs++;
         if(m.generatedImage || (m.images && m.images.length)) images++;
+        if(m.content) totalWords += m.content.trim().split(/\s+/).filter(Boolean).length;
+        if(m.time){
+          const hh = parseInt((m.time.match(/^(\d{1,2})/)||[])[1], 10);
+          if(!isNaN(hh)) hourCounts[hh]++;
+        }
       });
       const ts = Number(id.split('_')[1]) || null;
       if(ts && (!earliestTs || ts < earliestTs)) earliestTs = ts;
     });
     const since = earliestTs ? new Date(earliestTs).toLocaleDateString('uz-UZ', { year:'numeric', month:'long', day:'numeric' }) : '—';
+    let peakHour = 0, peakVal = -1;
+    hourCounts.forEach((v,h) => { if(v > peakVal){ peakVal = v; peakHour = h; } });
+    const readingMins = Math.max(1, Math.round(totalWords / 200));
     const body = document.getElementById('statsBody');
     body.innerHTML = '';
     [
@@ -2252,6 +2911,9 @@
       ['🗣️ Sizning xabarlaringiz', userMsgs],
       ['🤖 Sardor AI javoblari', botMsgs],
       ['🖼️ Rasm bilan bog\'liq xabarlar', images],
+      ['📝 Jami so\'zlar soni', totalWords],
+      ['⏱️ Taxminiy o\'qish vaqti', readingMins + ' daqiqa'],
+      ['🕒 Eng faol soat', peakVal > 0 ? (peakHour + ':00 — ' + (peakHour+1) + ':00') : '—'],
       ['📅 Foydalanish boshlangan sana', since]
     ].forEach(([label, val]) => {
       const row = document.createElement('div');
@@ -2313,16 +2975,39 @@
     // Ruxsatni birinchi xabar yuborilganda so'raymiz (majburlab emas)
   }
   function notifyIfHidden(text){
+    markUnreadIfHidden();
     if(document.hidden && 'Notification' in window && Notification.permission === 'granted'){
       try{ new Notification('Sardor AI', { body: text.slice(0, 120), icon: 'icon-192.png' }); }catch(e){}
     }
   }
 
-  // ---------------- Esc key closes overlays ----------------
+  // ---------------- Esc key closes overlays / global shortcuts ----------------
   document.addEventListener('keydown', (e) => {
     if(e.key === 'Escape'){
       if(voiceRoomActive) closeVoiceRoom();
       aboutOverlay.classList.remove('show');
+      memoryOverlay.classList.remove('show');
+      statsOverlay.classList.remove('show');
+      themeOverlay.classList.remove('show');
+      shortcutsOverlay.classList.remove('show');
+      closeGlobalSearch();
+      closeInChatSearch();
+    }
+    if(e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'f'){
+      e.preventDefault();
+      openGlobalSearch();
+    } else if(e.ctrlKey && e.key.toLowerCase() === 'f'){
+      const activeTag = document.activeElement && document.activeElement.tagName;
+      if(activeTag !== 'INPUT' && activeTag !== 'TEXTAREA'){
+        e.preventDefault();
+        openInChatSearch();
+      }
+    } else if(e.ctrlKey && e.key === '.'){
+      e.preventDefault();
+      applyFocusMode(!document.body.classList.contains('focus-mode'));
+    } else if(e.key === '?' && document.activeElement !== inputEl && document.activeElement !== searchModalInput && document.activeElement !== inChatSearchInput){
+      e.preventDefault();
+      shortcutsOverlay.classList.add('show');
     }
   });
 
@@ -2644,6 +3329,7 @@
   autoGrow();
   updateCharCounter();
   applyFontSize();
+  updateStorageIndicator();
   if('serviceWorker' in navigator){
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./service-worker.js').catch(() => {});
