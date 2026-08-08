@@ -1,10 +1,13 @@
+
+
+Index · HTML
 <!DOCTYPE html>
 <html lang="uz">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0d1526">
-<meta name="google-site-verification" content="LWoUSDNOfsKI2O6wDm_Kmn1vCODF4zBm2ZC0-siYDQI" />
+<meta name="google-site-verification" content="bh6pALCCdTaLf5GNhMrA04VF_39Km8O3nplMXPSyRFo" />
 <title>Sardor AI — bepul o'zbek sun'iy intellekt chatbot</title>
 <meta name="description" content="Sardor AI — Saydurasulov Sardor tomonidan yaratilgan bepul o'zbekcha sun'iy intellekt chatbot. Savol bering, suhbatlashing, rasm chizdiring, qo'shiq yozdiring, fayl yuboring, ovozli gaplashing.">
 <meta name="keywords" content="Sardor AI, Sardor ai chatbot, sun'iy intellekt, o'zbek chatbot, Saydurasulov Sardor">
@@ -73,7 +76,7 @@
     max-width:1180px;
     margin:0 auto;
   }
-
+ 
   /* ---------- Sidebar ---------- */
   .sidebar{
     width:270px;
@@ -218,7 +221,7 @@
     cursor:pointer;
     font-family:'Manrope',sans-serif;
   }
-
+ 
   /* ---------- Main ---------- */
   .app{
     flex:1;
@@ -365,24 +368,6 @@
     border:1px solid rgba(201,162,39,0.3);
     color:var(--cream);
     border-bottom-left-radius:3px;
-  }
-  body.glass-mode .msg.bot{
-    background:rgba(255,255,255,0.06);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    border:1px solid rgba(255,255,255,0.18);
-  }
-  body.glass-mode .msg.user{
-    background:rgba(46,158,150,0.55);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-  }
-  body.glass-mode .sidebar,
-  body.glass-mode .header,
-  body.glass-mode .composer{
-    background:rgba(255,255,255,0.04) !important;
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
   }
   .msg.bot.typing{
     display:flex;
@@ -656,6 +641,9 @@
     background:#0d1526 !important;
   }
   .codeCopyBtn{
+    position:absolute;
+    top:6px;
+    right:6px;
     background:rgba(201,162,39,0.25);
     border:1px solid rgba(201,162,39,0.5);
     color:var(--gold-soft);
@@ -664,7 +652,6 @@
     border-radius:6px;
     cursor:pointer;
     font-family:'Manrope',sans-serif;
-    white-space:nowrap;
   }
   .codeCopyBtn:hover{background:rgba(201,162,39,0.4);}
   .toast{
@@ -682,22 +669,9 @@
     opacity:0;
     pointer-events:none;
     transition:opacity 0.25s, transform 0.25s;
-    display:flex;
-    align-items:center;
-    gap:10px;
   }
-  .toast.show{ opacity:1; transform:translateX(-50%) translateY(-6px); pointer-events:auto; }
-  .toast button{
-    background:rgba(201,162,39,0.25);
-    border:1px solid rgba(201,162,39,0.5);
-    color:var(--gold-soft);
-    padding:3px 10px;
-    border-radius:12px;
-    font-size:11.5px;
-    cursor:pointer;
-    font-family:'Manrope',sans-serif;
-  }
-
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(-6px); }
+ 
   /* ---------- Voice Room ---------- */
   .voiceRoomOverlay{
     position:fixed; inset:0;
@@ -806,16 +780,7 @@
     color:rgba(128,128,128,0.7);
     max-width:280px;
   }
-  .voiceRateRow{
-    margin-top:18px;
-    display:flex;
-    align-items:center;
-    gap:10px;
-    font-size:11.5px;
-    color:rgba(245,238,220,0.7);
-  }
-  .voiceRateRow input[type=range]{ width:120px; }
-
+ 
   /* ---------- About modal ---------- */
   .aboutOverlay{
     position:fixed; inset:0;
@@ -835,8 +800,6 @@
     padding:26px 26px 20px;
     max-width:360px;
     width:100%;
-    max-height:82vh;
-    overflow-y:auto;
   }
   .aboutBox h3{
     font-family:'Cormorant Garamond', serif;
@@ -847,10 +810,10 @@
   .aboutBox p{ font-size:13px; color:var(--turquoise-light); margin:4px 0 12px; }
   .aboutBox ul{ list-style:none; padding:0; margin:0 0 14px; display:flex; flex-direction:column; gap:8px; font-size:13.5px; }
   .aboutFooter{ font-size:11.5px !important; color:rgba(128,128,128,0.7) !important; margin-top:10px !important; }
-
+ 
   /* ---------- Message language flag ---------- */
   .langFlag{ opacity:0.75; }
-
+ 
   /* ---------- Follow-up chips ---------- */
   .followUps{
     display:flex;
@@ -869,191 +832,7 @@
     font-family:'Manrope',sans-serif;
   }
   .followUps button:hover{ background:rgba(46,158,150,0.2); }
-
-  /* ---------- NEW: 25 qo'shimcha funksiyalar uchun style ---------- */
-  .storageBarWrap{
-    height:4px;
-    width:100%;
-    background:rgba(128,128,128,0.15);
-    border-radius:3px;
-    overflow:hidden;
-    margin-top:6px;
-  }
-  .storageBarFill{
-    height:100%;
-    background:var(--turquoise);
-    width:0%;
-    transition:width 0.3s;
-  }
-  .storageBarFill.warn{ background:var(--danger); }
-  .storageLabel{ font-size:9.5px; color:rgba(128,128,128,0.6); margin-top:2px; }
-
-  .chatItem .dupBtn, .chatItem .tagDot{
-    background:transparent;border:none;cursor:pointer;font-size:11px;
-    opacity:0.5; flex-shrink:0; color:var(--turquoise-light);
-  }
-  .chatItem:hover .dupBtn{ opacity:0.8; }
-  .tagDot{
-    width:9px;height:9px;border-radius:50%;
-    flex-shrink:0;
-    cursor:pointer;
-    border:1px solid rgba(255,255,255,0.3);
-  }
-
-  body.focus-mode .sidebar{ display:none; }
-  body.focus-mode .header .headerActions button:not(#focusModeBtn){ display:none; }
-  body.focus-mode .header .headerActions button.lbl-hide{ display:none; }
-  body.focus-mode .menuToggle{ display:none; }
-
-  body.compact-mode .msg{ padding:7px 11px; font-size:13.5px; }
-  body.compact-mode .msgRow{ margin-bottom:5px; }
-  body.compact-mode .msgMeta{ display:none; }
-
-  .searchModalOverlay{
-    position:fixed; inset:0;
-    background:rgba(0,0,0,0.6);
-    display:none;
-    align-items:flex-start;
-    justify-content:center;
-    z-index:120;
-    padding:60px 20px 20px;
-  }
-  .searchModalOverlay.show{ display:flex; }
-  .searchModalBox{
-    background:var(--lapis-dark);
-    border:1px solid rgba(201,162,39,0.4);
-    border-radius:14px;
-    width:100%;
-    max-width:480px;
-    max-height:70vh;
-    display:flex;
-    flex-direction:column;
-    overflow:hidden;
-  }
-  .searchModalBox input{
-    padding:14px 16px;
-    border:none;
-    border-bottom:1px solid rgba(201,162,39,0.25);
-    background:transparent;
-    color:var(--cream);
-    font-family:'Manrope',sans-serif;
-    font-size:15px;
-    outline:none;
-  }
-  .searchModalResults{ overflow-y:auto; flex:1; padding:6px; }
-  .searchResultItem{
-    padding:10px 12px;
-    border-radius:9px;
-    cursor:pointer;
-    font-size:13px;
-    color:var(--cream-dim);
-  }
-  .searchResultItem:hover{ background:rgba(46,158,150,0.15); }
-  .searchResultItem b{ color:var(--gold-soft); }
-  .searchResultChat{ font-size:10.5px; color:var(--turquoise-light); margin-bottom:2px; }
-  mark.hitMark{ background:var(--gold); color:var(--lapis-dark); border-radius:3px; padding:0 1px; }
-
-  .inChatSearchBar{
-    display:none;
-    align-items:center;
-    gap:8px;
-    padding:8px 26px;
-    background:var(--lapis-dark);
-    border-top:1px solid rgba(201,162,39,0.15);
-  }
-  .inChatSearchBar.show{ display:flex; }
-  .inChatSearchBar input{
-    flex:1;
-    padding:8px 10px;
-    border-radius:8px;
-    border:1px solid rgba(201,162,39,0.4);
-    background:rgba(128,128,128,0.06);
-    color:var(--cream);
-    font-family:'Manrope',sans-serif;
-    font-size:13px;
-    outline:none;
-  }
-  .inChatSearchBar button{
-    background:transparent;
-    border:1px solid rgba(201,162,39,0.4);
-    color:var(--gold-soft);
-    border-radius:8px;
-    padding:6px 10px;
-    cursor:pointer;
-    font-size:12px;
-  }
-  .inChatSearchBar span{ font-size:11px; color:rgba(128,128,128,0.7); white-space:nowrap; }
-
-  .emojiPickerBox{
-    position:absolute;
-    bottom:56px;
-    right:26px;
-    background:var(--lapis-dark);
-    border:1px solid rgba(201,162,39,0.4);
-    border-radius:12px;
-    padding:8px;
-    display:none;
-    grid-template-columns:repeat(8, 1fr);
-    gap:4px;
-    max-width:280px;
-    z-index:30;
-    box-shadow:0 4px 20px rgba(0,0,0,0.4);
-  }
-  .emojiPickerBox.show{ display:grid; }
-  .emojiPickerBox button{
-    background:transparent;
-    border:none;
-    font-size:18px;
-    cursor:pointer;
-    padding:4px;
-    border-radius:6px;
-  }
-  .emojiPickerBox button:hover{ background:rgba(201,162,39,0.15); }
-
-  .shortcutsGrid{ display:flex; flex-direction:column; gap:8px; font-size:12.5px; }
-  .shortcutsGrid div{ display:flex; justify-content:space-between; gap:10px; }
-  .shortcutsGrid kbd{
-    background:rgba(201,162,39,0.15);
-    border:1px solid rgba(201,162,39,0.4);
-    border-radius:5px;
-    padding:1px 7px;
-    font-family:monospace;
-    font-size:11px;
-    color:var(--gold-soft);
-  }
-
-  .continueBtnWrap{ margin-top:6px; }
-  .continueBtnWrap button{
-    background:rgba(201,162,39,0.15);
-    border:1px solid rgba(201,162,39,0.4);
-    color:var(--gold-soft);
-    font-size:11.5px;
-    padding:5px 12px;
-    border-radius:14px;
-    cursor:pointer;
-    font-family:'Manrope',sans-serif;
-  }
-
-  .draftSavedTag{
-    font-size:9.5px;
-    color:var(--turquoise-light);
-    opacity:0;
-    transition:opacity 0.3s;
-  }
-  .draftSavedTag.show{ opacity:0.8; }
-
-  .fontFamilyRow{ display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
-  .fontFamilyRow button{
-    background:rgba(128,128,128,0.08);
-    border:1px solid rgba(201,162,39,0.3);
-    color:var(--cream);
-    padding:7px 12px;
-    border-radius:9px;
-    cursor:pointer;
-    font-size:12.5px;
-  }
-  .fontFamilyRow button.active{ border-color:var(--gold); background:rgba(201,162,39,0.2); color:var(--gold-soft); }
-
+ 
   @media (max-width: 720px){
     .sidebar{
       position:fixed;
@@ -1069,7 +848,7 @@
     .headerActions button span.lbl{ display:none; }
     .headerActions{ flex-wrap:wrap; justify-content:flex-end; row-gap:6px; }
     .headerActions button{ padding:0 8px; font-size:12px; }
-
+ 
     .composer{
       flex-wrap:wrap;
       row-gap:8px;
@@ -1094,7 +873,7 @@
 </head>
 <body>
 <div class="shell">
-
+ 
   <div class="sidebar" id="sidebar">
     <div class="sidebarTop">
       <div class="brandRow">
@@ -1108,19 +887,12 @@
       <button class="newChatBtn" id="newChatBtn">+ Yangi suhbat <span style="opacity:.55;font-weight:400;">(Ctrl+K)</span></button>
     </div>
     <div class="chatList" id="chatList"></div>
-    <div class="sidebarFooter" style="flex-direction:column;align-items:stretch;gap:6px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-        <span>Saydurasulov Sardor</span>
-        <div style="display:flex;gap:6px;">
-          <button id="globalSearchBtn" title="Barcha suhbatlarda qidirish (Ctrl+Shift+F)">🔎</button>
-          <button id="exportAllBtn" title="Barcha suhbatlarni .txt qilib yuklab olish">⬇ Export</button>
-        </div>
-      </div>
-      <div class="storageBarWrap"><div class="storageBarFill" id="storageBarFill"></div></div>
-      <div class="storageLabel" id="storageLabel">Xotira: 0%</div>
+    <div class="sidebarFooter">
+      <span>Saydurasulov Sardor</span>
+      <button id="exportAllBtn" title="Barcha suhbatlarni .txt qilib yuklab olish">⬇ Export</button>
     </div>
   </div>
-
+ 
   <div class="app">
     <div class="header">
       <svg class="headerNeural" viewBox="0 0 600 80" preserveAspectRatio="none">
@@ -1143,16 +915,6 @@
         <button id="fontDownBtn" title="Shriftni kichraytirish">A-</button>
         <button id="fontUpBtn" title="Shriftni kattalashtirish">A+</button>
         <button id="soundToggleBtn" title="Bildirishnoma ovozi">🔔</button>
-        <button id="memoryBtn" title="Xotira">🧠</button>
-        <button id="statsBtn" title="Profil va statistika">📊</button>
-        <button id="themeBtn" title="Ranglar va tema">🎨</button>
-        <button id="inChatSearchBtn" title="Shu suhbatda qidirish (Ctrl+F)">🔍</button>
-        <button id="compactModeBtn" title="Ixcham ko'rinish">📏</button>
-        <button id="focusModeBtn" title="Fokus rejimi (Ctrl+.)">🎯</button>
-        <button id="shortcutsBtn" title="Klaviatura yorliqlari (?)">⌨️</button>
-        <button id="exportMdBtn" title="Suhbatni Markdown qilib yuklab olish">📝</button>
-        <button id="exportPdfBtn" title="Suhbatni chop etish / PDF">🖨️</button>
-        <button id="devicePrefBtn" title="Qurilma turi (PC / Mobil)">📱</button>
         <button id="aboutBtn" title="Ilova haqida">ℹ️</button>
         <button id="voiceRoomBtn" title="Ovozli suhbat xonasi">🎙️ <span class="lbl">Ovozli xona</span></button>
         <button id="renameBtn" title="Suhbat nomini o'zgartirish">✏️ <span class="lbl">Nomlash</span></button>
@@ -1169,33 +931,22 @@
           <button data-q="Python'da 'salom dunyo' deb chiqaradigan kod yoz">💻 Kod yozdir</button>
           <button data-q="Rasm chiz: tog'lar orasidagi quyosh botishi, sokin ko'l aks etgan holda">🎨 Rasm chizdir</button>
           <button data-q="Do'stlik haqida qisqa qo'shiq matni yoz">🎤 Qo'shiq yozdir</button>
-          <button id="randomPromptBtn">🎲 Tasodifiy savol</button>
         </div>
       </div>
       <button class="scrollDownBtn" id="scrollDownBtn" title="Pastga tushish">⬇</button>
-      <button class="scrollDownBtn" id="scrollUpBtn" title="Yuqoriga chiqish" style="bottom:60px;">⬆</button>
-    </div>
-    <div class="inChatSearchBar" id="inChatSearchBar">
-      <input type="text" id="inChatSearchInput" placeholder="Shu suhbatda qidirish...">
-      <span id="inChatSearchCount">0/0</span>
-      <button id="inChatSearchPrev">↑</button>
-      <button id="inChatSearchNext">↓</button>
-      <button id="inChatSearchClose">✕</button>
     </div>
     <div class="attachBar" id="attachBar">
       <div id="attachPreviewSlot"></div>
       <span id="attachLabel"></span>
       <button id="attachRemoveBtn">✕ olib tashlash</button>
     </div>
-    <div class="composer" style="position:relative;">
+    <div class="composer">
       <input type="file" id="imgInput" accept="image/*" multiple style="display:none;">
       <input type="file" id="fileInput" accept=".pdf,.txt,.md,.csv" style="display:none;">
       <button id="imgBtn" class="iconBtn" title="Rasm biriktirish">📷</button>
       <button id="fileBtn" class="iconBtn" title="Fayl biriktirish (PDF, TXT)">📎</button>
       <button id="locBtn" class="iconBtn" title="Joylashuvni ulashish">📍</button>
       <button id="micBtn" class="iconBtn" title="Ovozli xabar">🎤</button>
-      <button id="emojiBtn" class="iconBtn" title="Emoji">😊</button>
-      <div class="emojiPickerBox" id="emojiPickerBox"></div>
       <select id="voiceLangSelect" title="Ovozli til" style="height:46px;border-radius:12px;border:1px solid rgba(201,162,39,0.4);background:transparent;color:var(--gold-soft);font-family:'Manrope',sans-serif;font-size:12px;padding:0 4px;flex-shrink:0;">
         <option value="auto">🌐 Avto</option>
         <option value="uz-UZ">🇺🇿 O'zbek</option>
@@ -1210,8 +961,6 @@
     </div>
     <div class="composerFooter">
       <span id="charCounter">0 belgi</span>
-      <span class="draftSavedTag" id="draftSavedTag">qoralama saqlandi ✓</span>
-      <span id="wordCounter" style="opacity:.7;"></span>
       <span>Sardor AI xato qilishi mumkin — muhim narsalarni tekshirib ko'ring</span>
     </div>
   </div>
@@ -1238,97 +987,28 @@
   <div class="voiceCaption" id="voiceCaption"></div>
   <button class="voiceMicBig" id="voiceMicBig">🎤</button>
   <div class="voiceHint">Gapirayotganda bosing — u to'xtaydi va sizni tinglaydi</div>
-  <div class="voiceRateRow">
-    <span>🐢</span>
-    <input type="range" id="voiceRateSlider" min="0.6" max="1.6" step="0.05" value="1.02">
-    <span>🐇</span>
-  </div>
 </div>
-
-
+ 
+ 
 <div class="aboutOverlay" id="aboutOverlay">
   <div class="aboutBox">
     <button class="voiceRoomClose" id="aboutClose" title="Yopish">✕</button>
     <h3>Sardor AI haqida</h3>
     <p>La havla vala quvvata illa billah</p>
     <ul>
-      <li>💬 Jonli (streaming) suhbat + internetdan qidirish</li>
-      <li>🎨 Rasm chizish, tahrirlash, logo/banner/stiker</li>
-      <li>🎤 Ovozli xona — jonli mikrofon to'lqini bilan</li>
-      <li>📎 Rasm, PDF, Word, Excel tahlil qilish</li>
-      <li>🧠 Xotira — muhim narsalarni doim eslab qoladi</li>
-      <li>🌗 15+ tema, neon va shisha (glass) uslub</li>
+      <li>💬 Jonli (streaming) suhbat</li>
+      <li>🎨 Rasm chizish</li>
+      <li>🎤 Ovozli xona — faqat gaplashish, yozmasdan</li>
+      <li>📎 Rasm va PDF tahlil qilish</li>
+      <li>🌗 Kunduzgi/tungi mavzu</li>
       <li>🌐 Ko'p tilda gaplashish va eshitish</li>
     </ul>
     <p class="aboutFooter">Yaratuvchi: Saydurasulov Sardor</p>
   </div>
 </div>
-
-<div class="aboutOverlay" id="memoryOverlay">
-  <div class="aboutBox">
-    <button class="voiceRoomClose" id="memoryClose" title="Yopish">✕</button>
-    <h3>🧠 Xotira</h3>
-    <p>Bu yerga yozganlaringizni Sardor AI har bir suhbatda eslab turadi (masalan: ismingiz, kasbingiz, yoqtirgan narsalaringiz).</p>
-    <div id="memoryList" style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto;margin-bottom:12px;"></div>
-    <div style="display:flex;gap:6px;">
-      <input type="text" id="memoryInput" placeholder="Masalan: Mening ismim Davlat" style="flex:1;padding:9px 10px;border-radius:9px;border:1px solid rgba(201,162,39,0.4);background:rgba(128,128,128,0.06);color:var(--cream);font-family:'Manrope',sans-serif;font-size:13px;outline:none;">
-      <button id="memoryAddBtn" style="background:var(--gold);border:none;color:var(--lapis-dark);border-radius:9px;padding:0 14px;cursor:pointer;font-weight:700;">+</button>
-    </div>
-  </div>
-</div>
-
-<div class="aboutOverlay" id="statsOverlay">
-  <div class="aboutBox">
-    <button class="voiceRoomClose" id="statsClose" title="Yopish">✕</button>
-    <h3>📊 Profil va statistika</h3>
-    <div id="statsBody" style="display:flex;flex-direction:column;gap:8px;font-size:13.5px;"></div>
-  </div>
-</div>
-
-<div class="aboutOverlay" id="themeOverlay">
-  <div class="aboutBox">
-    <button class="voiceRoomClose" id="themeClose" title="Yopish">✕</button>
-    <h3>🎨 Ranglar va tema</h3>
-    <p>Rang palettasini tanlang:</p>
-    <div id="paletteGrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;"></div>
-    <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;">
-      <input type="checkbox" id="glassToggle"> Shisha (glassmorphism) uslub
-    </label>
-    <p style="margin-top:14px;margin-bottom:2px;">Shrift turi:</p>
-    <div class="fontFamilyRow" id="fontFamilyRow">
-      <button data-f="'Manrope',sans-serif">Sans</button>
-      <button data-f="'Cormorant Garamond',serif">Serif</button>
-      <button data-f="'Courier New',monospace">Mono</button>
-    </div>
-  </div>
-</div>
-
-<div class="aboutOverlay" id="shortcutsOverlay">
-  <div class="aboutBox">
-    <button class="voiceRoomClose" id="shortcutsClose" title="Yopish">✕</button>
-    <h3>⌨️ Klaviatura yorliqlari</h3>
-    <div class="shortcutsGrid">
-      <div><span>Yangi suhbat</span><kbd>Ctrl+K</kbd></div>
-      <div><span>Xabar maydoniga sakrash</span><kbd>Ctrl+/</kbd></div>
-      <div><span>Xabar yuborish</span><kbd>Enter</kbd></div>
-      <div><span>Barcha suhbatlarda qidirish</span><kbd>Ctrl+Shift+F</kbd></div>
-      <div><span>Shu suhbatda qidirish</span><kbd>Ctrl+F</kbd></div>
-      <div><span>Fokus rejimi</span><kbd>Ctrl+.</kbd></div>
-      <div><span>Oynalarni yopish</span><kbd>Esc</kbd></div>
-      <div><span>Yorliqlar oynasi</span><kbd>?</kbd></div>
-    </div>
-  </div>
-</div>
-
-<div class="searchModalOverlay" id="searchModalOverlay">
-  <div class="searchModalBox">
-    <input type="text" id="searchModalInput" placeholder="🔎 Barcha suhbatlar bo'yicha qidirish...">
-    <div class="searchModalResults" id="searchModalResults"></div>
-  </div>
-</div>
-
+ 
 <div class="toast" id="toast"></div>
-
+ 
 <script>
   // ---------------- State & storage ----------------
   const STORAGE_KEY = 'sardorAI_chats_v2';
@@ -1337,9 +1017,9 @@
   const BACKEND_BASE = 'https://sardor-saydurasulov-bot.onrender.com';
   const CHAT_URL = BACKEND_BASE + '/chat';
   const IMAGE_URL = BACKEND_BASE + '/generate-image';
-
+ 
   const IMAGE_INTENT_RE = /\b(rasm|surat|kartinka|logo|banner)\b.*\b(chiz|yarat|soz|generatsi)|\bdraw\b|\bgenerate\b.*\bimage\b|\bnaris[uy]/i;
-
+ 
   let chats = {};
   let activeId = null;
   let sending = false;
@@ -1349,7 +1029,7 @@
   let lastInputWasVoice = false;
   let abortController = null;
   let searchQuery = '';
-
+ 
   function loadChats(){
     try{
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -1364,7 +1044,7 @@
       createChat();
     }
   }
-
+ 
   function persist(){
     try{
       localStorage.setItem(STORAGE_KEY, JSON.stringify(chats));
@@ -1372,48 +1052,28 @@
     }catch(e){
       console.warn('Saqlashda muammo (xotira to\'lgan bo\'lishi mumkin):', e);
     }
-    updateStorageIndicator();
   }
-
+ 
   function createChat(){
     const id = 'c_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
-    chats[id] = { id, title: 'Yangi suhbat', messages: [], pinned: false, draft: '', tag: null };
+    chats[id] = { id, title: 'Yangi suhbat', messages: [], pinned: false, draft: '' };
     activeId = id;
     persist();
     return id;
   }
-
-  function showToast(text, actionLabel, actionFn){
+ 
+  function showToast(text){
     const t = document.getElementById('toast');
-    t.innerHTML = '';
-    const span = document.createElement('span');
-    span.textContent = text;
-    t.appendChild(span);
-    if(actionLabel && actionFn){
-      const btn = document.createElement('button');
-      btn.textContent = actionLabel;
-      btn.addEventListener('click', () => { actionFn(); t.classList.remove('show'); });
-      t.appendChild(btn);
-    }
+    t.textContent = text;
     t.classList.add('show');
     clearTimeout(showToast._tm);
-    showToast._tm = setTimeout(() => t.classList.remove('show'), actionLabel ? 6000 : 1800);
+    showToast._tm = setTimeout(() => t.classList.remove('show'), 1800);
   }
-
+ 
   function timeNow(){
     return new Date().toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' });
   }
-
-  function buildMessagesPayload(chat){
-    const memLine = (typeof memoryContextLine === 'function') ? memoryContextLine() : '';
-    if(!memLine) return chat.messages;
-    return [
-      { role: 'user', content: memLine },
-      { role: 'assistant', content: "Tushundim, buni esda saqlayman." },
-      ...chat.messages
-    ];
-  }
-
+ 
   function greetingByHour(){
     const h = new Date().getHours();
     if(h < 6) return "Tungi tinchlik 🌙 Nima haqida gaplashamiz?";
@@ -1422,7 +1082,7 @@
     if(h < 22) return "Xayrli kech! 🌆 Sizni tinglayman.";
     return "Kech bo'ldi, lekin men doim shu yerdaman 🌙 Nima kerak?";
   }
-
+ 
   // ---------------- Theme ----------------
   const themeToggle = document.getElementById('themeToggle');
   function applyTheme(theme){
@@ -1445,12 +1105,11 @@
     applyTheme(next);
     localStorage.setItem(THEME_KEY, next);
   });
-
+ 
   // ---------------- Sidebar rendering ----------------
   const chatListEl = document.getElementById('chatList');
   const chatTitleEl = document.getElementById('chatTitle');
-  const TAG_COLORS = ['#c9a227', '#2e9e96', '#c9573f', '#a970ff', '#8bc34a', null];
-
+ 
   function renderChatList(){
     chatListEl.innerHTML = '';
     let ids = Object.keys(chats);
@@ -1469,7 +1128,7 @@
       const chat = chats[id];
       const item = document.createElement('div');
       item.className = 'chatItem' + (id === activeId ? ' active' : '');
-
+ 
       const pinBtn = document.createElement('button');
       pinBtn.className = 'pin' + (chat.pinned ? ' pinned' : '');
       pinBtn.textContent = '📌';
@@ -1480,19 +1139,7 @@
         persist();
         renderChatList();
       });
-
-      const tagDot = document.createElement('button');
-      tagDot.className = 'tagDot';
-      tagDot.style.background = chat.tag || 'transparent';
-      tagDot.title = "Rangli yorliq";
-      tagDot.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const idx = TAG_COLORS.indexOf(chat.tag || null);
-        chat.tag = TAG_COLORS[(idx + 1) % TAG_COLORS.length];
-        persist();
-        renderChatList();
-      });
-
+ 
       const titleSpan = document.createElement('span');
       titleSpan.className = 'title';
       titleSpan.textContent = chat.title || 'Yangi suhbat';
@@ -1501,16 +1148,7 @@
         e.stopPropagation();
         renameChat(id);
       });
-
-      const dupBtn = document.createElement('button');
-      dupBtn.className = 'dupBtn';
-      dupBtn.textContent = '⧉';
-      dupBtn.title = "Suhbatni nusxalash";
-      dupBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        duplicateChat(id);
-      });
-
+ 
       const delBtn = document.createElement('button');
       delBtn.className = 'delBtn';
       delBtn.textContent = '✕';
@@ -1519,35 +1157,15 @@
         e.stopPropagation();
         deleteChat(id);
       });
-
+ 
       item.appendChild(pinBtn);
-      item.appendChild(tagDot);
       item.appendChild(titleSpan);
-      item.appendChild(dupBtn);
       item.appendChild(delBtn);
       item.addEventListener('click', () => switchChat(id));
       chatListEl.appendChild(item);
     }
   }
-
-  function duplicateChat(id){
-    const src = chats[id];
-    const newId = 'c_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
-    chats[newId] = {
-      id: newId,
-      title: (src.title || 'Yangi suhbat') + ' (nusxa)',
-      messages: JSON.parse(JSON.stringify(src.messages || [])),
-      pinned: false,
-      draft: '',
-      tag: src.tag || null
-    };
-    activeId = newId;
-    persist();
-    renderChatList();
-    renderMessages();
-    showToast("Suhbat nusxalandi ✓");
-  }
-
+ 
   function renameChat(id){
     const chat = chats[id];
     const name = prompt("Suhbat nomini kiriting:", chat.title || '');
@@ -1559,12 +1177,12 @@
     }
   }
   document.getElementById('renameBtn').addEventListener('click', () => renameChat(activeId));
-
+ 
   document.getElementById('searchBox').addEventListener('input', (e) => {
     searchQuery = e.target.value.trim();
     renderChatList();
   });
-
+ 
   function switchChat(id){
     if(id === activeId) return;
     if(sending) stopGenerating();
@@ -1578,10 +1196,10 @@
     updateCharCounter();
     if(window.innerWidth <= 720) sidebar.classList.add('collapsed');
   }
-
+ 
   function deleteChat(id){
     const name = (chats[id] && chats[id].title) || 'Yangi suhbat';
-    const backup = JSON.parse(JSON.stringify(chats[id]));
+    if(!confirm(`"${name}" suhbatini butunlay o'chirishni xohlaysizmi?`)) return;
     delete chats[id];
     if(id === activeId){
       const ids = Object.keys(chats);
@@ -1590,15 +1208,8 @@
     persist();
     renderChatList();
     renderMessages();
-    showToast(`"${name}" o'chirildi`, 'Bekor qilish', () => {
-      chats[id] = backup;
-      activeId = id;
-      persist();
-      renderChatList();
-      renderMessages();
-    });
   }
-
+ 
   document.getElementById('newChatBtn').addEventListener('click', () => {
     if(sending) stopGenerating();
     if(chats[activeId]) chats[activeId].draft = inputEl.value;
@@ -1610,7 +1221,7 @@
     updateCharCounter();
     if(window.innerWidth <= 720) sidebar.classList.add('collapsed');
   });
-
+ 
   document.getElementById('exportAllBtn').addEventListener('click', () => {
     let out = 'SARDOR AI — barcha suhbatlar\n\n';
     for(const id of Object.keys(chats)){
@@ -1623,7 +1234,7 @@
     }
     downloadText(out, 'sardor-ai-suhbatlar.txt');
   });
-
+ 
   document.getElementById('shareBtn').addEventListener('click', () => {
     const chat = chats[activeId];
     if(!chat || chat.messages.length === 0){ showToast("Suhbat bo'sh"); return; }
@@ -1633,7 +1244,7 @@
     }
     navigator.clipboard.writeText(out).then(() => showToast("Suhbat nusxalandi ✓"));
   });
-
+ 
   function downloadText(text, filename){
     const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
@@ -1643,328 +1254,67 @@
     a.click();
     URL.revokeObjectURL(url);
   }
-
-  // ---- NEW: Export chat as Markdown ----
-  document.getElementById('exportMdBtn').addEventListener('click', () => {
-    const chat = chats[activeId];
-    if(!chat || chat.messages.length === 0){ showToast("Suhbat bo'sh"); return; }
-    let out = `# ${chat.title || 'Sardor AI suhbat'}\n\n`;
-    for(const m of chat.messages){
-      out += `**${m.role === 'user' ? 'Siz' : 'Sardor AI'}:**\n\n${m.content || ''}\n\n---\n\n`;
+ 
+  // ---------------- Sidebar toggle ----------------
+  const sidebar = document.getElementById('sidebar');
+  document.getElementById('menuToggle').addEventListener('click', () => {
+    sidebar.classList.toggle('collapsed');
+  });
+  if(window.innerWidth <= 720) sidebar.classList.add('collapsed');
+ 
+  // ---------------- Keyboard shortcuts ----------------
+  document.addEventListener('keydown', (e) => {
+    if(e.ctrlKey && e.key.toLowerCase() === 'k'){
+      e.preventDefault();
+      document.getElementById('newChatBtn').click();
+    } else if(e.ctrlKey && e.key === '/'){
+      e.preventDefault();
+      inputEl.focus();
     }
-    downloadText(out, (chat.title || 'suhbat').replace(/[^\w\-]+/g,'_') + '.md');
-    showToast("Markdown fayl yuklandi ✓");
   });
-
-  // ---- NEW: Export chat as PDF (print) ----
-  document.getElementById('exportPdfBtn').addEventListener('click', () => {
-    const chat = chats[activeId];
-    if(!chat || chat.messages.length === 0){ showToast("Suhbat bo'sh"); return; }
-    const w = window.open('', '_blank');
-    let html = `<html><head><meta charset="utf-8"><title>${chat.title||'Suhbat'}</title>
-      <style>
-        body{font-family:sans-serif;padding:30px;color:#222;}
-        h1{font-size:20px;}
-        .m{margin-bottom:14px;padding:10px 14px;border-radius:10px;}
-        .u{background:#e8f5f3;text-align:right;}
-        .b{background:#f5f2e6;}
-        .r{font-size:11px;color:#888;margin-bottom:3px;}
-      </style></head><body>`;
-    html += `<h1>${chat.title || 'Sardor AI suhbat'}</h1>`;
-    chat.messages.forEach(m => {
-      const cls = m.role === 'user' ? 'u' : 'b';
-      const role = m.role === 'user' ? 'Siz' : 'Sardor AI';
-      html += `<div class="m ${cls}"><div class="r">${role}</div>${(m.content||'').replace(/</g,'&lt;').replace(/\n/g,'<br>')}</div>`;
-    });
-    html += `</body></html>`;
-    w.document.write(html);
-    w.document.close();
-    setTimeout(() => w.print(), 400);
-  });
-
-  // ---- NEW: Storage usage indicator ----
-  function updateStorageIndicator(){
-    try{
-      let total = 0;
-      for(const k in localStorage){
-        if(localStorage.hasOwnProperty(k)) total += (localStorage[k].length + k.length) * 2;
-      }
-      const limitBytes = 5 * 1024 * 1024; // taxminiy 5MB
-      const pct = Math.min(100, Math.round((total / limitBytes) * 100));
-      const fill = document.getElementById('storageBarFill');
-      const label = document.getElementById('storageLabel');
-      if(fill){
-        fill.style.width = pct + '%';
-        fill.classList.toggle('warn', pct > 80);
-      }
-      if(label) label.textContent = `Xotira: ${pct}% (${(total/1024).toFixed(0)} KB)`;
-    }catch(e){}
-  }
-
-  // ---- NEW: Global search across all chats ----
-  const searchModalOverlay = document.getElementById('searchModalOverlay');
-  const searchModalInput = document.getElementById('searchModalInput');
-  const searchModalResults = document.getElementById('searchModalResults');
-  function openGlobalSearch(){
-    searchModalOverlay.classList.add('show');
-    searchModalInput.value = '';
-    searchModalResults.innerHTML = '<div style="padding:14px;font-size:12.5px;color:rgba(128,128,128,0.7);">Qidiruv so\'zini kiriting...</div>';
-    setTimeout(() => searchModalInput.focus(), 50);
-  }
-  function closeGlobalSearch(){ searchModalOverlay.classList.remove('show'); }
-  document.getElementById('globalSearchBtn').addEventListener('click', openGlobalSearch);
-  searchModalOverlay.addEventListener('click', (e) => { if(e.target === searchModalOverlay) closeGlobalSearch(); });
-  function highlightText(text, q){
-    const idx = text.toLowerCase().indexOf(q.toLowerCase());
-    if(idx === -1) return text.slice(0, 80);
-    const start = Math.max(0, idx - 25);
-    const end = Math.min(text.length, idx + q.length + 40);
-    let snippet = (start > 0 ? '…' : '') + text.slice(start, end) + (end < text.length ? '…' : '');
-    const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'ig');
-    return snippet.replace(re, m => `<mark class="hitMark">${m}</mark>`);
-  }
-  searchModalInput.addEventListener('input', () => {
-    const q = searchModalInput.value.trim();
-    searchModalResults.innerHTML = '';
-    if(!q){ searchModalResults.innerHTML = '<div style="padding:14px;font-size:12.5px;color:rgba(128,128,128,0.7);">Qidiruv so\'zini kiriting...</div>'; return; }
-    let found = 0;
-    for(const id of Object.keys(chats)){
-      const c = chats[id];
-      c.messages.forEach((m, idx) => {
-        if(m.content && m.content.toLowerCase().includes(q.toLowerCase()) && found < 40){
-          found++;
-          const item = document.createElement('div');
-          item.className = 'searchResultItem';
-          item.innerHTML = `<div class="searchResultChat">${c.title || 'Yangi suhbat'}</div>${highlightText(m.content, q)}`;
-          item.addEventListener('click', () => {
-            activeId = id;
-            persist();
-            renderChatList();
-            renderMessages();
-            closeGlobalSearch();
-          });
-          searchModalResults.appendChild(item);
-        }
-      });
-    }
-    if(found === 0) searchModalResults.innerHTML = '<div style="padding:14px;font-size:12.5px;color:rgba(128,128,128,0.7);">Hech narsa topilmadi</div>';
-  });
-
-  // ---- NEW: In-chat search (Ctrl+F) ----
-  const inChatSearchBar = document.getElementById('inChatSearchBar');
-  const inChatSearchInput = document.getElementById('inChatSearchInput');
-  const inChatSearchCount = document.getElementById('inChatSearchCount');
-  let inChatMatches = [];
-  let inChatMatchIdx = -1;
-  function openInChatSearch(){
-    inChatSearchBar.classList.add('show');
-    setTimeout(() => inChatSearchInput.focus(), 50);
-  }
-  function closeInChatSearch(){
-    inChatSearchBar.classList.remove('show');
-    document.querySelectorAll('.msg mark.hitMark').forEach(el => {
-      el.outerHTML = el.innerHTML;
-    });
-    inChatMatches = []; inChatMatchIdx = -1;
-  }
-  function runInChatSearch(){
-    document.querySelectorAll('.msg mark.hitMark').forEach(el => { el.outerHTML = el.innerHTML; });
-    inChatMatches = [];
-    const q = inChatSearchInput.value.trim();
-    if(!q){ inChatSearchCount.textContent = '0/0'; return; }
-    const holders = messagesEl.querySelectorAll('.msg > div:first-child');
-    holders.forEach(holder => {
-      const text = holder.textContent;
-      if(text.toLowerCase().includes(q.toLowerCase())){
-        const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'ig');
-        holder.innerHTML = holder.textContent.replace(re, m => `<mark class="hitMark">${m}</mark>`);
-        holder.querySelectorAll('mark.hitMark').forEach(m => inChatMatches.push(m));
-      }
-    });
-    inChatMatchIdx = inChatMatches.length ? 0 : -1;
-    updateInChatSearchCount();
-    if(inChatMatches.length) inChatMatches[0].scrollIntoView({ block: 'center', behavior: 'smooth' });
-  }
-  function updateInChatSearchCount(){
-    inChatSearchCount.textContent = inChatMatches.length ? `${inChatMatchIdx+1}/${inChatMatches.length}` : '0/0';
-  }
-  document.getElementById('inChatSearchBtn').addEventListener('click', () => {
-    if(inChatSearchBar.classList.contains('show')) closeInChatSearch(); else openInChatSearch();
-  });
-  document.getElementById('inChatSearchClose').addEventListener('click', closeInChatSearch);
-  inChatSearchInput.addEventListener('input', runInChatSearch);
-  document.getElementById('inChatSearchNext').addEventListener('click', () => {
-    if(!inChatMatches.length) return;
-    inChatMatchIdx = (inChatMatchIdx + 1) % inChatMatches.length;
-    inChatMatches[inChatMatchIdx].scrollIntoView({ block: 'center', behavior: 'smooth' });
-    updateInChatSearchCount();
-  });
-  document.getElementById('inChatSearchPrev').addEventListener('click', () => {
-    if(!inChatMatches.length) return;
-    inChatMatchIdx = (inChatMatchIdx - 1 + inChatMatches.length) % inChatMatches.length;
-    inChatMatches[inChatMatchIdx].scrollIntoView({ block: 'center', behavior: 'smooth' });
-    updateInChatSearchCount();
-  });
-
-  // ---- NEW: Focus mode ----
-  const FOCUS_KEY = 'sardorAI_focus_v1';
-  function applyFocusMode(on){
-    document.body.classList.toggle('focus-mode', on);
-    localStorage.setItem(FOCUS_KEY, on ? 'on' : 'off');
-  }
-  document.getElementById('focusModeBtn').addEventListener('click', () => {
-    applyFocusMode(!document.body.classList.contains('focus-mode'));
-  });
-  if(localStorage.getItem(FOCUS_KEY) === 'on') applyFocusMode(true);
-
-  // ---- NEW: Compact mode ----
-  const COMPACT_KEY = 'sardorAI_compact_v1';
-  function applyCompactMode(on){
-    document.body.classList.toggle('compact-mode', on);
-    localStorage.setItem(COMPACT_KEY, on ? 'on' : 'off');
-  }
-  document.getElementById('compactModeBtn').addEventListener('click', () => {
-    applyCompactMode(!document.body.classList.contains('compact-mode'));
-  });
-  if(localStorage.getItem(COMPACT_KEY) === 'on') applyCompactMode(true);
-
-  // ---- NEW: Shortcuts modal ----
-  const shortcutsOverlay = document.getElementById('shortcutsOverlay');
-  document.getElementById('shortcutsBtn').addEventListener('click', () => shortcutsOverlay.classList.add('show'));
-  document.getElementById('shortcutsClose').addEventListener('click', () => shortcutsOverlay.classList.remove('show'));
-
-  // ---- NEW: Random prompt ----
-  const RANDOM_PROMPTS = [
-    "Agar 24 soat qo'shimcha vaqting bo'lsa, nima qilar eding?",
-    "Menga hech kim bilmagan qiziq bir fakt ayt",
-    "3 daqiqada o'rganib bo'ladigan foydali ko'nikma nima?",
-    "Kelajakda hayot qanday bo'lishi mumkinligi haqida fikr bildir",
-    "Menga kunimni yaxshi o'tkazish uchun bitta maslahat ber",
-    "Motivatsion qisqa gap yoz",
-    "Eng qiziqarli tarixiy voqealardan birini ayt",
-    "Menga miyani charxlaydigan bir topishmoq ber",
-    "O'zbekistonning qiziqarli joylari haqida gapir",
-    "Hayotni osonlashtiradigan bitta hayot hikmati ayt"
-  ];
-  document.addEventListener('click', (e) => {
-    if(e.target && e.target.id === 'randomPromptBtn'){
-      const q = RANDOM_PROMPTS[Math.floor(Math.random() * RANDOM_PROMPTS.length)];
-      inputEl.value = q;
+ 
+  // ---------------- Suggested questions ----------------
+  function wireSuggestRow(el){
+    el.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-q]');
+      if(!btn) return;
+      inputEl.value = btn.getAttribute('data-q');
       autoGrow();
       updateCharCounter();
       sendMessage();
-    }
-  });
-
-  // ---- NEW: Emoji picker ----
-  const EMOJI_LIST = ['😀','😂','😍','🤔','😎','👍','🙏','🔥','🎉','❤️','😢','😴','🤝','👏','💡','✅','❌','⭐','🚀','🎨','📌','📎','🎤','🎧','🌙','☀️','🍀','🎁','🕌','🌸'];
-  const emojiPickerBox = document.getElementById('emojiPickerBox');
-  EMOJI_LIST.forEach(em => {
-    const b = document.createElement('button');
-    b.textContent = em;
-    b.addEventListener('click', () => {
-      inputEl.value += em;
-      autoGrow(); updateCharCounter();
-      emojiPickerBox.classList.remove('show');
-      inputEl.focus();
     });
-    emojiPickerBox.appendChild(b);
-  });
-  document.getElementById('emojiBtn').addEventListener('click', (e) => {
-    e.stopPropagation();
-    emojiPickerBox.classList.toggle('show');
-  });
-  document.addEventListener('click', (e) => {
-    if(!emojiPickerBox.contains(e.target) && e.target.id !== 'emojiBtn') emojiPickerBox.classList.remove('show');
-  });
-
-  // ---- NEW: Font family selector ----
-  const FONT_FAMILY_KEY = 'sardorAI_fontFamily_v1';
-  function applyFontFamily(f){
-    document.body.style.fontFamily = f;
-    localStorage.setItem(FONT_FAMILY_KEY, f);
-    document.querySelectorAll('#fontFamilyRow button').forEach(b => b.classList.toggle('active', b.getAttribute('data-f') === f));
   }
-  document.getElementById('fontFamilyRow').addEventListener('click', (e) => {
-    const btn = e.target.closest('button[data-f]');
-    if(btn) applyFontFamily(btn.getAttribute('data-f'));
-  });
-  applyFontFamily(localStorage.getItem(FONT_FAMILY_KEY) || "'Manrope',sans-serif");
-
-  // ---- NEW: Tab title unread indicator ----
-  const ORIGINAL_TITLE = document.title;
-  let unreadPending = false;
-  document.addEventListener('visibilitychange', () => {
-    if(!document.hidden && unreadPending){
-      unreadPending = false;
-      document.title = ORIGINAL_TITLE;
-    }
-  });
-  function markUnreadIfHidden(){
-    if(document.hidden){
-      unreadPending = true;
-      document.title = '● ' + ORIGINAL_TITLE;
-    }
-  }
-
-  // ---- NEW: Word counter ----
-  const wordCounterEl = document.getElementById('wordCounter');
-  function updateWordCounter(){
-    const words = inputEl.value.trim().split(/\s+/).filter(Boolean).length;
-    wordCounterEl.textContent = words ? words + ' so\'z' : '';
-  }
-
-  // ---- NEW: Draft saved indicator ----
-  const draftSavedTag = document.getElementById('draftSavedTag');
-  let draftSaveTimer = null;
-  function flashDraftSaved(){
-    clearTimeout(draftSaveTimer);
-    draftSavedTag.classList.add('show');
-    draftSaveTimer = setTimeout(() => draftSavedTag.classList.remove('show'), 1200);
-  }
-
+  wireSuggestRow(document.getElementById('suggestRow'));
+ 
   // ---------------- Message rendering ----------------
   const messagesEl = document.getElementById('messages');
   const inputEl = document.getElementById('input');
   const sendBtn = document.getElementById('sendBtn');
   const scrollDownBtn = document.getElementById('scrollDownBtn');
-  const scrollUpBtn = document.getElementById('scrollUpBtn');
   const charCounter = document.getElementById('charCounter');
-  const CHAR_SOFT_LIMIT = 4000;
-
+ 
   messagesEl.addEventListener('scroll', () => {
     const distFromBottom = messagesEl.scrollHeight - messagesEl.scrollTop - messagesEl.clientHeight;
     scrollDownBtn.classList.toggle('show', distFromBottom > 200);
-    scrollUpBtn.classList.toggle('show', messagesEl.scrollTop > 200);
   });
   scrollDownBtn.addEventListener('click', () => {
     messagesEl.scrollTo({ top: messagesEl.scrollHeight, behavior: 'smooth' });
   });
-  scrollUpBtn.addEventListener('click', () => {
-    messagesEl.scrollTo({ top: 0, behavior: 'smooth' });
-  });
-
+ 
   function updateCharCounter(){
-    const len = inputEl.value.length;
-    charCounter.textContent = len + ' belgi';
-    charCounter.style.color = len > CHAR_SOFT_LIMIT ? 'var(--danger)' : '';
-    updateWordCounter();
+    charCounter.textContent = inputEl.value.length + ' belgi';
   }
-
+ 
   function renderMessageContent(container, text){
     const parts = text.split(/```(\w*)\n?([\s\S]*?)```/g);
-    let codeBlockCount = 0;
     for(let i = 0; i < parts.length; i += 3){
       const plain = parts[i];
       if(plain) container.appendChild(document.createTextNode(plain));
       const lang = parts[i+1];
       const code = parts[i+2];
       if(code !== undefined){
-        codeBlockCount++;
         const wrap = document.createElement('div');
         wrap.className = 'codeWrap';
-        const btnRow = document.createElement('div');
-        btnRow.style.cssText = 'position:absolute;top:6px;right:6px;display:flex;gap:6px;';
         const btn = document.createElement('button');
         btn.className = 'codeCopyBtn';
         btn.textContent = 'Copy';
@@ -1974,73 +1324,25 @@
             setTimeout(() => btn.textContent = 'Copy', 1500);
           });
         });
-        btnRow.appendChild(btn);
-
-        const optBtn = document.createElement('button');
-        optBtn.className = 'codeCopyBtn';
-        optBtn.textContent = '⚡ Optimallashtir';
-        optBtn.addEventListener('click', () => {
-          if(sending) return;
-          inputEl.value = "Shu kodni optimallashtir va yaxshila:\n```" + (lang || '') + "\n" + code.trim() + "\n```";
-          autoGrow();
-          updateCharCounter();
-          sendMessage();
-        });
-        btnRow.appendChild(optBtn);
-
-        const isPreviewable = /^(html|htm|xml)$/i.test(lang || '') || /<html|<body|<!doctype/i.test(code);
-        if(isPreviewable){
-          const prevBtn = document.createElement('button');
-          prevBtn.className = 'codeCopyBtn';
-          prevBtn.textContent = '▶ Preview';
-          prevBtn.addEventListener('click', () => {
-            const existing = wrap.querySelector('.codePreviewFrame');
-            if(existing){ existing.remove(); prevBtn.textContent = '▶ Preview'; return; }
-            const iframe = document.createElement('iframe');
-            iframe.className = 'codePreviewFrame';
-            iframe.style.cssText = 'width:100%;height:320px;border:none;border-top:1px solid rgba(201,162,39,0.3);background:#fff;';
-            iframe.sandbox = 'allow-scripts';
-            iframe.srcdoc = code;
-            wrap.appendChild(iframe);
-            prevBtn.textContent = '✕ Yopish';
-          });
-          btnRow.appendChild(prevBtn);
-        }
-
         const pre = document.createElement('pre');
         const codeEl = document.createElement('code');
         if(lang) codeEl.className = 'language-' + lang;
         codeEl.textContent = code.trim();
         pre.appendChild(codeEl);
-        wrap.appendChild(btnRow);
+        wrap.appendChild(btn);
         wrap.appendChild(pre);
         container.appendChild(wrap);
         if(window.hljs) window.hljs.highlightElement(codeEl);
       }
     }
-    // NEW: "copy all code blocks" button if more than one
-    if(codeBlockCount > 1){
-      const allBtn = document.createElement('button');
-      allBtn.className = 'codeCopyBtn';
-      allBtn.style.cssText = 'margin-top:6px;display:block;';
-      allBtn.textContent = '📋 Barcha kodlarni nusxalash';
-      allBtn.addEventListener('click', () => {
-        const blocks = [];
-        for(let i = 0; i < parts.length; i += 3){
-          if(parts[i+2] !== undefined) blocks.push(parts[i+2].trim());
-        }
-        navigator.clipboard.writeText(blocks.join('\n\n')).then(() => showToast('Barcha kodlar nusxalandi ✓'));
-      });
-      container.appendChild(allBtn);
-    }
   }
-
+ 
   // opts: { imageUrls, fileMeta, generatedImageUrl, showActions, rawText, time, reaction, onRegenerate, onEdit }
   function buildMessageEl(role, text, opts){
     opts = opts || {};
     const row = document.createElement('div');
     row.className = 'msgRow ' + (role === 'user' ? 'user' : 'bot');
-
+ 
     const div = document.createElement('div');
     div.className = 'msg ' + (role === 'user' ? 'user' : 'bot');
     const textHolder = document.createElement('div');
@@ -2052,7 +1354,7 @@
       }
     }
     div.appendChild(textHolder);
-
+ 
     if(opts.imageUrls && opts.imageUrls.length){
       const grid = document.createElement('div');
       grid.className = 'imgGrid';
@@ -2088,11 +1390,11 @@
       chip.textContent = '📍 Xaritada ko\'rish';
       div.appendChild(chip);
     }
-
+ 
     if(opts.showActions !== false && (text || opts.generatedImageUrl)){
       const actions = document.createElement('div');
       actions.className = 'msgActions';
-
+ 
       const copyBtn = document.createElement('button');
       copyBtn.textContent = '📋';
       copyBtn.title = 'Nusxalash';
@@ -2102,27 +1404,15 @@
         });
       });
       actions.appendChild(copyBtn);
-
+ 
       if(role === 'bot' && text){
         const speakBtn = document.createElement('button');
         speakBtn.textContent = '🔊';
         speakBtn.title = "Ovoz bilan o'qish";
         speakBtn.addEventListener('click', () => speak(text));
         actions.appendChild(speakBtn);
-
-        // NEW: translate quick action
-        const translateBtn = document.createElement('button');
-        translateBtn.textContent = '🌐';
-        translateBtn.title = "Ruschaga tarjima qilish";
-        translateBtn.addEventListener('click', () => {
-          if(sending) return;
-          inputEl.value = "Shu matnni ruschaga tarjima qil:\n" + text;
-          autoGrow(); updateCharCounter();
-          sendMessage();
-        });
-        actions.appendChild(translateBtn);
       }
-
+ 
       if(opts.generatedImageUrl){
         const dlBtn = document.createElement('a');
         dlBtn.textContent = '⬇';
@@ -2130,7 +1420,7 @@
         dlBtn.href = opts.generatedImageUrl;
         dlBtn.download = 'sardor-ai-rasm.png';
         actions.appendChild(dlBtn);
-
+ 
         const copyImgBtn = document.createElement('button');
         copyImgBtn.textContent = '🖼️';
         copyImgBtn.title = 'Rasmni nusxalash';
@@ -2146,7 +1436,7 @@
         });
         actions.appendChild(copyImgBtn);
       }
-
+ 
       if(role === 'bot' && opts.onRegenerate){
         const regenBtn = document.createElement('button');
         regenBtn.textContent = '🔄';
@@ -2177,7 +1467,7 @@
         actions.appendChild(upBtn);
         actions.appendChild(downBtn);
       }
-
+ 
       if(opts.onDelete){
         const delMsgBtn = document.createElement('button');
         delMsgBtn.textContent = '🗑';
@@ -2185,28 +1475,12 @@
         delMsgBtn.addEventListener('click', opts.onDelete);
         actions.appendChild(delMsgBtn);
       }
-
+ 
       div.appendChild(actions);
     }
-
-    // NEW: continue button if bot response looks cut off
-    if(role === 'bot' && opts.isLast && text && text.length > 40 && !/[.!?…"')\]。！？]\s*$/.test(text.trim())){
-      const contWrap = document.createElement('div');
-      contWrap.className = 'continueBtnWrap';
-      const contBtn = document.createElement('button');
-      contBtn.textContent = '➡ Davom ettirish';
-      contBtn.addEventListener('click', () => {
-        if(sending) return;
-        inputEl.value = 'Davom et';
-        autoGrow(); updateCharCounter();
-        sendMessage();
-      });
-      contWrap.appendChild(contBtn);
-      div.appendChild(contWrap);
-    }
-
+ 
     row.appendChild(div);
-
+ 
     if(opts.time || opts.langFlag){
       const meta = document.createElement('div');
       meta.className = 'msgMeta';
@@ -2215,14 +1489,14 @@
       meta.textContent = metaText;
       row.appendChild(meta);
     }
-
+ 
     row._textHolder = textHolder;
     row._bubble = div;
     return row;
   }
-
+ 
   function renderMessages(){
-    messagesEl.querySelectorAll('.msgRow, .empty, .followUps').forEach(el => el.remove());
+    messagesEl.querySelectorAll('.msgRow, .empty').forEach(el => el.remove());
     const chat = chats[activeId];
     chatTitleEl.textContent = chat && chat.title !== 'Yangi suhbat' ? chat.title : 'Sardor AI';
     if(!chat || chat.messages.length === 0){
@@ -2235,15 +1509,9 @@
         '<button data-q="Python\'da \'salom dunyo\' deb chiqaradigan kod yoz">💻 Kod yozdir</button>' +
         '<button data-q="Rasm chiz: tog\'lar orasidagi quyosh botishi, sokin ko\'l aks etgan holda">🎨 Rasm chizdir</button>' +
         '<button data-q="Do\'stlik haqida qisqa qo\'shiq matni yoz">🎤 Qo\'shiq yozdir</button>' +
-        '<button id="randomPromptBtn2">🎲 Tasodifiy savol</button>' +
         '</div>';
       messagesEl.insertBefore(div, scrollDownBtn);
       wireSuggestRow(div.querySelector('.suggestRow'));
-      const rb2 = div.querySelector('#randomPromptBtn2');
-      if(rb2) rb2.addEventListener('click', () => {
-        const q = RANDOM_PROMPTS[Math.floor(Math.random() * RANDOM_PROMPTS.length)];
-        inputEl.value = q; autoGrow(); updateCharCounter(); sendMessage();
-      });
       return;
     }
     let lastUserIdx = -1;
@@ -2254,7 +1522,6 @@
       else if(m.image && m.image.previewUrl) imageUrls = [m.image.previewUrl];
       const genUrl = m.generatedImage ? `data:${m.generatedImage.mimeType};base64,${m.generatedImage.data}` : null;
       const role = m.role === 'user' ? 'user' : 'bot';
-      const isLastMsg = idx === chat.messages.length - 1;
       const row = buildMessageEl(role, m.content, {
         imageUrls,
         fileMeta: m.file ? { name: m.file.name } : null,
@@ -2263,15 +1530,14 @@
         time: m.time || '',
         langFlag: m.content ? langFlagEmoji(m.content) : '',
         reaction: m.reaction,
-        isLast: isLastMsg,
         onReact: role === 'bot' ? (val) => { m.reaction = val; persist(); renderMessages(); } : null,
-        onRegenerate: (role === 'bot' && isLastMsg) ? () => regenerateLast() : null,
+        onRegenerate: (role === 'bot' && idx === chat.messages.length - 1) ? () => regenerateLast() : null,
         onEdit: (role === 'user' && idx === lastUserIdx) ? () => editAndResend(idx) : null,
         onDelete: () => { chat.messages.splice(idx, 1); persist(); renderChatList(); renderMessages(); }
       });
       messagesEl.insertBefore(row, scrollDownBtn);
-
-      if(role === 'bot' && isLastMsg && !sending && m.content && !m.generatedImage){
+ 
+      if(role === 'bot' && idx === chat.messages.length - 1 && !sending && m.content && !m.generatedImage){
         const chips = document.createElement('div');
         chips.className = 'followUps';
         chips.style.marginLeft = '4px';
@@ -2287,19 +1553,19 @@
     messagesEl.scrollTop = messagesEl.scrollHeight;
     applyFontSize();
   }
-
+ 
   function langFlagEmoji(text){
     const code = detectLangCode(text).split('-')[0];
     const map = { uz: '🇺🇿', ru: '🇷🇺', en: '🇬🇧', tr: '🇹🇷', ar: '🇸🇦' };
     return map[code] || '';
   }
-
+ 
   function autoTitleChat(chat, firstText){
     if(chat.title === 'Yangi suhbat' && firstText){
       chat.title = firstText.length > 34 ? firstText.slice(0,34) + '…' : firstText;
     }
   }
-
+ 
   // ---------------- Regenerate / Edit ----------------
   function regenerateLast(){
     if(sending) return;
@@ -2313,7 +1579,7 @@
     setSendingUI(true);
     runChatStream(chat).finally(() => { setSendingUI(false); messagesEl.scrollTop = messagesEl.scrollHeight; });
   }
-
+ 
   function editAndResend(idx){
     if(sending) return;
     const chat = chats[activeId];
@@ -2328,7 +1594,7 @@
     updateCharCounter();
     sendMessage();
   }
-
+ 
   // ---------------- Composer ----------------
   function autoGrow(){
     inputEl.style.height = 'auto';
@@ -2339,14 +1605,12 @@
     autoGrow();
     updateCharCounter();
     if(chats[activeId]) chats[activeId].draft = inputEl.value;
-    clearTimeout(inputEl._saveTm);
-    inputEl._saveTm = setTimeout(() => { persist(); flashDraftSaved(); }, 600);
   });
-
+ 
   const imgInput = document.getElementById('imgInput');
   const imgBtn = document.getElementById('imgBtn');
   const MAX_IMAGES = 6;
-
+ 
   function addImageFile(file){
     if(!file || !file.type.startsWith('image/')) return;
     if(pendingImages.length >= MAX_IMAGES){
@@ -2362,13 +1626,13 @@
     };
     reader.readAsDataURL(file);
   }
-
+ 
   imgBtn.addEventListener('click', () => imgInput.click());
   imgInput.addEventListener('change', () => {
     Array.from(imgInput.files).forEach(addImageFile);
     imgInput.value = '';
   });
-
+ 
   document.addEventListener('paste', (e) => {
     const items = e.clipboardData && e.clipboardData.items;
     if(!items) return;
@@ -2381,7 +1645,7 @@
     }
     if(found) e.preventDefault();
   });
-
+ 
   // Drag & drop images onto the chat window
   ['dragenter','dragover'].forEach(evt => {
     messagesEl.addEventListener(evt, (e) => {
@@ -2400,7 +1664,7 @@
     if(!files) return;
     Array.from(files).forEach(f => { if(f.type.startsWith('image/')) addImageFile(f); });
   });
-
+ 
   const fileInput = document.getElementById('fileInput');
   const fileBtn = document.getElementById('fileBtn');
   fileBtn.addEventListener('click', () => fileInput.click());
@@ -2428,12 +1692,12 @@
       reader.readAsText(file);
     }
   });
-
+ 
   const attachBar = document.getElementById('attachBar');
   const attachPreviewSlot = document.getElementById('attachPreviewSlot');
   const attachLabel = document.getElementById('attachLabel');
   document.getElementById('attachRemoveBtn').addEventListener('click', clearAttachment);
-
+ 
   function showAttachBar(){
     attachPreviewSlot.innerHTML = '';
     pendingImages.forEach((img, idx) => {
@@ -2480,7 +1744,7 @@
     fileInput.value = '';
     attachBar.classList.remove('show');
   }
-
+ 
   const locBtn = document.getElementById('locBtn');
   locBtn.addEventListener('click', () => {
     if(!navigator.geolocation){
@@ -2498,7 +1762,7 @@
       { timeout: 8000 }
     );
   });
-
+ 
   // ---- Til aniqlash (ovoz uchun) ----
   function detectLangCode(text){
     if(!text) return 'uz-UZ';
@@ -2508,7 +1772,7 @@
     if(/\b(the|is|are|and|you|please|hello|what|how)\b/i.test(text)) return 'en-US';
     return 'uz-UZ';
   }
-
+ 
   // ---- Ovoz uchun matnni tozalash: emoji va belgilarni o'qimasin, faqat tabiiy gap eshitilsin ----
   const EMOJI_RE = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{1F1E6}-\u{1F1FF}\u{2190}-\u{21FF}\u{2B00}-\u{2BFF}\uFE0F]/gu;
   function stripForSpeech(text){
@@ -2521,7 +1785,7 @@
       .replace(/\s{2,}/g, ' ')
       .trim();
   }
-
+ 
   const voiceLangSelect = document.getElementById('voiceLangSelect');
   const VOICE_LANG_KEY = 'sardorAI_voiceLang_v1';
   voiceLangSelect.value = localStorage.getItem(VOICE_LANG_KEY) || 'auto';
@@ -2529,17 +1793,7 @@
     localStorage.setItem(VOICE_LANG_KEY, voiceLangSelect.value);
     if(recognition) recognition.lang = voiceLangSelect.value === 'auto' ? (navigator.language || 'uz-UZ') : voiceLangSelect.value;
   });
-
-  // ---- NEW: Voice speech rate control ----
-  const VOICE_RATE_KEY = 'sardorAI_voiceRate_v1';
-  let voiceRate = parseFloat(localStorage.getItem(VOICE_RATE_KEY) || '1.02');
-  const voiceRateSlider = document.getElementById('voiceRateSlider');
-  voiceRateSlider.value = voiceRate;
-  voiceRateSlider.addEventListener('input', () => {
-    voiceRate = parseFloat(voiceRateSlider.value);
-    localStorage.setItem(VOICE_RATE_KEY, voiceRate);
-  });
-
+ 
   // ---- Voice input ----
   const micBtn = document.getElementById('micBtn');
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -2591,7 +1845,7 @@
       recognition.start(); listening = true; micBtn.classList.add('active');
     }
   });
-
+ 
   function speak(text, onEndCb){
     if(!window.speechSynthesis) return;
     const clean = stripForSpeech(text);
@@ -2600,7 +1854,7 @@
     const utter = new SpeechSynthesisUtterance(clean);
     const langCode = voiceLangSelect.value === 'auto' ? detectLangCode(clean) : voiceLangSelect.value;
     utter.lang = langCode;
-    utter.rate = voiceRate;
+    utter.rate = 1.02;
     utter.pitch = 0.95;
     const prefix = langCode.split('-')[0].toLowerCase();
     const voices = window.speechSynthesis.getVoices();
@@ -2616,7 +1870,7 @@
     window.speechSynthesis.getVoices();
     window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
   }
-
+ 
   // ---------------- Ovozli xona (faqat gaplashish) ----------------
   let voiceRoomActive = false;
   let voiceListeningNow = false;
@@ -2625,7 +1879,7 @@
   let voiceAudioCtx = null;
   let voiceAnalyser = null;
   let voiceRafId = null;
-
+ 
   const voiceRoomBtn = document.getElementById('voiceRoomBtn');
   const voiceRoomOverlay = document.getElementById('voiceRoomOverlay');
   const voiceRoomClose = document.getElementById('voiceRoomClose');
@@ -2634,14 +1888,14 @@
   const voiceCaption = document.getElementById('voiceCaption');
   const voiceMicBig = document.getElementById('voiceMicBig');
   const voiceWaveBars = document.querySelectorAll('#voiceWave span');
-
+ 
   function setVoiceState(state, text){
     voiceAvatarWrap.className = 'voiceAvatarWrap ' + state;
     voiceMicBig.className = 'voiceMicBig ' + state;
     voiceStatus.textContent = text;
     if(navigator.vibrate) navigator.vibrate(15);
   }
-
+ 
   async function ensureMicVisualizer(){
     if(voiceMicStream) return true;
     try{
@@ -2656,7 +1910,7 @@
       return false; // ruxsat berilmadi — baribir CSS animatsiya bilan davom etadi
     }
   }
-
+ 
   function drawMicWave(){
     if(!voiceAnalyser || !voiceListeningNow){ voiceRafId = null; return; }
     const data = new Uint8Array(voiceAnalyser.frequencyBinCount);
@@ -2672,7 +1926,7 @@
     if(voiceRafId){ cancelAnimationFrame(voiceRafId); voiceRafId = null; }
     voiceWaveBars.forEach(bar => bar.style.height = '6px');
   }
-
+ 
   function openVoiceRoom(){
     if(!SpeechRecognition){ showToast("Bu brauzer ovozli suhbatni qo'llab-quvvatlamaydi"); return; }
     voiceRoomActive = true;
@@ -2696,7 +1950,7 @@
   }
   voiceRoomBtn.addEventListener('click', openVoiceRoom);
   voiceRoomClose.addEventListener('click', closeVoiceRoom);
-
+ 
   function startVoiceListening(){
     if(!recognition) return;
     recognition.lang = voiceLangSelect.value === 'auto' ? (navigator.language || 'uz-UZ') : voiceLangSelect.value;
@@ -2722,7 +1976,7 @@
   }
   voiceMicBig.addEventListener('click', voiceMicClick);
   voiceAvatarWrap.addEventListener('click', voiceMicClick);
-
+ 
   async function handleVoiceRoomTranscript(transcript){
     stopMicWave();
     if(!transcript || !transcript.trim()){
@@ -2735,14 +1989,14 @@
     chat.messages.push({ role: 'user', content: transcript, time: timeNow() });
     persist();
     setVoiceState('thinking', "O'ylayapman...");
-
+ 
     voiceAbort = new AbortController();
     let fullText = '';
     try{
       const response = await fetch(CHAT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: buildMessagesPayload(chat) }),
+        body: JSON.stringify({ messages: chat.messages }),
         signal: voiceAbort.signal
       });
       if(!response.ok){
@@ -2782,23 +2036,22 @@
       return;
     }
     voiceAbort = null;
-
+ 
     if(!fullText){
       chat.messages.pop(); persist();
       setVoiceState('idle', "Javob kelmadi, qayta urinib ko'ring");
       return;
     }
-
+ 
     chat.messages.push({ role: 'assistant', content: fullText, time: timeNow() });
     persist();
     renderChatList();
     playNotifySound();
-    notifyIfHidden(fullText);
     voiceCaption.textContent = stripForSpeech(fullText);
     setVoiceState('speaking', "Gapiryapman...");
     speakInRoom(fullText);
   }
-
+ 
   function speakInRoom(text){
     const clean = stripForSpeech(text);
     if(!window.speechSynthesis || !clean){
@@ -2810,7 +2063,7 @@
     const utter = new SpeechSynthesisUtterance(clean);
     const langCode = voiceLangSelect.value === 'auto' ? detectLangCode(clean) : voiceLangSelect.value;
     utter.lang = langCode;
-    utter.rate = voiceRate;
+    utter.rate = 1.02;
     utter.pitch = 0.95;
     const prefix = langCode.split('-')[0].toLowerCase();
     const voices = window.speechSynthesis.getVoices();
@@ -2825,193 +2078,20 @@
     };
     window.speechSynthesis.speak(utter);
   }
-
+ 
   // ---------------- About modal ----------------
   const aboutOverlay = document.getElementById('aboutOverlay');
   document.getElementById('aboutBtn').addEventListener('click', () => aboutOverlay.classList.add('show'));
   document.getElementById('aboutClose').addEventListener('click', () => aboutOverlay.classList.remove('show'));
-
-  // ---------------- Xotira (Memory) ----------------
-  const MEMORY_KEY = 'sardorAI_memory_v1';
-  let memoryNotes = [];
-  try{ memoryNotes = JSON.parse(localStorage.getItem(MEMORY_KEY) || '[]'); }catch(e){ memoryNotes = []; }
-  function persistMemory(){ localStorage.setItem(MEMORY_KEY, JSON.stringify(memoryNotes)); updateStorageIndicator(); }
-  function renderMemoryList(){
-    const list = document.getElementById('memoryList');
-    list.innerHTML = '';
-    if(memoryNotes.length === 0){
-      list.innerHTML = '<div style="font-size:12px;color:rgba(128,128,128,0.6);">Hali hech narsa qo\'shilmagan</div>';
-      return;
-    }
-    memoryNotes.forEach((note, idx) => {
-      const row = document.createElement('div');
-      row.style.cssText = 'display:flex;align-items:center;gap:6px;background:rgba(128,128,128,0.06);padding:6px 10px;border-radius:8px;font-size:12.5px;';
-      const span = document.createElement('span');
-      span.style.flex = '1';
-      span.textContent = note;
-      const rm = document.createElement('button');
-      rm.textContent = '✕';
-      rm.style.cssText = 'background:transparent;border:none;color:var(--danger);cursor:pointer;';
-      rm.addEventListener('click', () => { memoryNotes.splice(idx, 1); persistMemory(); renderMemoryList(); });
-      row.appendChild(span);
-      row.appendChild(rm);
-      list.appendChild(row);
-    });
-  }
-  const memoryOverlay = document.getElementById('memoryOverlay');
-  document.getElementById('memoryBtn').addEventListener('click', () => { renderMemoryList(); memoryOverlay.classList.add('show'); });
-  document.getElementById('memoryClose').addEventListener('click', () => memoryOverlay.classList.remove('show'));
-  document.getElementById('memoryAddBtn').addEventListener('click', () => {
-    const input = document.getElementById('memoryInput');
-    const val = input.value.trim();
-    if(!val) return;
-    memoryNotes.push(val);
-    persistMemory();
-    input.value = '';
-    renderMemoryList();
-    showToast("Xotiraga qo'shildi ✓");
-  });
-  document.getElementById('memoryInput').addEventListener('keydown', (e) => {
-    if(e.key === 'Enter'){ e.preventDefault(); document.getElementById('memoryAddBtn').click(); }
-  });
-  function memoryContextLine(){
-    if(memoryNotes.length === 0) return '';
-    return "[Foydalanuvchi haqida eslab qolingan narsalar: " + memoryNotes.join('; ') + "]";
-  }
-
-  // ---------------- Profil va statistika ----------------
-  const statsOverlay = document.getElementById('statsOverlay');
-  document.getElementById('statsBtn').addEventListener('click', () => {
-    const chatIds = Object.keys(chats);
-    let totalMsgs = 0, userMsgs = 0, botMsgs = 0, images = 0, earliestTs = null, totalWords = 0;
-    const hourCounts = new Array(24).fill(0);
-    chatIds.forEach(id => {
-      const c = chats[id];
-      totalMsgs += c.messages.length;
-      c.messages.forEach(m => {
-        if(m.role === 'user') userMsgs++; else botMsgs++;
-        if(m.generatedImage || (m.images && m.images.length)) images++;
-        if(m.content) totalWords += m.content.trim().split(/\s+/).filter(Boolean).length;
-        if(m.time){
-          const hh = parseInt((m.time.match(/^(\d{1,2})/)||[])[1], 10);
-          if(!isNaN(hh)) hourCounts[hh]++;
-        }
-      });
-      const ts = Number(id.split('_')[1]) || null;
-      if(ts && (!earliestTs || ts < earliestTs)) earliestTs = ts;
-    });
-    const since = earliestTs ? new Date(earliestTs).toLocaleDateString('uz-UZ', { year:'numeric', month:'long', day:'numeric' }) : '—';
-    let peakHour = 0, peakVal = -1;
-    hourCounts.forEach((v,h) => { if(v > peakVal){ peakVal = v; peakHour = h; } });
-    const readingMins = Math.max(1, Math.round(totalWords / 200));
-    const body = document.getElementById('statsBody');
-    body.innerHTML = '';
-    [
-      ['💬 Jami suhbatlar', chatIds.length],
-      ['✉️ Jami xabarlar', totalMsgs],
-      ['🗣️ Sizning xabarlaringiz', userMsgs],
-      ['🤖 Sardor AI javoblari', botMsgs],
-      ['🖼️ Rasm bilan bog\'liq xabarlar', images],
-      ['📝 Jami so\'zlar soni', totalWords],
-      ['⏱️ Taxminiy o\'qish vaqti', readingMins + ' daqiqa'],
-      ['🕒 Eng faol soat', peakVal > 0 ? (peakHour + ':00 — ' + (peakHour+1) + ':00') : '—'],
-      ['📅 Foydalanish boshlangan sana', since]
-    ].forEach(([label, val]) => {
-      const row = document.createElement('div');
-      row.style.cssText = 'display:flex;justify-content:space-between;border-bottom:1px solid rgba(128,128,128,0.15);padding-bottom:6px;';
-      row.innerHTML = `<span>${label}</span><strong>${val}</strong>`;
-      body.appendChild(row);
-    });
-    statsOverlay.classList.add('show');
-  });
-  document.getElementById('statsClose').addEventListener('click', () => statsOverlay.classList.remove('show'));
-
-  // ---------------- Ranglar va tema (palette) ----------------
-  const PALETTES = [
-    { name: "Lazurit (asosiy)", gold: '#c9a227', goldSoft: '#e6c869', turquoise: '#2e9e96', turquoiseLight: '#7fd4c9' },
-    { name: 'Neon', gold: '#ff2ec4', goldSoft: '#ff7ae0', turquoise: '#00e5ff', turquoiseLight: '#7dfaff' },
-    { name: 'O\'rmon', gold: '#8bc34a', goldSoft: '#b6e08a', turquoise: '#2e8b6e', turquoiseLight: '#7fd4a8' },
-    { name: 'Quyosh botishi', gold: '#ff8a3d', goldSoft: '#ffb877', turquoise: '#e94e77', turquoiseLight: '#ff9db8' },
-    { name: 'Binafsha', gold: '#a970ff', goldSoft: '#c9a3ff', turquoise: '#6a4bd6', turquoiseLight: '#a996f0' },
-    { name: 'Oltin qum', gold: '#d4af37', goldSoft: '#f0d878', turquoise: '#b08d57', turquoiseLight: '#e0c9a0' },
-    { name: 'Muzlik', gold: '#7fc8f8', goldSoft: '#b6e2ff', turquoise: '#2e6fa6', turquoiseLight: '#8fc2e8' },
-    { name: 'Qizil olov', gold: '#ff5252', goldSoft: '#ff8a80', turquoise: '#c62828', turquoiseLight: '#ff8a80' }
-  ];
-  const PALETTE_KEY = 'sardorAI_palette_v1';
-  const GLASS_KEY = 'sardorAI_glass_v1';
-  function applyPalette(idx){
-    const p = PALETTES[idx] || PALETTES[0];
-    document.documentElement.style.setProperty('--gold', p.gold);
-    document.documentElement.style.setProperty('--gold-soft', p.goldSoft);
-    document.documentElement.style.setProperty('--turquoise', p.turquoise);
-    document.documentElement.style.setProperty('--turquoise-light', p.turquoiseLight);
-    localStorage.setItem(PALETTE_KEY, idx);
-  }
-  function renderPaletteGrid(){
-    const grid = document.getElementById('paletteGrid');
-    grid.innerHTML = '';
-    const current = parseInt(localStorage.getItem(PALETTE_KEY) || '0', 10);
-    PALETTES.forEach((p, idx) => {
-      const sw = document.createElement('button');
-      sw.title = p.name;
-      sw.style.cssText = `height:44px;border-radius:10px;cursor:pointer;border:2px solid ${idx===current?'#fff':'transparent'};background:linear-gradient(135deg, ${p.gold}, ${p.turquoise});`;
-      sw.addEventListener('click', () => { applyPalette(idx); renderPaletteGrid(); });
-      grid.appendChild(sw);
-    });
-  }
-  const themeOverlay = document.getElementById('themeOverlay');
-  document.getElementById('themeBtn').addEventListener('click', () => { renderPaletteGrid(); themeOverlay.classList.add('show'); });
-  document.getElementById('themeClose').addEventListener('click', () => themeOverlay.classList.remove('show'));
-  const glassToggle = document.getElementById('glassToggle');
-  glassToggle.checked = localStorage.getItem(GLASS_KEY) === 'on';
-  document.body.classList.toggle('glass-mode', glassToggle.checked);
-  glassToggle.addEventListener('change', () => {
-    localStorage.setItem(GLASS_KEY, glassToggle.checked ? 'on' : 'off');
-    document.body.classList.toggle('glass-mode', glassToggle.checked);
-  });
-  applyPalette(parseInt(localStorage.getItem(PALETTE_KEY) || '0', 10));
-
-  // ---------------- Bildirishnoma (Notification API, tab fonda bo'lganda) ----------------
-  if('Notification' in window && Notification.permission === 'default'){
-    // Ruxsatni birinchi xabar yuborilganda so'raymiz (majburlab emas)
-  }
-  function notifyIfHidden(text){
-    markUnreadIfHidden();
-    if(document.hidden && 'Notification' in window && Notification.permission === 'granted'){
-      try{ new Notification('Sardor AI', { body: text.slice(0, 120), icon: 'icon-192.png' }); }catch(e){}
-    }
-  }
-
-  // ---------------- Esc key closes overlays / global shortcuts ----------------
+ 
+  // ---------------- Esc key closes overlays ----------------
   document.addEventListener('keydown', (e) => {
     if(e.key === 'Escape'){
       if(voiceRoomActive) closeVoiceRoom();
       aboutOverlay.classList.remove('show');
-      memoryOverlay.classList.remove('show');
-      statsOverlay.classList.remove('show');
-      themeOverlay.classList.remove('show');
-      shortcutsOverlay.classList.remove('show');
-      closeGlobalSearch();
-      closeInChatSearch();
-    }
-    if(e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'f'){
-      e.preventDefault();
-      openGlobalSearch();
-    } else if(e.ctrlKey && e.key.toLowerCase() === 'f'){
-      const activeTag = document.activeElement && document.activeElement.tagName;
-      if(activeTag !== 'INPUT' && activeTag !== 'TEXTAREA'){
-        e.preventDefault();
-        openInChatSearch();
-      }
-    } else if(e.ctrlKey && e.key === '.'){
-      e.preventDefault();
-      applyFocusMode(!document.body.classList.contains('focus-mode'));
-    } else if(e.key === '?' && document.activeElement !== inputEl && document.activeElement !== searchModalInput && document.activeElement !== inChatSearchInput){
-      e.preventDefault();
-      shortcutsOverlay.classList.add('show');
     }
   });
-
+ 
   // ---------------- Bildirishnoma ovozi (yangi javob kelganda) ----------------
   const SOUND_KEY = 'sardorAI_sound_v1';
   const soundToggleBtn = document.getElementById('soundToggleBtn');
@@ -3039,7 +2119,7 @@
     }catch(e){}
     if(navigator.vibrate) navigator.vibrate(60);
   }
-
+ 
   // ---------------- Shrift kattaligini sozlash ----------------
   const FONT_KEY = 'sardorAI_fontSize_v1';
   let fontSize = parseInt(localStorage.getItem(FONT_KEY) || '15', 10);
@@ -3057,9 +2137,9 @@
     localStorage.setItem(FONT_KEY, fontSize);
     applyFontSize();
   });
-
+ 
   // ---------------- Tizim mavzusi initTheme() ichida hisobga olinadi ----------------
-
+ 
   // ---------------- Send / Stream / Stop ----------------
   function setSendingUI(isSending){
     sending = isSending;
@@ -3072,7 +2152,7 @@
       sendBtn.disabled = false;
     }
   }
-
+ 
   function stopGenerating(){
     if(abortController){
       abortController.abort();
@@ -3080,36 +2160,33 @@
     }
     setSendingUI(false);
   }
-
+ 
   sendBtn.addEventListener('click', () => {
     if(sending){ stopGenerating(); return; }
     sendMessage();
   });
-
+ 
   async function sendMessage(){
     if(sending) return;
-    if('Notification' in window && Notification.permission === 'default'){
-      Notification.requestPermission().catch(() => {});
-    }
     const text = inputEl.value.trim();
     const hasImages = pendingImages.length > 0;
     const attach = hasImages ? { kind: 'images', images: pendingImages.slice() } : pendingFile;
     const loc = pendingLocation;
-
+ 
     if((!text && !attach && !loc)) return;
-
+ 
     setSendingUI(true);
     inputEl.value = '';
     autoGrow();
     updateCharCounter();
-
+ 
     const chat = chats[activeId];
     chat.draft = '';
     clearAttachment();
-
+ 
     let displayText = text;
     let userMsg = { role: 'user', content: text, time: timeNow() };
-
+ 
     if(attach && attach.kind === 'images'){
       userMsg.images = attach.images.map(img => ({ mimeType: img.mimeType, data: img.data, previewUrl: img.previewUrl }));
     } else if(attach && attach.kind === 'file'){
@@ -3118,45 +2195,45 @@
       displayText = (text ? text + '\n\n' : '') + `[Fayl: ${attach.name}]`;
       userMsg.content = (text ? text + '\n\n' : '') + `--- ${attach.name} fayli mazmuni ---\n${attach.data}`;
     }
-
+ 
     if(loc){
       userMsg.location = { lat: loc.lat, lng: loc.lng };
       const locLine = `[Foydalanuvchi joylashuvi: kenglik ${loc.lat.toFixed(5)}, uzunlik ${loc.lng.toFixed(5)}]`;
       userMsg.content = (userMsg.content ? userMsg.content + '\n\n' : '') + locLine;
       displayText = (displayText ? displayText + '\n\n' : '') + '📍 Joylashuv ulashildi';
     }
-
+ 
     if(chat.messages.length === 0) autoTitleChat(chat, text || (attach ? (attach.name || 'Rasmlar') : (loc ? 'Joylashuv' : 'Yangi suhbat')));
-
+ 
     chat.messages.push(userMsg);
     persist();
     renderChatList();
     renderMessages();
-
+ 
     const isImageIntent = IMAGE_INTENT_RE.test(text);
-
+ 
     if(isImageIntent && text){
       await runImageGeneration(chat, text, attach && attach.kind === 'images' ? attach.images[0] : null);
     } else {
       await runChatStream(chat);
     }
-
+ 
     setSendingUI(false);
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
-
+ 
   async function runImageGeneration(chat, prompt, refImage){
     const typingEl = document.createElement('div');
     typingEl.className = 'msgRow bot';
     typingEl.innerHTML = '<div class="msg bot typing"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>';
     messagesEl.insertBefore(typingEl, scrollDownBtn);
     messagesEl.scrollTop = messagesEl.scrollHeight;
-
+ 
     abortController = new AbortController();
     try{
       const body = { prompt };
       if(refImage) body.image = { mimeType: refImage.mimeType, data: refImage.data };
-
+ 
       const response = await fetch(IMAGE_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -3165,13 +2242,13 @@
       });
       const data = await response.json();
       typingEl.remove();
-
+ 
       if(!response.ok || !data.image){
         const errMsg = (data.error && data.error.message) ? data.error.message : "Rasmni chizib bo'lmadi.";
         renderBotError(chat, errMsg);
         return;
       }
-
+ 
       const caption = data.text || "Mana, tayyor! 🎨";
       chat.messages.push({ role: 'assistant', content: caption, generatedImage: data.image, time: timeNow() });
       persist();
@@ -3191,7 +2268,7 @@
       abortController = null;
     }
   }
-
+ 
   function renderBotError(chat, errMsg){
     chat.messages.pop();
     persist();
@@ -3199,27 +2276,27 @@
     const row = buildMessageEl('bot', "Xatolik: " + errMsg, { showActions: false });
     messagesEl.insertBefore(row, scrollDownBtn);
   }
-
+ 
   async function runChatStream(chat){
     const typingEl = document.createElement('div');
     typingEl.className = 'msgRow bot';
     typingEl.innerHTML = '<div class="msg bot typing"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>';
     messagesEl.insertBefore(typingEl, scrollDownBtn);
     messagesEl.scrollTop = messagesEl.scrollHeight;
-
+ 
     abortController = new AbortController();
     let fullText = '';
     let botRow = null;
     let aborted = false;
-
+ 
     try{
       const response = await fetch(CHAT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: buildMessagesPayload(chat) }),
+        body: JSON.stringify({ messages: chat.messages }),
         signal: abortController.signal
       });
-
+ 
       if(!response.ok){
         let errMsg = 'Nomalum xatolik';
         try{ const data = await response.json(); errMsg = (data.error && data.error.message) ? data.error.message : errMsg; }catch(e){}
@@ -3227,11 +2304,11 @@
         renderBotError(chat, errMsg);
         return;
       }
-
+ 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
-
+ 
       while(true){
         const { done, value } = await reader.read();
         if(done) break;
@@ -3268,9 +2345,9 @@
         return;
       }
     }
-
+ 
     abortController = null;
-
+ 
     if(!fullText){
       typingEl.remove();
       if(!aborted){
@@ -3283,19 +2360,18 @@
       }
       return;
     }
-
+ 
     const finalText = fullText + (aborted ? '\n\n[to\'xtatildi]' : '');
     chat.messages.push({ role: 'assistant', content: finalText, time: timeNow() });
     persist();
     renderChatList();
     renderMessages();
     if(!aborted) playNotifySound();
-    if(!aborted) notifyIfHidden(finalText);
     if(lastInputWasVoice && !aborted) speak(fullText);
     lastInputWasVoice = false;
     if(!aborted && window.innerWidth > 720) inputEl.focus();
   }
-
+ 
   document.getElementById('clearBtn').addEventListener('click', () => {
     if(!confirm('Shu suhbatni tozalashni xohlaysizmi?')) return;
     if(sending) stopGenerating();
@@ -3305,14 +2381,14 @@
     renderChatList();
     renderMessages();
   });
-
+ 
   inputEl.addEventListener('keydown', (e) => {
     if(e.key === 'Enter' && !e.shiftKey){
       e.preventDefault();
       if(!sending) sendMessage();
     }
   });
-
+ 
   // ---------------- Init ----------------
   function detectDevice(){
     const isMobile = window.innerWidth <= 720 || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -3321,7 +2397,7 @@
   }
   detectDevice();
   window.addEventListener('resize', detectDevice);
-
+ 
   initTheme();
   loadChats();
   renderChatList();
@@ -3330,7 +2406,6 @@
   autoGrow();
   updateCharCounter();
   applyFontSize();
-  updateStorageIndicator();
   if('serviceWorker' in navigator){
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./service-worker.js').catch(() => {});
@@ -3339,3 +2414,14 @@
 </script>
 </body>
 </html>
+ 
+
+
+
+
+
+
+
+
+
+
