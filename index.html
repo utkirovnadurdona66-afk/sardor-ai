@@ -1,6 +1,3 @@
-
-
-Index · HTML
 <!DOCTYPE html>
 <html lang="uz">
 <head>
@@ -37,6 +34,8 @@ Index · HTML
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.7.0/mammoth.browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   :root{
     --lapis: #16213e;
@@ -76,7 +75,7 @@ Index · HTML
     max-width:1180px;
     margin:0 auto;
   }
- 
+
   /* ---------- Sidebar ---------- */
   .sidebar{
     width:270px;
@@ -221,7 +220,7 @@ Index · HTML
     cursor:pointer;
     font-family:'Manrope',sans-serif;
   }
- 
+
   /* ---------- Main ---------- */
   .app{
     flex:1;
@@ -641,9 +640,6 @@ Index · HTML
     background:#0d1526 !important;
   }
   .codeCopyBtn{
-    position:absolute;
-    top:6px;
-    right:6px;
     background:rgba(201,162,39,0.25);
     border:1px solid rgba(201,162,39,0.5);
     color:var(--gold-soft);
@@ -652,6 +648,7 @@ Index · HTML
     border-radius:6px;
     cursor:pointer;
     font-family:'Manrope',sans-serif;
+    white-space:nowrap;
   }
   .codeCopyBtn:hover{background:rgba(201,162,39,0.4);}
   .toast{
@@ -671,7 +668,7 @@ Index · HTML
     transition:opacity 0.25s, transform 0.25s;
   }
   .toast.show{ opacity:1; transform:translateX(-50%) translateY(-6px); }
- 
+
   /* ---------- Voice Room ---------- */
   .voiceRoomOverlay{
     position:fixed; inset:0;
@@ -780,7 +777,7 @@ Index · HTML
     color:rgba(128,128,128,0.7);
     max-width:280px;
   }
- 
+
   /* ---------- About modal ---------- */
   .aboutOverlay{
     position:fixed; inset:0;
@@ -810,10 +807,10 @@ Index · HTML
   .aboutBox p{ font-size:13px; color:var(--turquoise-light); margin:4px 0 12px; }
   .aboutBox ul{ list-style:none; padding:0; margin:0 0 14px; display:flex; flex-direction:column; gap:8px; font-size:13.5px; }
   .aboutFooter{ font-size:11.5px !important; color:rgba(128,128,128,0.7) !important; margin-top:10px !important; }
- 
+
   /* ---------- Message language flag ---------- */
   .langFlag{ opacity:0.75; }
- 
+
   /* ---------- Follow-up chips ---------- */
   .followUps{
     display:flex;
@@ -832,7 +829,7 @@ Index · HTML
     font-family:'Manrope',sans-serif;
   }
   .followUps button:hover{ background:rgba(46,158,150,0.2); }
- 
+
   @media (max-width: 720px){
     .sidebar{
       position:fixed;
@@ -848,7 +845,7 @@ Index · HTML
     .headerActions button span.lbl{ display:none; }
     .headerActions{ flex-wrap:wrap; justify-content:flex-end; row-gap:6px; }
     .headerActions button{ padding:0 8px; font-size:12px; }
- 
+
     .composer{
       flex-wrap:wrap;
       row-gap:8px;
@@ -873,7 +870,7 @@ Index · HTML
 </head>
 <body>
 <div class="shell">
- 
+
   <div class="sidebar" id="sidebar">
     <div class="sidebarTop">
       <div class="brandRow">
@@ -889,10 +886,15 @@ Index · HTML
     <div class="chatList" id="chatList"></div>
     <div class="sidebarFooter">
       <span>Saydurasulov Sardor</span>
-      <button id="exportAllBtn" title="Barcha suhbatlarni .txt qilib yuklab olish">⬇ Export</button>
+      <span style="display:flex;gap:6px;">
+        <button id="exportAllBtn" title="Barcha suhbatlarni .txt qilib yuklab olish">⬇ TXT</button>
+        <button id="exportJsonBtn" title="Joriy suhbatni JSON qilib yuklab olish">⬇ JSON</button>
+        <button id="importJsonBtn" title="JSON suhbat faylini import qilish">⬆ Import</button>
+      </span>
     </div>
+    <input type="file" id="importJsonInput" accept=".json" style="display:none;">
   </div>
- 
+
   <div class="app">
     <div class="header">
       <svg class="headerNeural" viewBox="0 0 600 80" preserveAspectRatio="none">
@@ -915,6 +917,10 @@ Index · HTML
         <button id="fontDownBtn" title="Shriftni kichraytirish">A-</button>
         <button id="fontUpBtn" title="Shriftni kattalashtirish">A+</button>
         <button id="soundToggleBtn" title="Bildirishnoma ovozi">🔔</button>
+        <button id="memoryBtn" title="Xotira">🧠</button>
+        <button id="statsBtn" title="Profil va statistika">📊</button>
+        <button id="themeBtn" title="Ranglar va tema">🎨</button>
+        <button id="archiveBtn" title="Arxivlangan suhbatlar">🗄️</button>
         <button id="aboutBtn" title="Ilova haqida">ℹ️</button>
         <button id="voiceRoomBtn" title="Ovozli suhbat xonasi">🎙️ <span class="lbl">Ovozli xona</span></button>
         <button id="renameBtn" title="Suhbat nomini o'zgartirish">✏️ <span class="lbl">Nomlash</span></button>
@@ -938,11 +944,12 @@ Index · HTML
     <div class="attachBar" id="attachBar">
       <div id="attachPreviewSlot"></div>
       <span id="attachLabel"></span>
+      <button id="ocrQuickBtn" style="display:none;">🔤 Matnni o'qi</button>
       <button id="attachRemoveBtn">✕ olib tashlash</button>
     </div>
     <div class="composer">
       <input type="file" id="imgInput" accept="image/*" multiple style="display:none;">
-      <input type="file" id="fileInput" accept=".pdf,.txt,.md,.csv" style="display:none;">
+      <input type="file" id="fileInput" accept=".pdf,.txt,.md,.csv,.docx,.xlsx,.xls" style="display:none;">
       <button id="imgBtn" class="iconBtn" title="Rasm biriktirish">📷</button>
       <button id="fileBtn" class="iconBtn" title="Fayl biriktirish (PDF, TXT)">📎</button>
       <button id="locBtn" class="iconBtn" title="Joylashuvni ulashish">📍</button>
@@ -988,27 +995,69 @@ Index · HTML
   <button class="voiceMicBig" id="voiceMicBig">🎤</button>
   <div class="voiceHint">Gapirayotganda bosing — u to'xtaydi va sizni tinglaydi</div>
 </div>
- 
- 
+
+
 <div class="aboutOverlay" id="aboutOverlay">
   <div class="aboutBox">
     <button class="voiceRoomClose" id="aboutClose" title="Yopish">✕</button>
     <h3>Sardor AI haqida</h3>
     <p>La havla vala quvvata illa billah</p>
     <ul>
-      <li>💬 Jonli (streaming) suhbat</li>
-      <li>🎨 Rasm chizish</li>
-      <li>🎤 Ovozli xona — faqat gaplashish, yozmasdan</li>
-      <li>📎 Rasm va PDF tahlil qilish</li>
-      <li>🌗 Kunduzgi/tungi mavzu</li>
+      <li>💬 Jonli (streaming) suhbat + internetdan qidirish</li>
+      <li>🎨 Rasm chizish, tahrirlash, logo/banner/stiker</li>
+      <li>🎤 Ovozli xona — jonli mikrofon to'lqini bilan</li>
+      <li>📎 Rasm, PDF, Word, Excel tahlil qilish</li>
+      <li>🧠 Xotira — muhim narsalarni doim eslab qoladi</li>
+      <li>🌗 Rang palettalari, neon va shisha (glass) uslub</li>
       <li>🌐 Ko'p tilda gaplashish va eshitish</li>
     </ul>
     <p class="aboutFooter">Yaratuvchi: Saydurasulov Sardor</p>
   </div>
 </div>
- 
+
+<div class="aboutOverlay" id="memoryOverlay">
+  <div class="aboutBox">
+    <button class="voiceRoomClose" id="memoryClose" title="Yopish">✕</button>
+    <h3>🧠 Xotira</h3>
+    <p>Bu yerga yozganlaringizni Sardor AI har bir suhbatda eslab turadi (masalan: ismingiz, kasbingiz, yoqtirgan narsalaringiz).</p>
+    <div id="memoryList" style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto;margin-bottom:12px;"></div>
+    <div style="display:flex;gap:6px;">
+      <input type="text" id="memoryInput" placeholder="Masalan: Mening ismim Davlat" style="flex:1;padding:9px 10px;border-radius:9px;border:1px solid rgba(201,162,39,0.4);background:rgba(128,128,128,0.06);color:var(--cream);font-family:'Manrope',sans-serif;font-size:13px;outline:none;">
+      <button id="memoryAddBtn" style="background:var(--gold);border:none;color:var(--lapis-dark);border-radius:9px;padding:0 14px;cursor:pointer;font-weight:700;">+</button>
+    </div>
+  </div>
+</div>
+
+<div class="aboutOverlay" id="statsOverlay">
+  <div class="aboutBox">
+    <button class="voiceRoomClose" id="statsClose" title="Yopish">✕</button>
+    <h3>📊 Profil va statistika</h3>
+    <div id="statsBody" style="display:flex;flex-direction:column;gap:8px;font-size:13.5px;"></div>
+  </div>
+</div>
+
+<div class="aboutOverlay" id="themeOverlay">
+  <div class="aboutBox">
+    <button class="voiceRoomClose" id="themeClose" title="Yopish">✕</button>
+    <h3>🎨 Ranglar va tema</h3>
+    <p>Rang palettasini tanlang:</p>
+    <div id="paletteGrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;"></div>
+    <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;">
+      <input type="checkbox" id="glassToggle"> Shisha (glassmorphism) uslub
+    </label>
+  </div>
+</div>
+
+<div class="aboutOverlay" id="archiveOverlay">
+  <div class="aboutBox">
+    <button class="voiceRoomClose" id="archiveClose" title="Yopish">✕</button>
+    <h3>🗄️ Arxivlangan suhbatlar</h3>
+    <div id="archiveList" style="display:flex;flex-direction:column;gap:6px;max-height:280px;overflow-y:auto;"></div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
- 
+
 <script>
   // ---------------- State & storage ----------------
   const STORAGE_KEY = 'sardorAI_chats_v2';
@@ -1017,9 +1066,9 @@ Index · HTML
   const BACKEND_BASE = 'https://sardor-saydurasulov-bot.onrender.com';
   const CHAT_URL = BACKEND_BASE + '/chat';
   const IMAGE_URL = BACKEND_BASE + '/generate-image';
- 
+
   const IMAGE_INTENT_RE = /\b(rasm|surat|kartinka|logo|banner)\b.*\b(chiz|yarat|soz|generatsi)|\bdraw\b|\bgenerate\b.*\bimage\b|\bnaris[uy]/i;
- 
+
   let chats = {};
   let activeId = null;
   let sending = false;
@@ -1029,7 +1078,7 @@ Index · HTML
   let lastInputWasVoice = false;
   let abortController = null;
   let searchQuery = '';
- 
+
   function loadChats(){
     try{
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -1044,7 +1093,7 @@ Index · HTML
       createChat();
     }
   }
- 
+
   function persist(){
     try{
       localStorage.setItem(STORAGE_KEY, JSON.stringify(chats));
@@ -1053,7 +1102,7 @@ Index · HTML
       console.warn('Saqlashda muammo (xotira to\'lgan bo\'lishi mumkin):', e);
     }
   }
- 
+
   function createChat(){
     const id = 'c_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
     chats[id] = { id, title: 'Yangi suhbat', messages: [], pinned: false, draft: '' };
@@ -1061,7 +1110,7 @@ Index · HTML
     persist();
     return id;
   }
- 
+
   function showToast(text){
     const t = document.getElementById('toast');
     t.textContent = text;
@@ -1069,11 +1118,11 @@ Index · HTML
     clearTimeout(showToast._tm);
     showToast._tm = setTimeout(() => t.classList.remove('show'), 1800);
   }
- 
+
   function timeNow(){
     return new Date().toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' });
   }
- 
+
   function greetingByHour(){
     const h = new Date().getHours();
     if(h < 6) return "Tungi tinchlik 🌙 Nima haqida gaplashamiz?";
@@ -1082,7 +1131,7 @@ Index · HTML
     if(h < 22) return "Xayrli kech! 🌆 Sizni tinglayman.";
     return "Kech bo'ldi, lekin men doim shu yerdaman 🌙 Nima kerak?";
   }
- 
+
   // ---------------- Theme ----------------
   const themeToggle = document.getElementById('themeToggle');
   function applyTheme(theme){
@@ -1105,14 +1154,14 @@ Index · HTML
     applyTheme(next);
     localStorage.setItem(THEME_KEY, next);
   });
- 
+
   // ---------------- Sidebar rendering ----------------
   const chatListEl = document.getElementById('chatList');
   const chatTitleEl = document.getElementById('chatTitle');
- 
+
   function renderChatList(){
     chatListEl.innerHTML = '';
-    let ids = Object.keys(chats);
+    let ids = Object.keys(chats).filter(id => !chats[id].archived);
     if(searchQuery){
       const q = searchQuery.toLowerCase();
       ids = ids.filter(id => (chats[id].title || '').toLowerCase().includes(q));
@@ -1128,7 +1177,7 @@ Index · HTML
       const chat = chats[id];
       const item = document.createElement('div');
       item.className = 'chatItem' + (id === activeId ? ' active' : '');
- 
+
       const pinBtn = document.createElement('button');
       pinBtn.className = 'pin' + (chat.pinned ? ' pinned' : '');
       pinBtn.textContent = '📌';
@@ -1139,7 +1188,7 @@ Index · HTML
         persist();
         renderChatList();
       });
- 
+
       const titleSpan = document.createElement('span');
       titleSpan.className = 'title';
       titleSpan.textContent = chat.title || 'Yangi suhbat';
@@ -1148,7 +1197,24 @@ Index · HTML
         e.stopPropagation();
         renameChat(id);
       });
- 
+
+      const archBtn = document.createElement('button');
+      archBtn.className = 'delBtn';
+      archBtn.textContent = '🗄️';
+      archBtn.title = 'Arxivlash';
+      archBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        chat.archived = true;
+        if(id === activeId){
+          const remaining = Object.keys(chats).filter(cid => !chats[cid].archived);
+          activeId = remaining.length ? remaining[remaining.length - 1] : createChat();
+        }
+        persist();
+        renderChatList();
+        renderMessages();
+        showToast("Suhbat arxivlandi");
+      });
+
       const delBtn = document.createElement('button');
       delBtn.className = 'delBtn';
       delBtn.textContent = '✕';
@@ -1157,15 +1223,16 @@ Index · HTML
         e.stopPropagation();
         deleteChat(id);
       });
- 
+
       item.appendChild(pinBtn);
       item.appendChild(titleSpan);
+      item.appendChild(archBtn);
       item.appendChild(delBtn);
       item.addEventListener('click', () => switchChat(id));
       chatListEl.appendChild(item);
     }
   }
- 
+
   function renameChat(id){
     const chat = chats[id];
     const name = prompt("Suhbat nomini kiriting:", chat.title || '');
@@ -1177,12 +1244,12 @@ Index · HTML
     }
   }
   document.getElementById('renameBtn').addEventListener('click', () => renameChat(activeId));
- 
+
   document.getElementById('searchBox').addEventListener('input', (e) => {
     searchQuery = e.target.value.trim();
     renderChatList();
   });
- 
+
   function switchChat(id){
     if(id === activeId) return;
     if(sending) stopGenerating();
@@ -1196,7 +1263,7 @@ Index · HTML
     updateCharCounter();
     if(window.innerWidth <= 720) sidebar.classList.add('collapsed');
   }
- 
+
   function deleteChat(id){
     const name = (chats[id] && chats[id].title) || 'Yangi suhbat';
     if(!confirm(`"${name}" suhbatini butunlay o'chirishni xohlaysizmi?`)) return;
@@ -1209,7 +1276,7 @@ Index · HTML
     renderChatList();
     renderMessages();
   }
- 
+
   document.getElementById('newChatBtn').addEventListener('click', () => {
     if(sending) stopGenerating();
     if(chats[activeId]) chats[activeId].draft = inputEl.value;
@@ -1221,7 +1288,7 @@ Index · HTML
     updateCharCounter();
     if(window.innerWidth <= 720) sidebar.classList.add('collapsed');
   });
- 
+
   document.getElementById('exportAllBtn').addEventListener('click', () => {
     let out = 'SARDOR AI — barcha suhbatlar\n\n';
     for(const id of Object.keys(chats)){
@@ -1234,7 +1301,48 @@ Index · HTML
     }
     downloadText(out, 'sardor-ai-suhbatlar.txt');
   });
- 
+
+  document.getElementById('exportJsonBtn').addEventListener('click', () => {
+    const chat = chats[activeId];
+    if(!chat || chat.messages.length === 0){ showToast("Suhbat bo'sh"); return; }
+    const exportable = {
+      title: chat.title,
+      messages: chat.messages.map(m => ({ role: m.role, content: m.content, time: m.time }))
+    };
+    const blob = new Blob([JSON.stringify(exportable, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = (chat.title || 'suhbat').replace(/[^\w\-]+/g, '_') + '.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  const importJsonInput = document.getElementById('importJsonInput');
+  document.getElementById('importJsonBtn').addEventListener('click', () => importJsonInput.click());
+  importJsonInput.addEventListener('change', () => {
+    const file = importJsonInput.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try{
+        const data = JSON.parse(reader.result);
+        if(!Array.isArray(data.messages)) throw new Error('invalid');
+        const id = createChat();
+        chats[id].title = data.title || 'Import qilingan suhbat';
+        chats[id].messages = data.messages.map(m => ({ role: m.role === 'user' ? 'user' : 'assistant', content: m.content || '', time: m.time || timeNow() }));
+        persist();
+        renderChatList();
+        renderMessages();
+        showToast("Suhbat import qilindi ✓");
+      }catch(e){
+        showToast("Fayl noto'g'ri formatda");
+      }
+      importJsonInput.value = '';
+    };
+    reader.readAsText(file);
+  });
+
   document.getElementById('shareBtn').addEventListener('click', () => {
     const chat = chats[activeId];
     if(!chat || chat.messages.length === 0){ showToast("Suhbat bo'sh"); return; }
@@ -1244,7 +1352,7 @@ Index · HTML
     }
     navigator.clipboard.writeText(out).then(() => showToast("Suhbat nusxalandi ✓"));
   });
- 
+
   function downloadText(text, filename){
     const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
@@ -1254,14 +1362,14 @@ Index · HTML
     a.click();
     URL.revokeObjectURL(url);
   }
- 
+
   // ---------------- Sidebar toggle ----------------
   const sidebar = document.getElementById('sidebar');
   document.getElementById('menuToggle').addEventListener('click', () => {
     sidebar.classList.toggle('collapsed');
   });
   if(window.innerWidth <= 720) sidebar.classList.add('collapsed');
- 
+
   // ---------------- Keyboard shortcuts ----------------
   document.addEventListener('keydown', (e) => {
     if(e.ctrlKey && e.key.toLowerCase() === 'k'){
@@ -1272,7 +1380,7 @@ Index · HTML
       inputEl.focus();
     }
   });
- 
+
   // ---------------- Suggested questions ----------------
   function wireSuggestRow(el){
     el.addEventListener('click', (e) => {
@@ -1285,14 +1393,14 @@ Index · HTML
     });
   }
   wireSuggestRow(document.getElementById('suggestRow'));
- 
+
   // ---------------- Message rendering ----------------
   const messagesEl = document.getElementById('messages');
   const inputEl = document.getElementById('input');
   const sendBtn = document.getElementById('sendBtn');
   const scrollDownBtn = document.getElementById('scrollDownBtn');
   const charCounter = document.getElementById('charCounter');
- 
+
   messagesEl.addEventListener('scroll', () => {
     const distFromBottom = messagesEl.scrollHeight - messagesEl.scrollTop - messagesEl.clientHeight;
     scrollDownBtn.classList.toggle('show', distFromBottom > 200);
@@ -1300,11 +1408,11 @@ Index · HTML
   scrollDownBtn.addEventListener('click', () => {
     messagesEl.scrollTo({ top: messagesEl.scrollHeight, behavior: 'smooth' });
   });
- 
+
   function updateCharCounter(){
     charCounter.textContent = inputEl.value.length + ' belgi';
   }
- 
+
   function renderMessageContent(container, text){
     const parts = text.split(/```(\w*)\n?([\s\S]*?)```/g);
     for(let i = 0; i < parts.length; i += 3){
@@ -1315,6 +1423,9 @@ Index · HTML
       if(code !== undefined){
         const wrap = document.createElement('div');
         wrap.className = 'codeWrap';
+        const btnRow = document.createElement('div');
+        btnRow.style.cssText = 'position:absolute;top:6px;right:6px;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;max-width:calc(100% - 12px);';
+
         const btn = document.createElement('button');
         btn.className = 'codeCopyBtn';
         btn.textContent = 'Copy';
@@ -1324,25 +1435,58 @@ Index · HTML
             setTimeout(() => btn.textContent = 'Copy', 1500);
           });
         });
+        btnRow.appendChild(btn);
+
+        const optBtn = document.createElement('button');
+        optBtn.className = 'codeCopyBtn';
+        optBtn.textContent = '⚡ Optimallashtir';
+        optBtn.addEventListener('click', () => {
+          if(sending) return;
+          inputEl.value = "Shu kodni optimallashtir va yaxshila:\n```" + (lang || '') + "\n" + code.trim() + "\n```";
+          autoGrow();
+          updateCharCounter();
+          sendMessage();
+        });
+        btnRow.appendChild(optBtn);
+
+        const isPreviewable = /^(html|htm|xml)$/i.test(lang || '') || /<html|<body|<!doctype/i.test(code);
+        if(isPreviewable){
+          const prevBtn = document.createElement('button');
+          prevBtn.className = 'codeCopyBtn';
+          prevBtn.textContent = '▶ Preview';
+          prevBtn.addEventListener('click', () => {
+            const existing = wrap.querySelector('.codePreviewFrame');
+            if(existing){ existing.remove(); prevBtn.textContent = '▶ Preview'; return; }
+            const iframe = document.createElement('iframe');
+            iframe.className = 'codePreviewFrame';
+            iframe.style.cssText = 'width:100%;height:320px;border:none;border-top:1px solid rgba(201,162,39,0.3);background:#fff;';
+            iframe.sandbox = 'allow-scripts';
+            iframe.srcdoc = code;
+            wrap.appendChild(iframe);
+            prevBtn.textContent = '✕ Yopish';
+          });
+          btnRow.appendChild(prevBtn);
+        }
+
         const pre = document.createElement('pre');
         const codeEl = document.createElement('code');
         if(lang) codeEl.className = 'language-' + lang;
         codeEl.textContent = code.trim();
         pre.appendChild(codeEl);
-        wrap.appendChild(btn);
+        wrap.appendChild(btnRow);
         wrap.appendChild(pre);
         container.appendChild(wrap);
         if(window.hljs) window.hljs.highlightElement(codeEl);
       }
     }
   }
- 
+
   // opts: { imageUrls, fileMeta, generatedImageUrl, showActions, rawText, time, reaction, onRegenerate, onEdit }
   function buildMessageEl(role, text, opts){
     opts = opts || {};
     const row = document.createElement('div');
     row.className = 'msgRow ' + (role === 'user' ? 'user' : 'bot');
- 
+
     const div = document.createElement('div');
     div.className = 'msg ' + (role === 'user' ? 'user' : 'bot');
     const textHolder = document.createElement('div');
@@ -1354,7 +1498,7 @@ Index · HTML
       }
     }
     div.appendChild(textHolder);
- 
+
     if(opts.imageUrls && opts.imageUrls.length){
       const grid = document.createElement('div');
       grid.className = 'imgGrid';
@@ -1390,11 +1534,11 @@ Index · HTML
       chip.textContent = '📍 Xaritada ko\'rish';
       div.appendChild(chip);
     }
- 
+
     if(opts.showActions !== false && (text || opts.generatedImageUrl)){
       const actions = document.createElement('div');
       actions.className = 'msgActions';
- 
+
       const copyBtn = document.createElement('button');
       copyBtn.textContent = '📋';
       copyBtn.title = 'Nusxalash';
@@ -1404,7 +1548,7 @@ Index · HTML
         });
       });
       actions.appendChild(copyBtn);
- 
+
       if(role === 'bot' && text){
         const speakBtn = document.createElement('button');
         speakBtn.textContent = '🔊';
@@ -1412,7 +1556,7 @@ Index · HTML
         speakBtn.addEventListener('click', () => speak(text));
         actions.appendChild(speakBtn);
       }
- 
+
       if(opts.generatedImageUrl){
         const dlBtn = document.createElement('a');
         dlBtn.textContent = '⬇';
@@ -1420,7 +1564,7 @@ Index · HTML
         dlBtn.href = opts.generatedImageUrl;
         dlBtn.download = 'sardor-ai-rasm.png';
         actions.appendChild(dlBtn);
- 
+
         const copyImgBtn = document.createElement('button');
         copyImgBtn.textContent = '🖼️';
         copyImgBtn.title = 'Rasmni nusxalash';
@@ -1436,7 +1580,7 @@ Index · HTML
         });
         actions.appendChild(copyImgBtn);
       }
- 
+
       if(role === 'bot' && opts.onRegenerate){
         const regenBtn = document.createElement('button');
         regenBtn.textContent = '🔄';
@@ -1467,7 +1611,15 @@ Index · HTML
         actions.appendChild(upBtn);
         actions.appendChild(downBtn);
       }
- 
+
+      if(opts.onPin){
+        const pinMsgBtn = document.createElement('button');
+        pinMsgBtn.textContent = '📌';
+        pinMsgBtn.className = opts.pinned ? 'reacted' : '';
+        pinMsgBtn.title = opts.pinned ? "Pindan olib tashlash" : "Xabarni pin qilish";
+        pinMsgBtn.addEventListener('click', opts.onPin);
+        actions.appendChild(pinMsgBtn);
+      }
       if(opts.onDelete){
         const delMsgBtn = document.createElement('button');
         delMsgBtn.textContent = '🗑';
@@ -1475,12 +1627,12 @@ Index · HTML
         delMsgBtn.addEventListener('click', opts.onDelete);
         actions.appendChild(delMsgBtn);
       }
- 
+
       div.appendChild(actions);
     }
- 
+
     row.appendChild(div);
- 
+
     if(opts.time || opts.langFlag){
       const meta = document.createElement('div');
       meta.className = 'msgMeta';
@@ -1489,12 +1641,12 @@ Index · HTML
       meta.textContent = metaText;
       row.appendChild(meta);
     }
- 
+
     row._textHolder = textHolder;
     row._bubble = div;
     return row;
   }
- 
+
   function renderMessages(){
     messagesEl.querySelectorAll('.msgRow, .empty').forEach(el => el.remove());
     const chat = chats[activeId];
@@ -1536,7 +1688,7 @@ Index · HTML
         onDelete: () => { chat.messages.splice(idx, 1); persist(); renderChatList(); renderMessages(); }
       });
       messagesEl.insertBefore(row, scrollDownBtn);
- 
+
       if(role === 'bot' && idx === chat.messages.length - 1 && !sending && m.content && !m.generatedImage){
         const chips = document.createElement('div');
         chips.className = 'followUps';
@@ -1553,19 +1705,19 @@ Index · HTML
     messagesEl.scrollTop = messagesEl.scrollHeight;
     applyFontSize();
   }
- 
+
   function langFlagEmoji(text){
     const code = detectLangCode(text).split('-')[0];
     const map = { uz: '🇺🇿', ru: '🇷🇺', en: '🇬🇧', tr: '🇹🇷', ar: '🇸🇦' };
     return map[code] || '';
   }
- 
+
   function autoTitleChat(chat, firstText){
     if(chat.title === 'Yangi suhbat' && firstText){
       chat.title = firstText.length > 34 ? firstText.slice(0,34) + '…' : firstText;
     }
   }
- 
+
   // ---------------- Regenerate / Edit ----------------
   function regenerateLast(){
     if(sending) return;
@@ -1579,7 +1731,7 @@ Index · HTML
     setSendingUI(true);
     runChatStream(chat).finally(() => { setSendingUI(false); messagesEl.scrollTop = messagesEl.scrollHeight; });
   }
- 
+
   function editAndResend(idx){
     if(sending) return;
     const chat = chats[activeId];
@@ -1594,7 +1746,7 @@ Index · HTML
     updateCharCounter();
     sendMessage();
   }
- 
+
   // ---------------- Composer ----------------
   function autoGrow(){
     inputEl.style.height = 'auto';
@@ -1606,11 +1758,11 @@ Index · HTML
     updateCharCounter();
     if(chats[activeId]) chats[activeId].draft = inputEl.value;
   });
- 
+
   const imgInput = document.getElementById('imgInput');
   const imgBtn = document.getElementById('imgBtn');
   const MAX_IMAGES = 6;
- 
+
   function addImageFile(file){
     if(!file || !file.type.startsWith('image/')) return;
     if(pendingImages.length >= MAX_IMAGES){
@@ -1626,13 +1778,13 @@ Index · HTML
     };
     reader.readAsDataURL(file);
   }
- 
+
   imgBtn.addEventListener('click', () => imgInput.click());
   imgInput.addEventListener('change', () => {
     Array.from(imgInput.files).forEach(addImageFile);
     imgInput.value = '';
   });
- 
+
   document.addEventListener('paste', (e) => {
     const items = e.clipboardData && e.clipboardData.items;
     if(!items) return;
@@ -1645,7 +1797,7 @@ Index · HTML
     }
     if(found) e.preventDefault();
   });
- 
+
   // Drag & drop images onto the chat window
   ['dragenter','dragover'].forEach(evt => {
     messagesEl.addEventListener(evt, (e) => {
@@ -1664,7 +1816,7 @@ Index · HTML
     if(!files) return;
     Array.from(files).forEach(f => { if(f.type.startsWith('image/')) addImageFile(f); });
   });
- 
+
   const fileInput = document.getElementById('fileInput');
   const fileBtn = document.getElementById('fileBtn');
   fileBtn.addEventListener('click', () => fileInput.click());
@@ -1676,7 +1828,9 @@ Index · HTML
       fileInput.value = '';
       return;
     }
+    const nameLower = file.name.toLowerCase();
     const reader = new FileReader();
+
     if(file.type === 'application/pdf'){
       reader.onload = () => {
         const base64 = reader.result.split(',')[1];
@@ -1684,6 +1838,39 @@ Index · HTML
         showAttachBar();
       };
       reader.readAsDataURL(file);
+
+    } else if(nameLower.endsWith('.docx')){
+      if(!window.mammoth){ showToast("Word o'quvchi hali yuklanmadi, biroz kuting"); return; }
+      reader.onload = async () => {
+        try{
+          showToast("Word fayli o'qilmoqda...");
+          const result = await window.mammoth.extractRawText({ arrayBuffer: reader.result });
+          pendingFile = { kind:'text', mimeType: 'text/plain', data: result.value, name: file.name };
+          showAttachBar();
+        }catch(e){
+          showToast("Word faylini o'qib bo'lmadi");
+        }
+      };
+      reader.readAsArrayBuffer(file);
+
+    } else if(nameLower.endsWith('.xlsx') || nameLower.endsWith('.xls')){
+      if(!window.XLSX){ showToast("Excel o'quvchi hali yuklanmadi, biroz kuting"); return; }
+      reader.onload = () => {
+        try{
+          const wb = window.XLSX.read(reader.result, { type: 'array' });
+          let text = '';
+          wb.SheetNames.forEach(sheetName => {
+            text += `--- ${sheetName} ---\n`;
+            text += window.XLSX.utils.sheet_to_csv(wb.Sheets[sheetName]) + '\n\n';
+          });
+          pendingFile = { kind:'text', mimeType: 'text/plain', data: text, name: file.name };
+          showAttachBar();
+        }catch(e){
+          showToast("Excel faylini o'qib bo'lmadi");
+        }
+      };
+      reader.readAsArrayBuffer(file);
+
     } else {
       reader.onload = () => {
         pendingFile = { kind:'text', mimeType: 'text/plain', data: reader.result, name: file.name };
@@ -1692,12 +1879,19 @@ Index · HTML
       reader.readAsText(file);
     }
   });
- 
+
   const attachBar = document.getElementById('attachBar');
   const attachPreviewSlot = document.getElementById('attachPreviewSlot');
   const attachLabel = document.getElementById('attachLabel');
   document.getElementById('attachRemoveBtn').addEventListener('click', clearAttachment);
- 
+  document.getElementById('ocrQuickBtn').addEventListener('click', () => {
+    if(sending) return;
+    inputEl.value = "Bu rasmdagi barcha matnni aynan qanday yozilgan bo'lsa, xatosiz o'qib ber";
+    autoGrow();
+    updateCharCounter();
+    sendMessage();
+  });
+
   function showAttachBar(){
     attachPreviewSlot.innerHTML = '';
     pendingImages.forEach((img, idx) => {
@@ -1734,6 +1928,7 @@ Index · HTML
     if(pendingFile) parts.push(pendingFile.name);
     if(pendingLocation) parts.push('Joylashuv: ' + pendingLocation.lat.toFixed(3) + ', ' + pendingLocation.lng.toFixed(3));
     attachLabel.textContent = parts.join(' + ');
+    document.getElementById('ocrQuickBtn').style.display = pendingImages.length ? 'inline-block' : 'none';
     attachBar.classList.add('show');
   }
   function clearAttachment(){
@@ -1744,7 +1939,7 @@ Index · HTML
     fileInput.value = '';
     attachBar.classList.remove('show');
   }
- 
+
   const locBtn = document.getElementById('locBtn');
   locBtn.addEventListener('click', () => {
     if(!navigator.geolocation){
@@ -1762,7 +1957,7 @@ Index · HTML
       { timeout: 8000 }
     );
   });
- 
+
   // ---- Til aniqlash (ovoz uchun) ----
   function detectLangCode(text){
     if(!text) return 'uz-UZ';
@@ -1772,7 +1967,7 @@ Index · HTML
     if(/\b(the|is|are|and|you|please|hello|what|how)\b/i.test(text)) return 'en-US';
     return 'uz-UZ';
   }
- 
+
   // ---- Ovoz uchun matnni tozalash: emoji va belgilarni o'qimasin, faqat tabiiy gap eshitilsin ----
   const EMOJI_RE = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{1F1E6}-\u{1F1FF}\u{2190}-\u{21FF}\u{2B00}-\u{2BFF}\uFE0F]/gu;
   function stripForSpeech(text){
@@ -1785,7 +1980,7 @@ Index · HTML
       .replace(/\s{2,}/g, ' ')
       .trim();
   }
- 
+
   const voiceLangSelect = document.getElementById('voiceLangSelect');
   const VOICE_LANG_KEY = 'sardorAI_voiceLang_v1';
   voiceLangSelect.value = localStorage.getItem(VOICE_LANG_KEY) || 'auto';
@@ -1793,7 +1988,7 @@ Index · HTML
     localStorage.setItem(VOICE_LANG_KEY, voiceLangSelect.value);
     if(recognition) recognition.lang = voiceLangSelect.value === 'auto' ? (navigator.language || 'uz-UZ') : voiceLangSelect.value;
   });
- 
+
   // ---- Voice input ----
   const micBtn = document.getElementById('micBtn');
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -1845,7 +2040,7 @@ Index · HTML
       recognition.start(); listening = true; micBtn.classList.add('active');
     }
   });
- 
+
   function speak(text, onEndCb){
     if(!window.speechSynthesis) return;
     const clean = stripForSpeech(text);
@@ -1870,7 +2065,7 @@ Index · HTML
     window.speechSynthesis.getVoices();
     window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
   }
- 
+
   // ---------------- Ovozli xona (faqat gaplashish) ----------------
   let voiceRoomActive = false;
   let voiceListeningNow = false;
@@ -1879,7 +2074,7 @@ Index · HTML
   let voiceAudioCtx = null;
   let voiceAnalyser = null;
   let voiceRafId = null;
- 
+
   const voiceRoomBtn = document.getElementById('voiceRoomBtn');
   const voiceRoomOverlay = document.getElementById('voiceRoomOverlay');
   const voiceRoomClose = document.getElementById('voiceRoomClose');
@@ -1888,14 +2083,14 @@ Index · HTML
   const voiceCaption = document.getElementById('voiceCaption');
   const voiceMicBig = document.getElementById('voiceMicBig');
   const voiceWaveBars = document.querySelectorAll('#voiceWave span');
- 
+
   function setVoiceState(state, text){
     voiceAvatarWrap.className = 'voiceAvatarWrap ' + state;
     voiceMicBig.className = 'voiceMicBig ' + state;
     voiceStatus.textContent = text;
     if(navigator.vibrate) navigator.vibrate(15);
   }
- 
+
   async function ensureMicVisualizer(){
     if(voiceMicStream) return true;
     try{
@@ -1910,7 +2105,7 @@ Index · HTML
       return false; // ruxsat berilmadi — baribir CSS animatsiya bilan davom etadi
     }
   }
- 
+
   function drawMicWave(){
     if(!voiceAnalyser || !voiceListeningNow){ voiceRafId = null; return; }
     const data = new Uint8Array(voiceAnalyser.frequencyBinCount);
@@ -1926,7 +2121,7 @@ Index · HTML
     if(voiceRafId){ cancelAnimationFrame(voiceRafId); voiceRafId = null; }
     voiceWaveBars.forEach(bar => bar.style.height = '6px');
   }
- 
+
   function openVoiceRoom(){
     if(!SpeechRecognition){ showToast("Bu brauzer ovozli suhbatni qo'llab-quvvatlamaydi"); return; }
     voiceRoomActive = true;
@@ -1950,7 +2145,7 @@ Index · HTML
   }
   voiceRoomBtn.addEventListener('click', openVoiceRoom);
   voiceRoomClose.addEventListener('click', closeVoiceRoom);
- 
+
   function startVoiceListening(){
     if(!recognition) return;
     recognition.lang = voiceLangSelect.value === 'auto' ? (navigator.language || 'uz-UZ') : voiceLangSelect.value;
@@ -1976,7 +2171,7 @@ Index · HTML
   }
   voiceMicBig.addEventListener('click', voiceMicClick);
   voiceAvatarWrap.addEventListener('click', voiceMicClick);
- 
+
   async function handleVoiceRoomTranscript(transcript){
     stopMicWave();
     if(!transcript || !transcript.trim()){
@@ -1989,14 +2184,14 @@ Index · HTML
     chat.messages.push({ role: 'user', content: transcript, time: timeNow() });
     persist();
     setVoiceState('thinking', "O'ylayapman...");
- 
+
     voiceAbort = new AbortController();
     let fullText = '';
     try{
       const response = await fetch(CHAT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: chat.messages }),
+        body: JSON.stringify({ messages: buildMessagesPayload(chat) }),
         signal: voiceAbort.signal
       });
       if(!response.ok){
@@ -2036,22 +2231,23 @@ Index · HTML
       return;
     }
     voiceAbort = null;
- 
+
     if(!fullText){
       chat.messages.pop(); persist();
       setVoiceState('idle', "Javob kelmadi, qayta urinib ko'ring");
       return;
     }
- 
+
     chat.messages.push({ role: 'assistant', content: fullText, time: timeNow() });
     persist();
     renderChatList();
     playNotifySound();
+    notifyIfHidden(fullText);
     voiceCaption.textContent = stripForSpeech(fullText);
     setVoiceState('speaking', "Gapiryapman...");
     speakInRoom(fullText);
   }
- 
+
   function speakInRoom(text){
     const clean = stripForSpeech(text);
     if(!window.speechSynthesis || !clean){
@@ -2078,12 +2274,191 @@ Index · HTML
     };
     window.speechSynthesis.speak(utter);
   }
- 
+
   // ---------------- About modal ----------------
   const aboutOverlay = document.getElementById('aboutOverlay');
   document.getElementById('aboutBtn').addEventListener('click', () => aboutOverlay.classList.add('show'));
   document.getElementById('aboutClose').addEventListener('click', () => aboutOverlay.classList.remove('show'));
- 
+
+  // ---------------- Xotira (Memory) ----------------
+  const MEMORY_KEY = 'sardorAI_memory_v1';
+  let memoryNotes = [];
+  try{ memoryNotes = JSON.parse(localStorage.getItem(MEMORY_KEY) || '[]'); }catch(e){ memoryNotes = []; }
+  function persistMemory(){ localStorage.setItem(MEMORY_KEY, JSON.stringify(memoryNotes)); }
+  function renderMemoryList(){
+    const list = document.getElementById('memoryList');
+    list.innerHTML = '';
+    if(memoryNotes.length === 0){
+      list.innerHTML = '<div style="font-size:12px;color:rgba(128,128,128,0.6);">Hali hech narsa qo\'shilmagan</div>';
+      return;
+    }
+    memoryNotes.forEach((note, idx) => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:6px;background:rgba(128,128,128,0.06);padding:6px 10px;border-radius:8px;font-size:12.5px;';
+      const span = document.createElement('span');
+      span.style.flex = '1';
+      span.textContent = note;
+      const rm = document.createElement('button');
+      rm.textContent = '✕';
+      rm.style.cssText = 'background:transparent;border:none;color:var(--danger);cursor:pointer;';
+      rm.addEventListener('click', () => { memoryNotes.splice(idx, 1); persistMemory(); renderMemoryList(); });
+      row.appendChild(span);
+      row.appendChild(rm);
+      list.appendChild(row);
+    });
+  }
+  const memoryOverlay = document.getElementById('memoryOverlay');
+  document.getElementById('memoryBtn').addEventListener('click', () => { renderMemoryList(); memoryOverlay.classList.add('show'); });
+  document.getElementById('memoryClose').addEventListener('click', () => memoryOverlay.classList.remove('show'));
+  document.getElementById('memoryAddBtn').addEventListener('click', () => {
+    const input = document.getElementById('memoryInput');
+    const val = input.value.trim();
+    if(!val) return;
+    memoryNotes.push(val);
+    persistMemory();
+    input.value = '';
+    renderMemoryList();
+    showToast("Xotiraga qo'shildi ✓");
+  });
+  document.getElementById('memoryInput').addEventListener('keydown', (e) => {
+    if(e.key === 'Enter'){ e.preventDefault(); document.getElementById('memoryAddBtn').click(); }
+  });
+  function memoryContextLine(){
+    if(memoryNotes.length === 0) return '';
+    return "[Foydalanuvchi haqida eslab qolingan narsalar: " + memoryNotes.join('; ') + "]";
+  }
+  function buildMessagesPayload(chat){
+    const memLine = memoryContextLine();
+    if(!memLine) return chat.messages;
+    return [
+      { role: 'user', content: memLine },
+      { role: 'assistant', content: "Tushundim, buni esda saqlayman." },
+      ...chat.messages
+    ];
+  }
+
+  // ---------------- Profil va statistika ----------------
+  const statsOverlay = document.getElementById('statsOverlay');
+  document.getElementById('statsBtn').addEventListener('click', () => {
+    const chatIds = Object.keys(chats);
+    let totalMsgs = 0, userMsgs = 0, botMsgs = 0, images = 0, earliestTs = null;
+    chatIds.forEach(id => {
+      const c = chats[id];
+      totalMsgs += c.messages.length;
+      c.messages.forEach(m => {
+        if(m.role === 'user') userMsgs++; else botMsgs++;
+        if(m.generatedImage || (m.images && m.images.length)) images++;
+      });
+      const ts = Number(id.split('_')[1]) || null;
+      if(ts && (!earliestTs || ts < earliestTs)) earliestTs = ts;
+    });
+    const since = earliestTs ? new Date(earliestTs).toLocaleDateString('uz-UZ', { year:'numeric', month:'long', day:'numeric' }) : '—';
+    const body = document.getElementById('statsBody');
+    body.innerHTML = '';
+    [
+      ['💬 Jami suhbatlar', chatIds.length],
+      ['✉️ Jami xabarlar', totalMsgs],
+      ['🗣️ Sizning xabarlaringiz', userMsgs],
+      ['🤖 Sardor AI javoblari', botMsgs],
+      ['🖼️ Rasm bilan bog\'liq xabarlar', images],
+      ['📅 Foydalanish boshlangan sana', since]
+    ].forEach(([label, val]) => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;justify-content:space-between;border-bottom:1px solid rgba(128,128,128,0.15);padding-bottom:6px;';
+      row.innerHTML = `<span>${label}</span><strong>${val}</strong>`;
+      body.appendChild(row);
+    });
+    statsOverlay.classList.add('show');
+  });
+  document.getElementById('statsClose').addEventListener('click', () => statsOverlay.classList.remove('show'));
+
+  // ---------------- Ranglar va tema (palette) ----------------
+  const PALETTES = [
+    { name: "Lazurit (asosiy)", gold: '#c9a227', goldSoft: '#e6c869', turquoise: '#2e9e96', turquoiseLight: '#7fd4c9' },
+    { name: 'Neon', gold: '#ff2ec4', goldSoft: '#ff7ae0', turquoise: '#00e5ff', turquoiseLight: '#7dfaff' },
+    { name: 'O\'rmon', gold: '#8bc34a', goldSoft: '#b6e08a', turquoise: '#2e8b6e', turquoiseLight: '#7fd4a8' },
+    { name: 'Quyosh botishi', gold: '#ff8a3d', goldSoft: '#ffb877', turquoise: '#e94e77', turquoiseLight: '#ff9db8' },
+    { name: 'Binafsha', gold: '#a970ff', goldSoft: '#c9a3ff', turquoise: '#6a4bd6', turquoiseLight: '#a996f0' },
+    { name: 'Oltin qum', gold: '#d4af37', goldSoft: '#f0d878', turquoise: '#b08d57', turquoiseLight: '#e0c9a0' },
+    { name: 'Muzlik', gold: '#7fc8f8', goldSoft: '#b6e2ff', turquoise: '#2e6fa6', turquoiseLight: '#8fc2e8' },
+    { name: 'Qizil olov', gold: '#ff5252', goldSoft: '#ff8a80', turquoise: '#c62828', turquoiseLight: '#ff8a80' }
+  ];
+  const PALETTE_KEY = 'sardorAI_palette_v1';
+  const GLASS_KEY = 'sardorAI_glass_v1';
+  function applyPalette(idx){
+    const p = PALETTES[idx] || PALETTES[0];
+    document.documentElement.style.setProperty('--gold', p.gold);
+    document.documentElement.style.setProperty('--gold-soft', p.goldSoft);
+    document.documentElement.style.setProperty('--turquoise', p.turquoise);
+    document.documentElement.style.setProperty('--turquoise-light', p.turquoiseLight);
+    localStorage.setItem(PALETTE_KEY, idx);
+  }
+  function renderPaletteGrid(){
+    const grid = document.getElementById('paletteGrid');
+    grid.innerHTML = '';
+    const current = parseInt(localStorage.getItem(PALETTE_KEY) || '0', 10);
+    PALETTES.forEach((p, idx) => {
+      const sw = document.createElement('button');
+      sw.title = p.name;
+      sw.style.cssText = `height:44px;border-radius:10px;cursor:pointer;border:2px solid ${idx===current?'#fff':'transparent'};background:linear-gradient(135deg, ${p.gold}, ${p.turquoise});`;
+      sw.addEventListener('click', () => { applyPalette(idx); renderPaletteGrid(); });
+      grid.appendChild(sw);
+    });
+  }
+  const themeOverlay = document.getElementById('themeOverlay');
+  document.getElementById('themeBtn').addEventListener('click', () => { renderPaletteGrid(); themeOverlay.classList.add('show'); });
+  document.getElementById('themeClose').addEventListener('click', () => themeOverlay.classList.remove('show'));
+  const glassToggle = document.getElementById('glassToggle');
+  glassToggle.checked = localStorage.getItem(GLASS_KEY) === 'on';
+  document.body.classList.toggle('glass-mode', glassToggle.checked);
+  glassToggle.addEventListener('change', () => {
+    localStorage.setItem(GLASS_KEY, glassToggle.checked ? 'on' : 'off');
+    document.body.classList.toggle('glass-mode', glassToggle.checked);
+  });
+  applyPalette(parseInt(localStorage.getItem(PALETTE_KEY) || '0', 10));
+
+  // ---------------- Arxivlash ----------------
+  const archiveOverlay = document.getElementById('archiveOverlay');
+  function renderArchiveList(){
+    const list = document.getElementById('archiveList');
+    list.innerHTML = '';
+    const archivedIds = Object.keys(chats).filter(id => chats[id].archived);
+    if(archivedIds.length === 0){
+      list.innerHTML = '<div style="font-size:12.5px;color:rgba(128,128,128,0.6);">Arxivlangan suhbat yo\'q</div>';
+      return;
+    }
+    archivedIds.forEach(id => {
+      const c = chats[id];
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:8px;background:rgba(128,128,128,0.06);padding:8px 10px;border-radius:8px;font-size:13px;';
+      const span = document.createElement('span');
+      span.style.flex = '1';
+      span.textContent = c.title || 'Yangi suhbat';
+      const restoreBtn = document.createElement('button');
+      restoreBtn.textContent = '↩️ Qaytarish';
+      restoreBtn.style.cssText = 'background:transparent;border:1px solid rgba(46,158,150,0.4);color:var(--turquoise-light);border-radius:7px;padding:4px 9px;cursor:pointer;font-size:11.5px;';
+      restoreBtn.addEventListener('click', () => {
+        c.archived = false;
+        persist();
+        renderArchiveList();
+        renderChatList();
+        showToast("Suhbat qaytarildi ✓");
+      });
+      row.appendChild(span);
+      row.appendChild(restoreBtn);
+      list.appendChild(row);
+    });
+  }
+  document.getElementById('archiveBtn').addEventListener('click', () => { renderArchiveList(); archiveOverlay.classList.add('show'); });
+  document.getElementById('archiveClose').addEventListener('click', () => archiveOverlay.classList.remove('show'));
+
+  // ---------------- Bildirishnoma (tab fonda bo'lganda) ----------------
+  function notifyIfHidden(text){
+    if(document.hidden && 'Notification' in window && Notification.permission === 'granted'){
+      try{ new Notification('Sardor AI', { body: text.slice(0, 120), icon: 'icon-192.png' }); }catch(e){}
+    }
+  }
+
   // ---------------- Esc key closes overlays ----------------
   document.addEventListener('keydown', (e) => {
     if(e.key === 'Escape'){
@@ -2091,7 +2466,7 @@ Index · HTML
       aboutOverlay.classList.remove('show');
     }
   });
- 
+
   // ---------------- Bildirishnoma ovozi (yangi javob kelganda) ----------------
   const SOUND_KEY = 'sardorAI_sound_v1';
   const soundToggleBtn = document.getElementById('soundToggleBtn');
@@ -2119,7 +2494,7 @@ Index · HTML
     }catch(e){}
     if(navigator.vibrate) navigator.vibrate(60);
   }
- 
+
   // ---------------- Shrift kattaligini sozlash ----------------
   const FONT_KEY = 'sardorAI_fontSize_v1';
   let fontSize = parseInt(localStorage.getItem(FONT_KEY) || '15', 10);
@@ -2137,9 +2512,9 @@ Index · HTML
     localStorage.setItem(FONT_KEY, fontSize);
     applyFontSize();
   });
- 
+
   // ---------------- Tizim mavzusi initTheme() ichida hisobga olinadi ----------------
- 
+
   // ---------------- Send / Stream / Stop ----------------
   function setSendingUI(isSending){
     sending = isSending;
@@ -2152,7 +2527,7 @@ Index · HTML
       sendBtn.disabled = false;
     }
   }
- 
+
   function stopGenerating(){
     if(abortController){
       abortController.abort();
@@ -2160,33 +2535,36 @@ Index · HTML
     }
     setSendingUI(false);
   }
- 
+
   sendBtn.addEventListener('click', () => {
     if(sending){ stopGenerating(); return; }
     sendMessage();
   });
- 
+
   async function sendMessage(){
     if(sending) return;
+    if('Notification' in window && Notification.permission === 'default'){
+      Notification.requestPermission().catch(() => {});
+    }
     const text = inputEl.value.trim();
     const hasImages = pendingImages.length > 0;
     const attach = hasImages ? { kind: 'images', images: pendingImages.slice() } : pendingFile;
     const loc = pendingLocation;
- 
+
     if((!text && !attach && !loc)) return;
- 
+
     setSendingUI(true);
     inputEl.value = '';
     autoGrow();
     updateCharCounter();
- 
+
     const chat = chats[activeId];
     chat.draft = '';
     clearAttachment();
- 
+
     let displayText = text;
     let userMsg = { role: 'user', content: text, time: timeNow() };
- 
+
     if(attach && attach.kind === 'images'){
       userMsg.images = attach.images.map(img => ({ mimeType: img.mimeType, data: img.data, previewUrl: img.previewUrl }));
     } else if(attach && attach.kind === 'file'){
@@ -2195,45 +2573,45 @@ Index · HTML
       displayText = (text ? text + '\n\n' : '') + `[Fayl: ${attach.name}]`;
       userMsg.content = (text ? text + '\n\n' : '') + `--- ${attach.name} fayli mazmuni ---\n${attach.data}`;
     }
- 
+
     if(loc){
       userMsg.location = { lat: loc.lat, lng: loc.lng };
       const locLine = `[Foydalanuvchi joylashuvi: kenglik ${loc.lat.toFixed(5)}, uzunlik ${loc.lng.toFixed(5)}]`;
       userMsg.content = (userMsg.content ? userMsg.content + '\n\n' : '') + locLine;
       displayText = (displayText ? displayText + '\n\n' : '') + '📍 Joylashuv ulashildi';
     }
- 
+
     if(chat.messages.length === 0) autoTitleChat(chat, text || (attach ? (attach.name || 'Rasmlar') : (loc ? 'Joylashuv' : 'Yangi suhbat')));
- 
+
     chat.messages.push(userMsg);
     persist();
     renderChatList();
     renderMessages();
- 
+
     const isImageIntent = IMAGE_INTENT_RE.test(text);
- 
+
     if(isImageIntent && text){
       await runImageGeneration(chat, text, attach && attach.kind === 'images' ? attach.images[0] : null);
     } else {
       await runChatStream(chat);
     }
- 
+
     setSendingUI(false);
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
- 
+
   async function runImageGeneration(chat, prompt, refImage){
     const typingEl = document.createElement('div');
     typingEl.className = 'msgRow bot';
     typingEl.innerHTML = '<div class="msg bot typing"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>';
     messagesEl.insertBefore(typingEl, scrollDownBtn);
     messagesEl.scrollTop = messagesEl.scrollHeight;
- 
+
     abortController = new AbortController();
     try{
       const body = { prompt };
       if(refImage) body.image = { mimeType: refImage.mimeType, data: refImage.data };
- 
+
       const response = await fetch(IMAGE_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -2242,13 +2620,13 @@ Index · HTML
       });
       const data = await response.json();
       typingEl.remove();
- 
+
       if(!response.ok || !data.image){
         const errMsg = (data.error && data.error.message) ? data.error.message : "Rasmni chizib bo'lmadi.";
         renderBotError(chat, errMsg);
         return;
       }
- 
+
       const caption = data.text || "Mana, tayyor! 🎨";
       chat.messages.push({ role: 'assistant', content: caption, generatedImage: data.image, time: timeNow() });
       persist();
@@ -2268,7 +2646,7 @@ Index · HTML
       abortController = null;
     }
   }
- 
+
   function renderBotError(chat, errMsg){
     chat.messages.pop();
     persist();
@@ -2276,27 +2654,27 @@ Index · HTML
     const row = buildMessageEl('bot', "Xatolik: " + errMsg, { showActions: false });
     messagesEl.insertBefore(row, scrollDownBtn);
   }
- 
+
   async function runChatStream(chat){
     const typingEl = document.createElement('div');
     typingEl.className = 'msgRow bot';
     typingEl.innerHTML = '<div class="msg bot typing"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>';
     messagesEl.insertBefore(typingEl, scrollDownBtn);
     messagesEl.scrollTop = messagesEl.scrollHeight;
- 
+
     abortController = new AbortController();
     let fullText = '';
     let botRow = null;
     let aborted = false;
- 
+
     try{
       const response = await fetch(CHAT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: chat.messages }),
+        body: JSON.stringify({ messages: buildMessagesPayload(chat) }),
         signal: abortController.signal
       });
- 
+
       if(!response.ok){
         let errMsg = 'Nomalum xatolik';
         try{ const data = await response.json(); errMsg = (data.error && data.error.message) ? data.error.message : errMsg; }catch(e){}
@@ -2304,11 +2682,11 @@ Index · HTML
         renderBotError(chat, errMsg);
         return;
       }
- 
+
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
- 
+
       while(true){
         const { done, value } = await reader.read();
         if(done) break;
@@ -2345,9 +2723,9 @@ Index · HTML
         return;
       }
     }
- 
+
     abortController = null;
- 
+
     if(!fullText){
       typingEl.remove();
       if(!aborted){
@@ -2360,18 +2738,19 @@ Index · HTML
       }
       return;
     }
- 
+
     const finalText = fullText + (aborted ? '\n\n[to\'xtatildi]' : '');
     chat.messages.push({ role: 'assistant', content: finalText, time: timeNow() });
     persist();
     renderChatList();
     renderMessages();
     if(!aborted) playNotifySound();
+    if(!aborted) notifyIfHidden(finalText);
     if(lastInputWasVoice && !aborted) speak(fullText);
     lastInputWasVoice = false;
     if(!aborted && window.innerWidth > 720) inputEl.focus();
   }
- 
+
   document.getElementById('clearBtn').addEventListener('click', () => {
     if(!confirm('Shu suhbatni tozalashni xohlaysizmi?')) return;
     if(sending) stopGenerating();
@@ -2381,14 +2760,14 @@ Index · HTML
     renderChatList();
     renderMessages();
   });
- 
+
   inputEl.addEventListener('keydown', (e) => {
     if(e.key === 'Enter' && !e.shiftKey){
       e.preventDefault();
       if(!sending) sendMessage();
     }
   });
- 
+
   // ---------------- Init ----------------
   function detectDevice(){
     const isMobile = window.innerWidth <= 720 || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -2397,7 +2776,7 @@ Index · HTML
   }
   detectDevice();
   window.addEventListener('resize', detectDevice);
- 
+
   initTheme();
   loadChats();
   renderChatList();
@@ -2414,14 +2793,3 @@ Index · HTML
 </script>
 </body>
 </html>
- 
-
-
-
-
-
-
-
-
-
-
