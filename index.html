@@ -271,7 +271,7 @@
     font-size:16px;
     flex-shrink:0;
   }
-  .headerActions{ display:flex; gap:8px; position:relative; z-index:1; flex-shrink:0; }
+  .headerActions{ display:flex; gap:8px; position:relative; z-index:1; flex-shrink:0; align-items:center; }
   .headerActions button{
     background:transparent;
     border:1px solid rgba(201,162,39,0.4);
@@ -830,6 +830,81 @@
   }
   .followUps button:hover{ background:rgba(46,158,150,0.2); }
 
+  /* ---------- Google login chip ---------- */
+  .userChip{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    background:rgba(46,158,150,0.12);
+    border:1px solid rgba(46,158,150,0.4);
+    border-radius:20px;
+    padding:4px 10px 4px 4px;
+    font-size:12.5px;
+    color:var(--turquoise-light);
+  }
+  .userChip img{
+    width:24px;height:24px;border-radius:50%;
+    border:1px solid rgba(201,162,39,0.4);
+  }
+  .userChip span{
+    max-width:110px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .userChip button{
+    background:transparent !important;
+    border:none !important;
+    color:var(--danger) !important;
+    cursor:pointer;
+    font-size:13px !important;
+    padding:0 2px !important;
+    height:auto !important;
+    margin-left:2px;
+  }
+  #googleLoginWrap{ display:flex; align-items:center; }
+
+  /* ---------- Glassmorphism mode ---------- */
+  body.glass-mode .sidebar,
+  body.glass-mode .header,
+  body.glass-mode .composer,
+  body.glass-mode .aboutBox,
+  body.glass-mode .attachBar{
+    background:rgba(22,33,62,0.55) !important;
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+  }
+  body.light.glass-mode .sidebar,
+  body.light.glass-mode .header,
+  body.light.glass-mode .composer,
+  body.light.glass-mode .aboutBox,
+  body.light.glass-mode .attachBar{
+    background:rgba(255,255,255,0.55) !important;
+  }
+  body.glass-mode .msg.bot{
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+
+  /* ---------- Accessibility: keyboard focus ---------- */
+  button:focus-visible,
+  textarea:focus-visible,
+  input:focus-visible,
+  .chatItem:focus-visible,
+  a:focus-visible{
+    outline: 2px solid var(--turquoise-light);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *, *::before, *::after{
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
   @media (max-width: 720px){
     .sidebar{
       position:fixed;
@@ -845,6 +920,7 @@
     .headerActions button span.lbl{ display:none; }
     .headerActions{ flex-wrap:wrap; justify-content:flex-end; row-gap:6px; }
     .headerActions button{ padding:0 8px; font-size:12px; }
+    .userChip span{ max-width:70px; }
 
     .composer{
       flex-wrap:wrap;
@@ -878,18 +954,19 @@
           <h1>Sardor AI</h1>
           <span>suhbatlar</span>
         </div>
-        <button class="themeToggle" id="themeToggle" title="Mavzuni almashtirish">🌙</button>
+        <button class="themeToggle" id="themeToggle" title="Mavzuni almashtirish" aria-label="Mavzuni almashtirish">🌙</button>
       </div>
-      <input type="text" class="searchBox" id="searchBox" placeholder="🔍 Suhbatlarni qidirish...">
+      <label for="searchBox" class="visually-hidden" style="position:absolute;left:-9999px;">Suhbatlarni qidirish</label>
+      <input type="text" class="searchBox" id="searchBox" placeholder="🔍 Suhbatlarni qidirish..." aria-label="Suhbatlarni qidirish">
       <button class="newChatBtn" id="newChatBtn">+ Yangi suhbat <span style="opacity:.55;font-weight:400;">(Ctrl+K)</span></button>
     </div>
-    <div class="chatList" id="chatList"></div>
+    <div class="chatList" id="chatList" role="list" aria-label="Suhbatlar ro'yxati"></div>
     <div class="sidebarFooter">
       <span>Saydurasulov Sardor</span>
       <span style="display:flex;gap:6px;">
-        <button id="exportAllBtn" title="Barcha suhbatlarni .txt qilib yuklab olish">⬇ TXT</button>
-        <button id="exportJsonBtn" title="Joriy suhbatni JSON qilib yuklab olish">⬇ JSON</button>
-        <button id="importJsonBtn" title="JSON suhbat faylini import qilish">⬆ Import</button>
+        <button id="exportAllBtn" title="Barcha suhbatlarni .txt qilib yuklab olish" aria-label="Barcha suhbatlarni yuklab olish">⬇ TXT</button>
+        <button id="exportJsonBtn" title="Joriy suhbatni JSON qilib yuklab olish" aria-label="Joriy suhbatni JSON qilib yuklab olish">⬇ JSON</button>
+        <button id="importJsonBtn" title="JSON suhbat faylini import qilish" aria-label="JSON suhbat faylini import qilish">⬆ Import</button>
       </span>
     </div>
     <input type="file" id="importJsonInput" accept=".json" style="display:none;">
@@ -897,7 +974,7 @@
 
   <div class="app">
     <div class="header">
-      <svg class="headerNeural" viewBox="0 0 600 80" preserveAspectRatio="none">
+      <svg class="headerNeural" viewBox="0 0 600 80" preserveAspectRatio="none" aria-hidden="true">
         <path d="M0,55 L70,55 L92,25 L125,25 L148,55 L215,55 L238,18 L278,18 L300,55 L378,55 L400,30 L442,30 L464,55 L540,55 L562,15 L600,15" fill="none" stroke="#7fd4c9" stroke-width="1"/>
         <circle cx="92" cy="25" r="2.4" fill="#c9a227"/>
         <circle cx="238" cy="18" r="2.4" fill="#c9a227"/>
@@ -908,27 +985,28 @@
         <circle cx="464" cy="55" r="1.8" fill="#7fd4c9"/>
         <circle cx="70" cy="55" r="1.8" fill="#7fd4c9"/>
       </svg>
-      <button class="menuToggle" id="menuToggle" title="Suhbatlar ro'yxati">☰</button>
+      <button class="menuToggle" id="menuToggle" title="Suhbatlar ro'yxati" aria-label="Suhbatlar ro'yxatini ko'rsatish/yashirish">☰</button>
       <div class="headerTitle">
         <h2 id="chatTitle">Sardor AI</h2>
-        <p><span class="onlineDot"></span> La havla vala quvvata illa billah</p>
+        <p><span class="onlineDot" aria-hidden="true"></span> La havla vala quvvata illa billah</p>
       </div>
       <div class="headerActions">
-        <button id="fontDownBtn" title="Shriftni kichraytirish">A-</button>
-        <button id="fontUpBtn" title="Shriftni kattalashtirish">A+</button>
-        <button id="soundToggleBtn" title="Bildirishnoma ovozi">🔔</button>
-        <button id="memoryBtn" title="Xotira">🧠</button>
-        <button id="statsBtn" title="Profil va statistika">📊</button>
-        <button id="themeBtn" title="Ranglar va tema">🎨</button>
-        <button id="archiveBtn" title="Arxivlangan suhbatlar">🗄️</button>
-        <button id="aboutBtn" title="Ilova haqida">ℹ️</button>
-        <button id="voiceRoomBtn" title="Ovozli suhbat xonasi">🎙️ <span class="lbl">Ovozli xona</span></button>
-        <button id="renameBtn" title="Suhbat nomini o'zgartirish">✏️ <span class="lbl">Nomlash</span></button>
-        <button id="shareBtn" title="Suhbatni nusxalash">🔗 <span class="lbl">Ulashish</span></button>
+        <button id="fontDownBtn" title="Shriftni kichraytirish" aria-label="Shriftni kichraytirish">A-</button>
+        <button id="fontUpBtn" title="Shriftni kattalashtirish" aria-label="Shriftni kattalashtirish">A+</button>
+        <button id="soundToggleBtn" title="Bildirishnoma ovozi" aria-label="Bildirishnoma ovozini yoqish/o'chirish">🔔</button>
+        <button id="memoryBtn" title="Xotira" aria-label="Xotira sozlamalari">🧠</button>
+        <button id="statsBtn" title="Profil va statistika" aria-label="Profil va statistika">📊</button>
+        <button id="themeBtn" title="Ranglar va tema" aria-label="Ranglar va tema">🎨</button>
+        <button id="archiveBtn" title="Arxivlangan suhbatlar" aria-label="Arxivlangan suhbatlar">🗄️</button>
+        <button id="aboutBtn" title="Ilova haqida" aria-label="Ilova haqida">ℹ️</button>
+        <button id="voiceRoomBtn" title="Ovozli suhbat xonasi" aria-label="Ovozli suhbat xonasini ochish">🎙️ <span class="lbl">Ovozli xona</span></button>
+        <button id="renameBtn" title="Suhbat nomini o'zgartirish" aria-label="Suhbat nomini o'zgartirish">✏️ <span class="lbl">Nomlash</span></button>
+        <button id="shareBtn" title="Suhbatni nusxalash" aria-label="Suhbatni nusxalash">🔗 <span class="lbl">Ulashish</span></button>
+        <div id="googleLoginWrap"></div>
       </div>
     </div>
-    <div class="girih"></div>
-    <div class="messages" id="messages">
+    <div class="girih" aria-hidden="true"></div>
+    <div class="messages" id="messages" role="log" aria-live="polite" aria-label="Suhbat xabarlari">
       <div class="empty" id="emptyState">
         Xabar yozing va suhbatni boshlang
         <div class="suggestRow" id="suggestRow">
@@ -939,7 +1017,7 @@
           <button data-q="Do'stlik haqida qisqa qo'shiq matni yoz">🎤 Qo'shiq yozdir</button>
         </div>
       </div>
-      <button class="scrollDownBtn" id="scrollDownBtn" title="Pastga tushish">⬇</button>
+      <button class="scrollDownBtn" id="scrollDownBtn" title="Pastga tushish" aria-label="Suhbatning pastiga tushish">⬇</button>
     </div>
     <div class="attachBar" id="attachBar">
       <div id="attachPreviewSlot"></div>
@@ -950,11 +1028,11 @@
     <div class="composer">
       <input type="file" id="imgInput" accept="image/*" multiple style="display:none;">
       <input type="file" id="fileInput" accept=".pdf,.txt,.md,.csv,.docx,.xlsx,.xls" style="display:none;">
-      <button id="imgBtn" class="iconBtn" title="Rasm biriktirish">📷</button>
-      <button id="fileBtn" class="iconBtn" title="Fayl biriktirish (PDF, TXT)">📎</button>
-      <button id="locBtn" class="iconBtn" title="Joylashuvni ulashish">📍</button>
-      <button id="micBtn" class="iconBtn" title="Ovozli xabar">🎤</button>
-      <select id="voiceLangSelect" title="Ovozli til" style="height:46px;border-radius:12px;border:1px solid rgba(201,162,39,0.4);background:transparent;color:var(--gold-soft);font-family:'Manrope',sans-serif;font-size:12px;padding:0 4px;flex-shrink:0;">
+      <button id="imgBtn" class="iconBtn" title="Rasm biriktirish" aria-label="Rasm biriktirish">📷</button>
+      <button id="fileBtn" class="iconBtn" title="Fayl biriktirish (PDF, TXT)" aria-label="Fayl biriktirish">📎</button>
+      <button id="locBtn" class="iconBtn" title="Joylashuvni ulashish" aria-label="Joylashuvni ulashish">📍</button>
+      <button id="micBtn" class="iconBtn" title="Ovozli xabar" aria-label="Ovozli xabar yozish">🎤</button>
+      <select id="voiceLangSelect" title="Ovozli til" aria-label="Ovozli til" style="height:46px;border-radius:12px;border:1px solid rgba(201,162,39,0.4);background:transparent;color:var(--gold-soft);font-family:'Manrope',sans-serif;font-size:12px;padding:0 4px;flex-shrink:0;">
         <option value="auto">🌐 Avto</option>
         <option value="uz-UZ">🇺🇿 O'zbek</option>
         <option value="ru-RU">🇷🇺 Русский</option>
@@ -962,9 +1040,10 @@
         <option value="tr-TR">🇹🇷 Türkçe</option>
         <option value="ar-SA">🇸🇦 العربية</option>
       </select>
-      <textarea id="input" placeholder="Xabaringizni yozing... (Ctrl+/ bilan bu yerga sakrang)" rows="1"></textarea>
+      <label for="input" class="visually-hidden" style="position:absolute;left:-9999px;">Xabar matni</label>
+      <textarea id="input" placeholder="Xabaringizni yozing... (Ctrl+/ bilan bu yerga sakrang)" rows="1" aria-label="Xabar matni"></textarea>
       <button id="sendBtn">Yuborish</button>
-      <button id="clearBtn" title="Bu suhbatni tozalash" style="background:transparent;border:1px solid rgba(201,162,39,0.4);color:var(--gold-soft);">Tozalash</button>
+      <button id="clearBtn" title="Bu suhbatni tozalash" aria-label="Bu suhbatni tozalash" style="background:transparent;border:1px solid rgba(201,162,39,0.4);color:var(--gold-soft);">Tozalash</button>
     </div>
     <div class="composerFooter">
       <span id="charCounter">0 belgi</span>
@@ -972,12 +1051,12 @@
     </div>
   </div>
 </div>
-<div class="voiceRoomOverlay" id="voiceRoomOverlay">
-  <button class="voiceRoomClose" id="voiceRoomClose" title="Yopish (Esc)">✕</button>
+<div class="voiceRoomOverlay" id="voiceRoomOverlay" role="dialog" aria-modal="true" aria-label="Ovozli suhbat xonasi">
+  <button class="voiceRoomClose" id="voiceRoomClose" title="Yopish (Esc)" aria-label="Ovozli xonani yopish">✕</button>
   <div class="voiceAvatarWrap" id="voiceAvatarWrap">
     <div class="voiceRing ring1"></div>
     <div class="voiceRing ring2"></div>
-    <svg class="voiceAvatarSvg" viewBox="0 0 200 200">
+    <svg class="voiceAvatarSvg" viewBox="0 0 200 200" aria-hidden="true">
       <circle cx="100" cy="100" r="72" fill="rgba(46,158,150,0.12)" stroke="var(--turquoise)" stroke-width="2"/>
       <circle cx="100" cy="34" r="6" fill="var(--gold)"/>
       <line x1="100" y1="40" x2="100" y2="58" stroke="var(--gold)" stroke-width="2"/>
@@ -987,19 +1066,19 @@
       <path class="mouth" d="M80,118 Q100,128 120,118" stroke="var(--gold-soft)" stroke-width="3" fill="none" stroke-linecap="round"/>
     </svg>
   </div>
-  <div class="voiceWave" id="voiceWave">
+  <div class="voiceWave" id="voiceWave" aria-hidden="true">
     <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
   </div>
   <div class="voiceStatus" id="voiceStatus">Gaplashish uchun mikrofonga bosing</div>
   <div class="voiceCaption" id="voiceCaption"></div>
-  <button class="voiceMicBig" id="voiceMicBig">🎤</button>
+  <button class="voiceMicBig" id="voiceMicBig" aria-label="Mikrofonni yoqish/o'chirish">🎤</button>
   <div class="voiceHint">Gapirayotganda bosing — u to'xtaydi va sizni tinglaydi</div>
 </div>
 
 
-<div class="aboutOverlay" id="aboutOverlay">
+<div class="aboutOverlay" id="aboutOverlay" role="dialog" aria-modal="true" aria-label="Ilova haqida">
   <div class="aboutBox">
-    <button class="voiceRoomClose" id="aboutClose" title="Yopish">✕</button>
+    <button class="voiceRoomClose" id="aboutClose" title="Yopish" aria-label="Yopish">✕</button>
     <h3>Sardor AI haqida</h3>
     <p>La havla vala quvvata illa billah</p>
     <ul>
@@ -1015,30 +1094,31 @@
   </div>
 </div>
 
-<div class="aboutOverlay" id="memoryOverlay">
+<div class="aboutOverlay" id="memoryOverlay" role="dialog" aria-modal="true" aria-label="Xotira">
   <div class="aboutBox">
-    <button class="voiceRoomClose" id="memoryClose" title="Yopish">✕</button>
+    <button class="voiceRoomClose" id="memoryClose" title="Yopish" aria-label="Yopish">✕</button>
     <h3>🧠 Xotira</h3>
     <p>Bu yerga yozganlaringizni Sardor AI har bir suhbatda eslab turadi (masalan: ismingiz, kasbingiz, yoqtirgan narsalaringiz).</p>
     <div id="memoryList" style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto;margin-bottom:12px;"></div>
     <div style="display:flex;gap:6px;">
-      <input type="text" id="memoryInput" placeholder="Masalan: Mening ismim Davlat" style="flex:1;padding:9px 10px;border-radius:9px;border:1px solid rgba(201,162,39,0.4);background:rgba(128,128,128,0.06);color:var(--cream);font-family:'Manrope',sans-serif;font-size:13px;outline:none;">
-      <button id="memoryAddBtn" style="background:var(--gold);border:none;color:var(--lapis-dark);border-radius:9px;padding:0 14px;cursor:pointer;font-weight:700;">+</button>
+      <label for="memoryInput" class="visually-hidden" style="position:absolute;left:-9999px;">Xotiraga qo'shish</label>
+      <input type="text" id="memoryInput" placeholder="Masalan: Mening ismim Davlat" aria-label="Xotiraga qo'shish" style="flex:1;padding:9px 10px;border-radius:9px;border:1px solid rgba(201,162,39,0.4);background:rgba(128,128,128,0.06);color:var(--cream);font-family:'Manrope',sans-serif;font-size:13px;outline:none;">
+      <button id="memoryAddBtn" aria-label="Xotiraga qo'shish" style="background:var(--gold);border:none;color:var(--lapis-dark);border-radius:9px;padding:0 14px;cursor:pointer;font-weight:700;">+</button>
     </div>
   </div>
 </div>
 
-<div class="aboutOverlay" id="statsOverlay">
+<div class="aboutOverlay" id="statsOverlay" role="dialog" aria-modal="true" aria-label="Profil va statistika">
   <div class="aboutBox">
-    <button class="voiceRoomClose" id="statsClose" title="Yopish">✕</button>
+    <button class="voiceRoomClose" id="statsClose" title="Yopish" aria-label="Yopish">✕</button>
     <h3>📊 Profil va statistika</h3>
     <div id="statsBody" style="display:flex;flex-direction:column;gap:8px;font-size:13.5px;"></div>
   </div>
 </div>
 
-<div class="aboutOverlay" id="themeOverlay">
+<div class="aboutOverlay" id="themeOverlay" role="dialog" aria-modal="true" aria-label="Ranglar va tema">
   <div class="aboutBox">
-    <button class="voiceRoomClose" id="themeClose" title="Yopish">✕</button>
+    <button class="voiceRoomClose" id="themeClose" title="Yopish" aria-label="Yopish">✕</button>
     <h3>🎨 Ranglar va tema</h3>
     <p>Rang palettasini tanlang:</p>
     <div id="paletteGrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;"></div>
@@ -1048,16 +1128,17 @@
   </div>
 </div>
 
-<div class="aboutOverlay" id="archiveOverlay">
+<div class="aboutOverlay" id="archiveOverlay" role="dialog" aria-modal="true" aria-label="Arxivlangan suhbatlar">
   <div class="aboutBox">
-    <button class="voiceRoomClose" id="archiveClose" title="Yopish">✕</button>
+    <button class="voiceRoomClose" id="archiveClose" title="Yopish" aria-label="Yopish">✕</button>
     <h3>🗄️ Arxivlangan suhbatlar</h3>
     <div id="archiveList" style="display:flex;flex-direction:column;gap:6px;max-height:280px;overflow-y:auto;"></div>
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>
   // ---------------- State & storage ----------------
   const STORAGE_KEY = 'sardorAI_chats_v2';
@@ -1177,11 +1258,14 @@
       const chat = chats[id];
       const item = document.createElement('div');
       item.className = 'chatItem' + (id === activeId ? ' active' : '');
+      item.setAttribute('role', 'listitem');
+      item.tabIndex = 0;
 
       const pinBtn = document.createElement('button');
       pinBtn.className = 'pin' + (chat.pinned ? ' pinned' : '');
       pinBtn.textContent = '📌';
       pinBtn.title = chat.pinned ? "Qadab qo'yishni bekor qilish" : "Qadab qo'yish";
+      pinBtn.setAttribute('aria-label', pinBtn.title);
       pinBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         chat.pinned = !chat.pinned;
@@ -1202,6 +1286,7 @@
       archBtn.className = 'delBtn';
       archBtn.textContent = '🗄️';
       archBtn.title = 'Arxivlash';
+      archBtn.setAttribute('aria-label', 'Suhbatni arxivlash');
       archBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         chat.archived = true;
@@ -1219,6 +1304,7 @@
       delBtn.className = 'delBtn';
       delBtn.textContent = '✕';
       delBtn.title = 'O\'chirish';
+      delBtn.setAttribute('aria-label', 'Suhbatni o\'chirish');
       delBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         deleteChat(id);
@@ -1229,6 +1315,9 @@
       item.appendChild(archBtn);
       item.appendChild(delBtn);
       item.addEventListener('click', () => switchChat(id));
+      item.addEventListener('keydown', (e) => {
+        if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); switchChat(id); }
+      });
       chatListEl.appendChild(item);
     }
   }
@@ -1505,6 +1594,8 @@
       opts.imageUrls.forEach(url => {
         const img = document.createElement('img');
         img.src = url;
+        img.loading = 'lazy';
+        img.alt = 'Biriktirilgan rasm';
         grid.appendChild(img);
       });
       div.appendChild(grid);
@@ -1514,6 +1605,8 @@
       wrap.className = 'genImageWrap';
       const img = document.createElement('img');
       img.src = opts.generatedImageUrl;
+      img.loading = 'lazy';
+      img.alt = 'Sardor AI tomonidan yaratilgan rasm';
       wrap.appendChild(img);
       div.appendChild(wrap);
     }
@@ -1542,6 +1635,7 @@
       const copyBtn = document.createElement('button');
       copyBtn.textContent = '📋';
       copyBtn.title = 'Nusxalash';
+      copyBtn.setAttribute('aria-label', 'Xabarni nusxalash');
       copyBtn.addEventListener('click', () => {
         navigator.clipboard.writeText(opts.rawText !== undefined ? opts.rawText : text).then(() => {
           showToast('Nusxalandi ✓');
@@ -1553,6 +1647,7 @@
         const speakBtn = document.createElement('button');
         speakBtn.textContent = '🔊';
         speakBtn.title = "Ovoz bilan o'qish";
+        speakBtn.setAttribute('aria-label', "Ovoz bilan o'qish");
         speakBtn.addEventListener('click', () => speak(text));
         actions.appendChild(speakBtn);
       }
@@ -1561,6 +1656,7 @@
         const dlBtn = document.createElement('a');
         dlBtn.textContent = '⬇';
         dlBtn.title = 'Yuklab olish';
+        dlBtn.setAttribute('aria-label', 'Rasmni yuklab olish');
         dlBtn.href = opts.generatedImageUrl;
         dlBtn.download = 'sardor-ai-rasm.png';
         actions.appendChild(dlBtn);
@@ -1568,6 +1664,7 @@
         const copyImgBtn = document.createElement('button');
         copyImgBtn.textContent = '🖼️';
         copyImgBtn.title = 'Rasmni nusxalash';
+        copyImgBtn.setAttribute('aria-label', 'Rasmni nusxalash');
         copyImgBtn.addEventListener('click', async () => {
           try{
             const res = await fetch(opts.generatedImageUrl);
@@ -1585,6 +1682,7 @@
         const regenBtn = document.createElement('button');
         regenBtn.textContent = '🔄';
         regenBtn.title = 'Qayta yaratish';
+        regenBtn.setAttribute('aria-label', 'Javobni qayta yaratish');
         regenBtn.addEventListener('click', opts.onRegenerate);
         actions.appendChild(regenBtn);
       }
@@ -1592,6 +1690,7 @@
         const editBtn = document.createElement('button');
         editBtn.textContent = '✏️';
         editBtn.title = "Tahrirlash va qayta yuborish";
+        editBtn.setAttribute('aria-label', "Xabarni tahrirlash");
         editBtn.addEventListener('click', opts.onEdit);
         actions.appendChild(editBtn);
       }
@@ -1599,12 +1698,14 @@
         const upBtn = document.createElement('button');
         upBtn.textContent = '👍';
         upBtn.className = opts.reaction === 'up' ? 'reacted' : '';
+        upBtn.setAttribute('aria-label', 'Yoqdi');
         upBtn.addEventListener('click', () => {
           if(opts.onReact) opts.onReact(opts.reaction === 'up' ? null : 'up');
         });
         const downBtn = document.createElement('button');
         downBtn.textContent = '👎';
         downBtn.className = opts.reaction === 'down' ? 'reacted' : '';
+        downBtn.setAttribute('aria-label', 'Yoqmadi');
         downBtn.addEventListener('click', () => {
           if(opts.onReact) opts.onReact(opts.reaction === 'down' ? null : 'down');
         });
@@ -1617,6 +1718,7 @@
         pinMsgBtn.textContent = '📌';
         pinMsgBtn.className = opts.pinned ? 'reacted' : '';
         pinMsgBtn.title = opts.pinned ? "Pindan olib tashlash" : "Xabarni pin qilish";
+        pinMsgBtn.setAttribute('aria-label', pinMsgBtn.title);
         pinMsgBtn.addEventListener('click', opts.onPin);
         actions.appendChild(pinMsgBtn);
       }
@@ -1624,6 +1726,7 @@
         const delMsgBtn = document.createElement('button');
         delMsgBtn.textContent = '🗑';
         delMsgBtn.title = "Xabarni o'chirish";
+        delMsgBtn.setAttribute('aria-label', "Xabarni o'chirish");
         delMsgBtn.addEventListener('click', opts.onDelete);
         actions.appendChild(delMsgBtn);
       }
@@ -1899,9 +2002,11 @@
       thumb.className = 'attachThumb';
       const im = document.createElement('img');
       im.src = img.previewUrl;
+      im.alt = 'Biriktirilgan rasm';
       const rm = document.createElement('button');
       rm.className = 'rm';
       rm.textContent = '✕';
+      rm.setAttribute('aria-label', 'Rasmni olib tashlash');
       rm.addEventListener('click', () => {
         pendingImages.splice(idx, 1);
         if(pendingImages.length === 0 && !pendingFile) clearAttachment();
@@ -2300,6 +2405,7 @@
       span.textContent = note;
       const rm = document.createElement('button');
       rm.textContent = '✕';
+      rm.setAttribute('aria-label', 'Eslatmani o\'chirish');
       rm.style.cssText = 'background:transparent;border:none;color:var(--danger);cursor:pointer;';
       rm.addEventListener('click', () => { memoryNotes.splice(idx, 1); persistMemory(); renderMemoryList(); });
       row.appendChild(span);
@@ -2400,6 +2506,7 @@
     PALETTES.forEach((p, idx) => {
       const sw = document.createElement('button');
       sw.title = p.name;
+      sw.setAttribute('aria-label', p.name + ' palettasini tanlash');
       sw.style.cssText = `height:44px;border-radius:10px;cursor:pointer;border:2px solid ${idx===current?'#fff':'transparent'};background:linear-gradient(135deg, ${p.gold}, ${p.turquoise});`;
       sw.addEventListener('click', () => { applyPalette(idx); renderPaletteGrid(); });
       grid.appendChild(sw);
@@ -2463,7 +2570,7 @@
   document.addEventListener('keydown', (e) => {
     if(e.key === 'Escape'){
       if(voiceRoomActive) closeVoiceRoom();
-      aboutOverlay.classList.remove('show');
+      [aboutOverlay, memoryOverlay, statsOverlay, themeOverlay, archiveOverlay].forEach(ov => ov.classList.remove('show'));
     }
   });
 
@@ -2512,6 +2619,102 @@
     localStorage.setItem(FONT_KEY, fontSize);
     applyFontSize();
   });
+
+  // ---------------- Google Login ----------------
+  const GOOGLE_CLIENT_ID = 'SIZNING_GOOGLE_CLIENT_ID'; // Google Console'dan olingan Client ID bilan almashtiring
+  const GOOGLE_LOGIN_URL = BACKEND_BASE + '/api/google-login';
+  const USER_KEY = 'sardorAI_user_v1';
+  const TOKEN_KEY = 'sardorAI_token_v1';
+
+  function getSavedUser(){
+    try{ return JSON.parse(localStorage.getItem(USER_KEY) || 'null'); }catch(e){ return null; }
+  }
+  function saveUser(user, token){
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
+    localStorage.setItem(TOKEN_KEY, token);
+  }
+  function clearUser(){
+    localStorage.removeItem(USER_KEY);
+    localStorage.removeItem(TOKEN_KEY);
+  }
+  function getAuthToken(){
+    return localStorage.getItem(TOKEN_KEY);
+  }
+
+  function renderGoogleLoginWrap(){
+    const wrap = document.getElementById('googleLoginWrap');
+    if(!wrap) return;
+    const user = getSavedUser();
+    wrap.innerHTML = '';
+    if(user){
+      const chip = document.createElement('div');
+      chip.className = 'userChip';
+      const img = document.createElement('img');
+      img.src = user.picture;
+      img.alt = user.name || 'Foydalanuvchi rasmi';
+      img.loading = 'lazy';
+      const span = document.createElement('span');
+      span.textContent = user.name;
+      const logoutBtn = document.createElement('button');
+      logoutBtn.textContent = '✕';
+      logoutBtn.title = 'Chiqish';
+      logoutBtn.setAttribute('aria-label', 'Google hisobdan chiqish');
+      logoutBtn.addEventListener('click', () => {
+        clearUser();
+        renderGoogleLoginWrap();
+        showToast("Tizimdan chiqdingiz");
+      });
+      chip.appendChild(img);
+      chip.appendChild(span);
+      chip.appendChild(logoutBtn);
+      wrap.appendChild(chip);
+    } else {
+      const div = document.createElement('div');
+      div.id = 'g_id_signin_render';
+      wrap.appendChild(div);
+      if(GOOGLE_CLIENT_ID !== 'SIZNING_GOOGLE_CLIENT_ID' && window.google && window.google.accounts){
+        try{
+          window.google.accounts.id.renderButton(div, { theme: 'outline', size: 'medium', type: 'standard' });
+        }catch(e){}
+      }
+    }
+  }
+
+  async function handleGoogleCredential(response){
+    try{
+      const res = await fetch(GOOGLE_LOGIN_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ credential: response.credential })
+      });
+      const data = await res.json();
+      if(data.success){
+        saveUser(data.user, data.token);
+        renderGoogleLoginWrap();
+        showToast("Xush kelibsiz, " + data.user.name + " ✓");
+      } else {
+        showToast("Kirishda xatolik yuz berdi");
+      }
+    }catch(e){
+      showToast("Serverga ulanib bo'lmadi");
+    }
+  }
+
+  function initGoogleLogin(){
+    if(GOOGLE_CLIENT_ID === 'SIZNING_GOOGLE_CLIENT_ID'){
+      // Client ID hali sozlanmagan — login tugmasi ko'rsatilmaydi
+      return;
+    }
+    if(!window.google || !window.google.accounts){
+      setTimeout(initGoogleLogin, 300);
+      return;
+    }
+    window.google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: handleGoogleCredential
+    });
+    renderGoogleLoginWrap();
+  }
 
   // ---------------- Tizim mavzusi initTheme() ichida hisobga olinadi ----------------
 
@@ -2785,6 +2988,10 @@
   autoGrow();
   updateCharCounter();
   applyFontSize();
+  initGoogleLogin();
+  window.addEventListener('error', (e) => {
+    console.error('Sardor AI xatosi:', e.error || e.message);
+  });
   if('serviceWorker' in navigator){
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./service-worker.js').catch(() => {});
