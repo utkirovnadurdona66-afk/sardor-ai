@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sardor-ai-v2';
+const CACHE_NAME = 'sardor-ai-v3';
 
 const CORE_ASSETS = [
   './',
@@ -8,7 +8,8 @@ const CORE_ASSETS = [
 
 const isApiRequest = (url) =>
   url.pathname.includes('/chat') ||
-  url.pathname.includes('/generate-image');
+  url.pathname.includes('/generate-image') ||
+  url.pathname.endsWith('/ads.json');
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
