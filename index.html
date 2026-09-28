@@ -341,6 +341,18 @@
     from{ opacity:0; transform:translateY(10px); }
     to{ opacity:1; transform:translateY(0); }
   }
+
+  /* ---- Reklama ---- */
+  .adBanner{ display:none; margin:0 14px 8px; }
+  .adBanner.show{ display:block; }
+  .adCard{ display:flex; align-items:center; gap:12px; padding:10px 14px; border-radius:14px; text-decoration:none; color:var(--cream); background:rgba(46,158,150,0.10); border:1px dashed rgba(201,162,39,0.45); max-width:82%; box-sizing:border-box; }
+  .adBanner .adCard{ max-width:none; padding:8px 12px; }
+  .adCard img{ width:48px; height:48px; border-radius:10px; object-fit:cover; flex-shrink:0; }
+  .adCard .adBody{ min-width:0; flex:1; }
+  .adCard .adTag{ font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:var(--gold-soft); }
+  .adCard .adTitle{ font-weight:700; font-size:14px; }
+  .adCard .adText{ font-size:12.5px; opacity:.85; }
+  .adCard .adCta{ flex-shrink:0; font-size:12.5px; padding:6px 12px; border-radius:10px; background:var(--gold); color:#111; font-weight:700; }
   .msgRow{
     display:flex;
     flex-direction:column;
@@ -1019,6 +1031,7 @@
       </div>
       <button class="scrollDownBtn" id="scrollDownBtn" title="Pastga tushish" aria-label="Suhbatning pastiga tushish">⬇</button>
     </div>
+    <div class="adBanner" id="adBanner" aria-label="Reklama"></div>
     <div class="attachBar" id="attachBar">
       <div id="attachPreviewSlot"></div>
       <span id="attachLabel"></span>
@@ -1750,6 +1763,77 @@
     return row;
   }
 
+  // ---------------- Reklama tizimi ----------------
+  const AD_EVERY = 1;          // har nechta bot javobidan keyin "Reklama" kartasi chiqadi
+  const AD_CONTACT_URL = '';   // "Reklama bering" havolasi, masalan 'https://t.me/username'
+  const AD_STATS_URL = '';     // ixtiyoriy: ko'rish/bosish statistikasi yuboriladigan manzil (POST)
+  let ADS = [];
+  let adBannerIdx = 0;
+  const adSeen = new Set();
+
+  function adSafeUrl(u){
+    try{ const x = new URL(u, location.href); return (x.protocol === 'https:' || x.protocol === 'http:') ? x.href : ''; }
+    catch(e){ return ''; }
+  }
+  function adTrack(ad, type){
+    if(!AD_STATS_URL) return;
+    try{ navigator.sendBeacon(AD_STATS_URL, JSON.stringify({ id: ad.id || ad.title, type, t: Date.now() })); }catch(e){}
+  }
+  function buildAdEl(ad){
+    const a = document.createElement('a');
+    a.className = 'adCard';
+    a.href = adSafeUrl(ad.url);
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer sponsored';
+    const img = adSafeUrl(ad.image || '');
+    if(img){ const i = document.createElement('img'); i.src = img; i.alt = ''; i.loading = 'lazy'; a.appendChild(i); }
+    const body = document.createElement('div'); body.className = 'adBody';
+    const tag = document.createElement('div'); tag.className = 'adTag'; tag.textContent = 'Reklama';
+    const t = document.createElement('div'); t.className = 'adTitle'; t.textContent = ad.title;
+    body.appendChild(tag); body.appendChild(t);
+    if(ad.text){ const x = document.createElement('div'); x.className = 'adText'; x.textContent = ad.text; body.appendChild(x); }
+    a.appendChild(body);
+    const cta = document.createElement('span'); cta.className = 'adCta'; cta.textContent = ad.cta || 'Ochish';
+    a.appendChild(cta);
+    a.addEventListener('click', () => adTrack(ad, 'click'));
+    return a;
+  }
+  function renderAdBanner(){
+    const box = document.getElementById('adBanner');
+    if(!box) return;
+    box.innerHTML = '';
+    if(!ADS.length){ box.classList.remove('show'); return; }
+    const ad = ADS[adBannerIdx % ADS.length];
+    box.appendChild(buildAdEl(ad));
+    box.classList.add('show');
+    const key = 'b:' + adBannerIdx;
+    if(!adSeen.has(key)){ adSeen.add(key); adTrack(ad, 'view'); }
+  }
+  function adAfterBotMessage(botSeen, idx){
+    if(!ADS.length || botSeen % AD_EVERY !== 0) return;
+    const ad = ADS[(botSeen / AD_EVERY - 1) % ADS.length];
+    const row = document.createElement('div');
+    row.className = 'msgRow bot adRow';
+    row.appendChild(buildAdEl(ad));
+    messagesEl.insertBefore(row, scrollDownBtn);
+    const key = 'f:' + activeId + ':' + idx;
+    if(!adSeen.has(key)){ adSeen.add(key); adTrack(ad, 'view'); }
+  }
+  async function loadAds(){
+    let list = [];
+    try{
+      const r = await fetch('./ads.json');
+      const d = await r.json();
+      list = (Array.isArray(d) ? d : []).filter(a => a && a.active !== false && a.title && adSafeUrl(a.url));
+    }catch(e){}
+    if(!list.length && AD_CONTACT_URL){
+      list = [{ id: 'house', title: "Bu yerda sizning reklamangiz bo'lishi mumkin", text: "Biznesingizni Sardor AI foydalanuvchilariga ko'rsating.", url: AD_CONTACT_URL, cta: "Bog'lanish" }];
+    }
+    ADS = list;
+    renderAdBanner();
+    renderMessages();
+  }
+
   function renderMessages(){
     messagesEl.querySelectorAll('.msgRow, .empty').forEach(el => el.remove());
     const chat = chats[activeId];
@@ -1771,6 +1855,7 @@
     }
     let lastUserIdx = -1;
     chat.messages.forEach((m, i) => { if(m.role === 'user') lastUserIdx = i; });
+    let botSeen = 0;
     chat.messages.forEach((m, idx) => {
       let imageUrls = [];
       if(Array.isArray(m.images)) imageUrls = m.images.map(i => i.previewUrl).filter(Boolean);
@@ -1804,6 +1889,7 @@
         });
         messagesEl.insertBefore(chips, scrollDownBtn);
       }
+      if(role === 'bot' && m.content){ botSeen++; adAfterBotMessage(botSeen, idx); }
     });
     messagesEl.scrollTop = messagesEl.scrollHeight;
     applyFontSize();
@@ -2787,6 +2873,8 @@
     if(chat.messages.length === 0) autoTitleChat(chat, text || (attach ? (attach.name || 'Rasmlar') : (loc ? 'Joylashuv' : 'Yangi suhbat')));
 
     chat.messages.push(userMsg);
+    adBannerIdx++;
+    renderAdBanner();
     persist();
     renderChatList();
     renderMessages();
@@ -2989,6 +3077,7 @@
   updateCharCounter();
   applyFontSize();
   initGoogleLogin();
+  loadAds();
   window.addEventListener('error', (e) => {
     console.error('Sardor AI xatosi:', e.error || e.message);
   });
