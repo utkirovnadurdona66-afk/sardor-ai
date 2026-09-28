@@ -1,0 +1,11 @@
+[
+  {
+    "id": "namuna-1",
+    "active": false,
+    "title": "Do'koningiz nomi",
+    "text": "Qisqa reklama matni (ixtiyoriy)",
+    "url": "https://t.me/username",
+    "image": "https://example.com/logo.png",
+    "cta": "Ochish"
+  }
+]
