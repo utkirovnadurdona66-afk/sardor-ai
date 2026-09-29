@@ -342,6 +342,62 @@
     to{ opacity:1; transform:translateY(0); }
   }
 
+
+  /* ---- To'liq ekranli (interstitial) reklama ---- */
+  .interstitialOverlay{
+    position:fixed; inset:0;
+    background:rgba(10,15,29,0.88);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:120;
+    padding:20px;
+    animation: riseIn 0.2s ease;
+  }
+  .interstitialOverlay.show{ display:flex; }
+  .interstitialBox{
+    position:relative;
+    background:var(--lapis-dark);
+    border:1px solid rgba(201,162,39,0.5);
+    border-radius:18px;
+    padding:28px 24px 22px;
+    max-width:380px;
+    width:100%;
+    text-align:center;
+  }
+  .interstitialBox .adTagBig{
+    font-size:10.5px; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--gold-soft); margin-bottom:10px; display:block;
+  }
+  .interstitialBox img{
+    width:88px; height:88px; border-radius:16px; object-fit:cover;
+    margin:0 auto 14px; display:block; border:1px solid rgba(201,162,39,0.4);
+  }
+  .interstitialBox .adTitleBig{ font-family:'Cormorant Garamond',serif; font-weight:700; font-size:22px; color:var(--cream); margin-bottom:6px; }
+  .interstitialBox .adTextBig{ font-size:13.5px; color:var(--turquoise-light); opacity:.9; margin-bottom:18px; }
+  .interstitialBox .adCtaBig{
+    display:inline-block; padding:10px 26px; border-radius:12px;
+    background:var(--gold); color:#111; font-weight:700; font-size:14.5px;
+    text-decoration:none; cursor:pointer;
+  }
+  .interstitialClose{
+    position:absolute; top:12px; right:14px;
+    width:32px; height:32px; border-radius:50%;
+    background:rgba(245,238,220,0.08);
+    border:1px solid rgba(201,162,39,0.4);
+    color:var(--gold-soft);
+    font-size:14px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .interstitialClose:disabled{ opacity:0.45; cursor:default; }
+  .interstitialCountdown{
+    position:absolute; top:10px; right:14px;
+    width:32px; height:32px; border-radius:50%;
+    background:rgba(245,238,220,0.08);
+    border:1px solid rgba(201,162,39,0.4);
+    color:var(--gold-soft);
+    font-size:13px; display:flex; align-items:center; justify-content:center;
+  }
   /* ---- Reklama ---- */
   .adBanner{ display:none; margin:0 14px 8px; }
   .adBanner.show{ display:block; }
@@ -1149,6 +1205,10 @@
   </div>
 </div>
 
+<div class="interstitialOverlay" id="interstitialOverlay" role="dialog" aria-modal="true" aria-label="Reklama">
+  <div class="interstitialBox" id="interstitialBox"></div>
+</div>
+
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -1861,6 +1921,99 @@
     renderMessages();
   }
 
+  // ---------------- To'satdan chiqadigan (interstitial) reklama ----------------
+  const INTERSTITIAL_EVERY = 4;      // har nechta bot javobidan keyin to'liq ekranli reklama chiqadi
+  const INTERSTITIAL_SKIP_AFTER = 5; // shuncha soniyadan keyin "Yopish" tugmasi bosiladigan bo'ladi
+  let interstitialShownCount = 0;
+  let interstitialTimer = null;
+
+  function buildInterstitialContent(ad){
+    const box = document.getElementById('interstitialBox');
+    box.innerHTML = '';
+
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'interstitialClose';
+    closeBtn.textContent = '✕';
+    closeBtn.setAttribute('aria-label', "Reklamani yopish");
+    closeBtn.disabled = true;
+
+    const countdownEl = document.createElement('div');
+    countdownEl.className = 'interstitialCountdown';
+    countdownEl.textContent = String(INTERSTITIAL_SKIP_AFTER);
+
+    const tag = document.createElement('span');
+    tag.className = 'adTagBig';
+    tag.textContent = 'Reklama';
+
+    const img = adSafeUrl(ad.image || '');
+    let imgEl = null;
+    if(img){ imgEl = document.createElement('img'); imgEl.src = img; imgEl.alt = ''; }
+
+    const title = document.createElement('div');
+    title.className = 'adTitleBig';
+    title.textContent = ad.title;
+
+    const text = document.createElement('div');
+    text.className = 'adTextBig';
+    text.textContent = ad.text || '';
+
+    const cta = document.createElement('a');
+    cta.className = 'adCtaBig';
+    cta.href = adSafeUrl(ad.url);
+    cta.target = '_blank';
+    cta.rel = 'noopener noreferrer sponsored';
+    cta.textContent = ad.cta || 'Ko\'rish';
+    cta.addEventListener('click', () => adTrack(ad, 'click'));
+
+    box.appendChild(closeBtn);
+    box.appendChild(countdownEl);
+    box.appendChild(tag);
+    if(imgEl) box.appendChild(imgEl);
+    box.appendChild(title);
+    if(ad.text) box.appendChild(text);
+    box.appendChild(cta);
+
+    return { closeBtn, countdownEl };
+  }
+
+  function showInterstitialAd(){
+    if(!ADS.length) return;
+    const overlay = document.getElementById('interstitialOverlay');
+    const ad = ADS[interstitialShownCount % ADS.length];
+    const { closeBtn, countdownEl } = buildInterstitialContent(ad);
+    overlay.classList.add('show');
+
+    let remaining = INTERSTITIAL_SKIP_AFTER;
+    const key = 'i:' + activeId + ':' + interstitialShownCount + ':' + (ad.id || ad.title);
+    let viewCounted = false;
+
+    clearInterval(interstitialTimer);
+    interstitialTimer = setInterval(() => {
+      if(document.visibilityState !== 'visible'){ return; } // fonda bo'lsa hisoblamaymiz
+      remaining -= 1;
+      countdownEl.textContent = String(Math.max(remaining, 0));
+      if(remaining <= 0){
+        clearInterval(interstitialTimer);
+        countdownEl.style.display = 'none';
+        closeBtn.disabled = false;
+        if(!viewCounted){ viewCounted = true; adTrack(ad, 'view'); }
+      }
+    }, 1000);
+
+    const close = () => {
+      clearInterval(interstitialTimer);
+      overlay.classList.remove('show');
+      closeBtn.removeEventListener('click', close);
+    };
+    closeBtn.addEventListener('click', close);
+  }
+
+  function maybeShowInterstitial(botSeen){
+    if(!ADS.length || botSeen % INTERSTITIAL_EVERY !== 0) return;
+    interstitialShownCount++;
+    showInterstitialAd();
+  }
+
   function renderMessages(){
     messagesEl.querySelectorAll('.msgRow, .empty').forEach(el => el.remove());
     const chat = chats[activeId];
@@ -1916,7 +2069,14 @@
         });
         messagesEl.insertBefore(chips, scrollDownBtn);
       }
-      if(role === 'bot' && m.content){ botSeen++; adAfterBotMessage(botSeen, idx); }
+      if(role === 'bot' && m.content){
+        botSeen++;
+        adAfterBotMessage(botSeen, idx);
+        if(idx === chat.messages.length - 1 && !sending && !m._interstitialShown){
+          m._interstitialShown = true;
+          maybeShowInterstitial(botSeen);
+        }
+      }
     });
     messagesEl.scrollTop = messagesEl.scrollHeight;
     applyFontSize();
@@ -2684,6 +2844,7 @@
     if(e.key === 'Escape'){
       if(voiceRoomActive) closeVoiceRoom();
       [aboutOverlay, memoryOverlay, statsOverlay, themeOverlay, archiveOverlay].forEach(ov => ov.classList.remove('show'));
+      // interstitialOverlay Esc bilan yopilmaydi — faqat taymer tugagach yopish tugmasi orqali (reklama shartnomasi talabi)
     }
   });
 
