@@ -1767,6 +1767,7 @@
   const AD_EVERY = 1;          // har nechta bot javobidan keyin "Reklama" kartasi chiqadi
   const AD_CONTACT_URL = '';   // "Reklama bering" havolasi, masalan 'https://t.me/username'
   const AD_STATS_URL = '';     // ixtiyoriy: ko'rish/bosish statistikasi yuboriladigan manzil (POST)
+  const AD_MIN_VIEW_MS = 7000;  // shartnoma bo'yicha: reklama kamida shuncha millisekund (7000=7s) ko'rinib tursagina 1 marta "ko'rildi" deb sanaladi
   let ADS = [];
   let adBannerIdx = 0;
   const adSeen = new Set();
@@ -1798,26 +1799,52 @@
     a.addEventListener('click', () => adTrack(ad, 'click'));
     return a;
   }
+  // Reklama kamida AD_MIN_VIEW_MS davomida uzluksiz ekranda ko'ringandagina "view" hisoblanadi.
+  // Sahifa fondа (boshqa tab) bo'lsa yoki elementdan chiqib ketsa, taymer to'xtaydi va qaytadan boshlanadi.
+  function trackDwellView(el, ad, key){
+    if(adSeen.has(key)) return;
+    let timer = null;
+    const clear = () => { if(timer){ clearTimeout(timer); timer = null; } };
+    const arm = () => {
+      clear();
+      timer = setTimeout(() => {
+        if(adSeen.has(key)) return;
+        adSeen.add(key);
+        adTrack(ad, 'view');
+        io.disconnect();
+      }, AD_MIN_VIEW_MS);
+    };
+    const io = new IntersectionObserver((entries) => {
+      const visible = entries[0].isIntersecting && document.visibilityState === 'visible';
+      if(visible) arm(); else clear();
+    }, { threshold: 0.6 });
+    io.observe(el);
+    document.addEventListener('visibilitychange', () => {
+      if(document.visibilityState !== 'visible') clear();
+    });
+  }
   function renderAdBanner(){
     const box = document.getElementById('adBanner');
     if(!box) return;
     box.innerHTML = '';
     if(!ADS.length){ box.classList.remove('show'); return; }
     const ad = ADS[adBannerIdx % ADS.length];
-    box.appendChild(buildAdEl(ad));
+    const el = buildAdEl(ad);
+    box.appendChild(el);
     box.classList.add('show');
     const key = 'b:' + adBannerIdx;
-    if(!adSeen.has(key)){ adSeen.add(key); adTrack(ad, 'view'); }
+    trackDwellView(el, ad, key);
   }
   function adAfterBotMessage(botSeen, idx){
     if(!ADS.length || botSeen % AD_EVERY !== 0) return;
     const ad = ADS[(botSeen / AD_EVERY - 1) % ADS.length];
     const row = document.createElement('div');
     row.className = 'msgRow bot adRow';
-    row.appendChild(buildAdEl(ad));
+    const el = buildAdEl(ad);
+    row.appendChild(el);
     messagesEl.insertBefore(row, scrollDownBtn);
     const key = 'f:' + activeId + ':' + idx;
-    if(!adSeen.has(key)){ adSeen.add(key); adTrack(ad, 'view'); }
+    trackDwellView(el, ad, key);
   }
   async function loadAds(){
     let list = [];
