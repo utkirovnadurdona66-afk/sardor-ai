@@ -2,8 +2,8 @@
   {
     "id": "reklama-1",
     "active": true,
-    "title": "Bu yerda reklamangiz",
-    "text": "Mahsulot yoki xizmatingiz haqida qisqa matn",
+    "title": "Do'koningiz nomi",
+    "text": "Mahsulot yoki xizmatingiz haqida qisqa va jozibali matn",
     "url": "https://t.me/username",
     "image": "",
     "cta": "Ko'rish"
@@ -11,10 +11,19 @@
   {
     "id": "reklama-2",
     "active": false,
-    "title": "Ikkinchi reklama (hozircha o'chiq)",
-    "text": "Kerak bo'lganda active: true qiling",
+    "title": "Ikkinchi reklama nomi",
+    "text": "Ikkinchi reklama matni",
     "url": "https://example.com",
     "image": "",
     "cta": "Ochish"
+  },
+  {
+    "id": "reklama-3",
+    "active": false,
+    "title": "Uchinchi reklama nomi",
+    "text": "Uchinchi reklama matni",
+    "url": "https://example.com",
+    "image": "",
+    "cta": "Buyurtma berish"
   }
 ]
