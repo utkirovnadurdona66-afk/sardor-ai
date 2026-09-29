@@ -1,0 +1,20 @@
+[
+  {
+    "id": "reklama-1",
+    "active": true,
+    "title": "Bu yerda reklamangiz",
+    "text": "Mahsulot yoki xizmatingiz haqida qisqa matn",
+    "url": "https://t.me/username",
+    "image": "",
+    "cta": "Ko'rish"
+  },
+  {
+    "id": "reklama-2",
+    "active": false,
+    "title": "Ikkinchi reklama (hozircha o'chiq)",
+    "text": "Kerak bo'lganda active: true qiling",
+    "url": "https://example.com",
+    "image": "",
+    "cta": "Ochish"
+  }
+]
